@@ -81,7 +81,7 @@ mybatis-plus:
 
   # 說明:typeAliases-package: 設定別名掃描包,通常用於掃描單表的實體類,但因繼承BaseMapper這很少用
   # 以這個範例項目為例,他應該是這個包下,預設所有實體類的類名(不區分大小寫)為別名
-  typeAliasesPackage: tw.org.topbs.pojo.entity
+  typeAliasesPackage: tw.com.zf_occupational_safety_platform.pojo.entity
   # 配置設定
   configuration:
     # 配置輸出日誌-方便查看SQL語句
@@ -166,20 +166,20 @@ springdoc:
     - group: 'all'
       paths-to-match: '/**'
       # 掃描包  tw.org.organ
-      packages-to-scan: tw.org.topbs
+      packages-to-scan: tw.com.zf_occupational_safety_platform
 
       #  文檔群組名為owner, 表示這個是給Member用戶使用的API
     - group: 'owner'
       paths-to-match: '/*/owner/**'
       # 掃描包  tw.org.organ
-      packages-to-scan: tw.org.topbs
+      packages-to-scan: tw.com.zf_occupational_safety_platform
 
       #  文檔群組名為admin, 表示這個是給管理者使用的，具有權限的狀態下,拿table Id 可以訪問所有數據
     - group: 'admin'
       # 這邊注意我是使用exclude 對某個路徑進行排除
       paths-to-exclude: '/*/owner/**'
       # 掃描包  tw.org.organ
-      packages-to-scan: tw.org.topbs
+      packages-to-scan: tw.com.zf_occupational_safety_platform
 
 
 #      #  以下為多個model的Controller層文檔分層,有需要再開啟
