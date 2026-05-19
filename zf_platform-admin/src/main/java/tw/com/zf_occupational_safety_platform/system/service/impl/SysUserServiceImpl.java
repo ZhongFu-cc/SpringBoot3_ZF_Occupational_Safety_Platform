@@ -58,7 +58,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		SysUser sysUser = baseMapper.selectById(id);
 
 		// 調用Service層私有方法,來獲取需要組裝的SysUserVO
-		SysUserVO sysUserVO = getSysUserVO(sysUser);
+		SysUserVO sysUserVO = buildUserPermissions(sysUser);
 
 		// 返回組裝過的SysUserVO
 		return sysUserVO;
@@ -75,7 +75,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		for (SysUser sysUser : sysUserList) {
 
 			// 調用Service層私有方法,來獲取需要組裝的SysUserVO
-			SysUserVO sysUserVO = getSysUserVO(sysUser);
+			SysUserVO sysUserVO = buildUserPermissions(sysUser);
 
 			// 組裝完畢放入List中
 			sysUserVOList.add(sysUserVO);
@@ -108,13 +108,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 		// 判斷帳號密碼
 		LambdaQueryWrapper<SysUser> loginQueryWrapper = new LambdaQueryWrapper<>();
-		loginQueryWrapper.eq(SysUser::getEmail, loginInfo.getEmail()).eq(SysUser::getPassword, loginInfo.getPassword());
+		loginQueryWrapper.eq(SysUser::getAccount, loginInfo.getAccount()).eq(SysUser::getPassword, loginInfo.getPassword());
 
 		// 獲取用戶資料
 		SysUser sysUser = baseMapper.selectOne(loginQueryWrapper);
 
 		// 調用Service層私有方法,來獲取需要組裝的SysUserVO
-		SysUserVO sysUserVO = getSysUserVO(sysUser);
+		SysUserVO sysUserVO = buildUserPermissions(sysUser);
 
 		// 透過userId做登入
 		StpUtil.login(sysUserVO.getSysUserId());
@@ -144,104 +144,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
 	}
 
-	// 以下為Service層,各個function同樣會使用的私有方法
-	private SysUserVO getSysUserVO(SysUser sysUser) {
-
-		// VO對象,填充用戶資訊
-		SysUserVO sysUserVO = sysUserConvert.entityToVO(sysUser);
-
-		// 創建Lmabda選擇器，從用戶-角色表中,根據用戶Id找到他所擁有的角色ID
-		LambdaQueryWrapper<SysUserRole> sysUserRoleWrapper = new LambdaQueryWrapper<>();
-		sysUserRoleWrapper.eq(SysUserRole::getSysUserId, sysUser.getSysUserId());
-
-		// 透過選擇器找到用戶對應的角色ID,透過stream拿到純數字的數組
-		List<SysUserRole> sysUserRoleList = sysUserRoleMapper.selectList(sysUserRoleWrapper);
-		List<Long> roleIdList = sysUserRoleList.stream().map(SysUserRole::getSysRoleId).collect(Collectors.toList());
-
-		// 創建Lmabda選擇器，從角色表中查詢包含角色Id列表中的所有角色資訊
-		LambdaQueryWrapper<SysRole> sysRoleWrapper = new LambdaQueryWrapper<>();
-		sysRoleWrapper.in(SysRole::getSysRoleId, roleIdList);
-
-		// 透過選擇器找到擁有的角色列表,透過stream拿到純文字的角色權限標示符數組
-		List<SysRole> sysRoleList = sysRoleMapper.selectList(sysRoleWrapper);
-		List<String> roleList = sysRoleList.stream().map(SysRole::getRoleKey).collect(Collectors.toList());
-
-		// VO對象,填充用戶所擁有的角色
-		sysUserVO.setRoleList(roleList);
-
-		// 創建Lmabda選擇器，從角色-菜單表中查詢包含角色ID列表中的所有菜單資訊
-		LambdaQueryWrapper<SysRoleMenu> sysRoleMenuWrapper = new LambdaQueryWrapper<>();
-		sysRoleMenuWrapper.in(!roleIdList.isEmpty(), SysRoleMenu::getSysRoleId, roleIdList);
-
-		// 透過選擇器找到角色擁有的菜單列表,透過stream拿到純文字的菜單ID List
-		List<SysRoleMenu> sysRoleMenuList = sysRoleMenuMapper.selectList(sysRoleMenuWrapper);
-		List<Long> menuIdList = sysRoleMenuList.stream().map(SysRoleMenu::getSysMenuId).collect(Collectors.toList());
-
-		// 創建Lmabda選擇器，從菜單表中查詢包含菜單ID列表中的所有菜單資訊
-		LambdaQueryWrapper<SysMenu> sysMenuWrapper = new LambdaQueryWrapper<>();
-		sysMenuWrapper.in(!menuIdList.isEmpty(), SysMenu::getSysMenuId, menuIdList);
-
-		// 獲取角色們所擁有菜單權限
-		List<SysMenu> sysMenuList = sysMenuMapper.selectList(sysMenuWrapper);
-
-		// 獲取權限列表
-		List<String> permissionList = sysMenuList.stream()
-				.filter(menu -> menu.getPermission() != null && !menu.getPermission().isEmpty())
-				.map(SysMenu::getPermission).collect(Collectors.toList());
-
-		// VO對象,填充用戶所擁有的權限
-		sysUserVO.setPermissionList(permissionList);
-
-		// 使用Menu資料組裝user的路由
-		ArrayList<RouteBO> allRouteList = new ArrayList<>();
-
-		// 遍歷Menu先取得全部的路由
-		for (SysMenu sysMenu : sysMenuList) {
-			// 當Menu的類型不為F , function級別時,代表他是M(Menu菜單), 或者C(Core核心頁面)
-			if (!sysMenu.getMenuType().equals("F")) {
-
-				// sysMenu轉換成BO對象, 用於組裝返回前端的路由對象
-				RouteBO route = sysMenuConvert.entityToBO(sysMenu);
-
-				// 將每個路由對象添加到List, 成為一個路由數組ArrayList<RouteBO>
-				allRouteList.add(route);
-			}
-		}
-
-		// 使用递归组装父子路由
-		List<RouteBO> routeVO = new ArrayList<>();
-		for (RouteBO route : allRouteList) {
-			// 當這個路由的parentId為0 那麼他是最頂層的路由
-			if (route.getParentId() == 0) {
-
-				assembleRoutes(route, allRouteList);
-				// 裝進返回給前端的路由中
-				routeVO.add(route);
-			}
-		}
-
-		// 將組裝後的父子路由放路sysUserVO
-		sysUserVO.setRouteList(routeVO);
-
-		return sysUserVO;
-	}
-
-	/**
-	 * 遞歸function 用來重新組裝成父子路由的
-	 * 
-	 * @param parent 當前路由
-	 * @param routes 所有路由List
-	 */
-	private void assembleRoutes(RouteBO parent, List<RouteBO> routes) {
-		for (RouteBO route : routes) {
-			if (route.getParentId() == parent.getMenuId()) {
-				// 遞歸執行assembleRoutes , 確保子路由都已经被正确地组装到了当前路由对象中
-				assembleRoutes(route, routes);
-				parent.addChild(route);
-			}
-		}
-	}
-
+	
 	@Override
 	public SysUserVO getUserInfo() {
 

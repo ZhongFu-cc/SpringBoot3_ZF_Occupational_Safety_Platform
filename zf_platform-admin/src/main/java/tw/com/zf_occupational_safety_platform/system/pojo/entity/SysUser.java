@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
+import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 
 /**
  * <p>
@@ -31,6 +32,10 @@ public class SysUser implements Serializable {
 
 	@TableId("sys_user_id")
 	private Long sysUserId;
+	
+	@Schema(description = "父級ID")
+	@TableField("parent_id")
+	private Long parentId;
 
 	@Schema(description = "帳號")
 	@TableField("account")
@@ -44,10 +49,6 @@ public class SysUser implements Serializable {
 	@TableField("real_name")
 	private String realName;
 
-	@Schema(description = "英文姓名(暱稱)")
-	@TableField("nick_name")
-	private String nickName;
-
 	@Schema(description = "信箱")
 	@TableField("email")
 	private String email;
@@ -55,10 +56,14 @@ public class SysUser implements Serializable {
 	@Schema(description = "電話號碼")
 	@TableField("phone")
 	private String phone;
+	
+	@Schema(description = "公司名稱")
+	@TableField("company_name")
+	private String companyName;
 
-	@Schema(description = "預設為0 啟用, 設置為1 禁用")
-	@TableField("status")
-	private Integer status;
+	@Schema(description = "是否啟用;0=否,1=是")
+	@TableField("is_active")
+	private CommonStatusEnum isActive;
 
 	@Schema(description = "備註,通常寫這個使用者的主要角色")
 	@TableField("remark")

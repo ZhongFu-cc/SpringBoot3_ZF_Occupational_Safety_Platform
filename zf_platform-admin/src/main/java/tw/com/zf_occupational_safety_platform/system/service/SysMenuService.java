@@ -1,5 +1,8 @@
 package tw.com.zf_occupational_safety_platform.system.service;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysMenu;
@@ -14,6 +17,12 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysMenu;
  */
 public interface SysMenuService extends IService<SysMenu> {
 
-	
-	
+	/**
+	 * 透過ids 查詢菜單/權限列表
+	 * 
+	 * @param sysMenuIds
+	 * @return
+	 */
+	List<SysMenu> findBySysMenus(Collection<Long> menuIds);
+
 }

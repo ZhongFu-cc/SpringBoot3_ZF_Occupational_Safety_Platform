@@ -1,5 +1,8 @@
 package tw.com.zf_occupational_safety_platform.system.service;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysRoleMenu;
@@ -14,4 +17,12 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysRoleMenu;
  */
 public interface SysRoleMenuService extends IService<SysRoleMenu> {
 
+	/**
+	 * 根據角色Ids，查詢持有選單及權限
+	 * 
+	 * @param sysRoleIds
+	 * @return
+	 */
+	List<SysRoleMenu> findBySysRoles(Collection<Long> sysRoleIds);
+	
 }

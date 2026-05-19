@@ -21,7 +21,9 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.system.manager.SystemManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.LoginInfo;
+import tw.com.zf_occupational_safety_platform.system.pojo.DTO.addUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.service.SysUserService;
 import tw.com.zf_occupational_safety_platform.utils.R;
@@ -34,13 +36,15 @@ import tw.com.zf_occupational_safety_platform.utils.R;
  * @author Joey
  * @since 2024-05-10
  */
-@Tag(name = "後台管理者API")
+@Tag(name = "後台用戶API")
 @Validated
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/sys-user")
 public class SysUserController {
 
+	private final SystemManager systemManager;
+	
 	private final SysUserService sysUserService;
 
 	/**
@@ -75,22 +79,22 @@ public class SysUserController {
 		return R.ok(userList);
 	}
 
-//	/**
-//	 * 新增User 後台管理者 待更新
-//	 * 
-//	 * @param user
-//	 * @return
-//	 */
-//	@Operation(summary = "新增後台管理者")
-//	@Parameters({
-//			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-//	@SaCheckRole("super-admin")
-//	@PostMapping
-//	public R<Void> saveUser(@RequestBody UserDTO userDTO) {
-//		// 待更新
-//		sysUserService.insertSysUser();
-//		return R.ok();
-//	}
+	/**
+	 * 新增User 後台管理者 待更新
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@Operation(summary = "新增使用者")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("super-admin")
+	@PostMapping
+	public R<Void> saveUser(@RequestBody addUserDTO addUserDTO) {
+		// 待更新
+		sysUserService.insertSysUser();
+		return R.ok();
+	}
 
 	/**
 	 * 根據實體類User 更新後台管理者 待更新

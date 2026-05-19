@@ -1,8 +1,13 @@
 package tw.com.zf_occupational_safety_platform.system.mapper;
 
+import java.util.Collection;
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysMenu;
+import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysRole;
 
 /**
  * <p>
@@ -14,4 +19,16 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysMenu;
  */
 public interface SysMenuMapper extends BaseMapper<SysMenu> {
 
+	/**
+	 * 根據Ids查詢列表
+	 * 
+	 * @param ids
+	 * @return
+	 */
+	default List<SysMenu> selectByIds(Collection<Long> ids) {
+		LambdaQueryWrapper<SysMenu> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(SysMenu::getSysMenuId, ids);
+		return this.selectList(queryWrapper);
+	}
+	
 }

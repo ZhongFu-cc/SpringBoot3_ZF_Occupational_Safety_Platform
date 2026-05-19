@@ -47,7 +47,7 @@ public class MybatisPlusMetaObjectHander implements MetaObjectHandler {
 					// this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class,
 					// LocalDateTime.now());
 					this.strictInsertFill(metaObject, "createDate", LocalDateTime.class, LocalDateTime.now());
-					this.strictInsertFill(metaObject, "createBy", String.class, sysUserVO.getNickName());
+					this.strictInsertFill(metaObject, "createBy", String.class, sysUserVO.getRealName());
 
 				}
 			} else {
@@ -89,7 +89,7 @@ public class MybatisPlusMetaObjectHander implements MetaObjectHandler {
 
 					//				log.info("開始更新填充...");
 					this.strictUpdateFill(metaObject, "updateDate", LocalDateTime.class, LocalDateTime.now());
-					this.strictUpdateFill(metaObject, "updateBy", String.class, sysUserVO.getNickName());
+					this.strictUpdateFill(metaObject, "updateBy", String.class, sysUserVO.getRealName());
 
 				}
 			} else {

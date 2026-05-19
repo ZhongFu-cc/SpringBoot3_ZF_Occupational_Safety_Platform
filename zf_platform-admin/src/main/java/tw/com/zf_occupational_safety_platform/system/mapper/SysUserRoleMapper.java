@@ -1,5 +1,8 @@
 package tw.com.zf_occupational_safety_platform.system.mapper;
 
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUserRole;
@@ -13,5 +16,17 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUserRole;
  * @since 2024-05-10
  */
 public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {
+
+	/**
+	 * 根據用戶Id查詢他所擁有的角色ID
+	 * 
+	 * @param sysUserId
+	 * @return
+	 */
+	default List<SysUserRole> selectBySysUserId(Long sysUserId) {
+		LambdaQueryWrapper<SysUserRole> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysUserRole::getSysUserId, sysUserId);
+		return this.selectList(queryWrapper);
+	}
 
 }

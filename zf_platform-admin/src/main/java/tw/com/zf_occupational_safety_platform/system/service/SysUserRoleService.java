@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.system.service;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUserRole;
@@ -13,5 +15,13 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUserRole;
  * @since 2024-05-10
  */
 public interface SysUserRoleService extends IService<SysUserRole> {
+
+	/**
+	 * 根據使用者ID查詢持有角色
+	 * 
+	 * @param sysUserId
+	 * @return
+	 */
+	List<SysUserRole> findBySysUser(Long sysUserId);
 
 }

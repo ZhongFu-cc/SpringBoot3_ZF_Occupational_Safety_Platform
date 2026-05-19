@@ -1,5 +1,9 @@
 package tw.com.zf_occupational_safety_platform.system.service.impl;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -18,5 +22,13 @@ import tw.com.zf_occupational_safety_platform.system.service.SysRoleService;
  */
 @Service
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
+
+	@Override
+	public List<SysRole> findBySysRoles(Collection<Long> roleIds) {
+		if (roleIds != null && roleIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByIds(roleIds);
+	}
 
 }

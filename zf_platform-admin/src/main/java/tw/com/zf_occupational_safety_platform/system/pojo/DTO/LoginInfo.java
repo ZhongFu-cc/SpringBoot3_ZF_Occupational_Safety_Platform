@@ -1,6 +1,5 @@
 package tw.com.zf_occupational_safety_platform.system.pojo.DTO;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -12,8 +11,7 @@ import lombok.Data;
 public class LoginInfo {
 
 	@NotBlank 
-	@Email
-	private String email;
+	private String account;
 	
 	@NotBlank
 	private String password;
