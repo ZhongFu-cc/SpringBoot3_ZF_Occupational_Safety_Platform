@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 @EnableScheduling
 @SpringBootApplication
-public class Topbs2026Application {
+public class ZF_PlatformApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(Topbs2026Application.class, args);
+		SpringApplication.run(ZF_PlatformApplication.class, args);
 	}
 }
