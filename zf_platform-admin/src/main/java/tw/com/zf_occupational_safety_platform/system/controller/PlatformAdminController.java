@@ -1,0 +1,131 @@
+package tw.com.zf_occupational_safety_platform.system.controller;
+
+import java.util.List;
+
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import cn.dev33.satoken.annotation.SaCheckRole;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
+import tw.com.zf_occupational_safety_platform.system.manager.PlatformAdminManager;
+import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
+import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
+import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
+import tw.com.zf_occupational_safety_platform.system.service.SysUserService;
+import tw.com.zf_occupational_safety_platform.utils.R;
+
+/**
+ * <p>
+ * 用戶表 - 用戶-平台管理者 前端控制器
+ * </p>
+ *
+ * @author Joey
+ * @since 2024-05-10
+ */
+@Tag(name = "用戶-平台管理者 API")
+@Validated
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/system/admin")
+public class PlatformAdminController {
+
+	private final AuthManager authManager;
+	private final PlatformAdminManager platformAdminManager;
+	private final SysUserService sysUserService;
+
+	/**
+	 * 根據ID查詢User 後台管理者
+	 * 
+	 * @param id
+	 * @return User
+	 */
+	@Operation(summary = "根據ID查詢使用者資料")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("super-admin")
+	@GetMapping("{id}")
+	public R<SysUser> getUser(@PathVariable("id") Long id) {
+		SysUser sysUser = sysUserService.get(id);
+		return R.ok(sysUser);
+	}
+
+	@GetMapping("slave/pagination")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢直系的slave使用者 (企業管理者)")
+	@SaCheckRole("super-admin")
+	public R<List<SysUser>> findSlaveUser(@RequestParam Integer page, @RequestParam Integer size) {
+		SysUserVO userInfo = authManager.getUserInfo();
+
+		return null;
+	}
+
+	/**
+	 * 新增使用者 (企業管理者)
+	 * 
+	 * @param addUserDTO
+	 * @return
+	 */
+	@Operation(summary = "新增使用者 (企業管理者)")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("super-admin")
+	@PostMapping
+	public R<Void> saveUser(@RequestBody @Valid AddSysUserDTO addUserDTO) {
+
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		platformAdminManager.createCompanyUser(addUserDTO, sysUserVO);
+		return R.ok();
+	}
+
+	/**
+	 * 更新使用者 (企業管理者)
+	 * 
+	 * @param user
+	 * @return
+	 */
+	@Operation(summary = "更新使用者 (企業管理者)")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("super-admin")
+	@PutMapping
+	public R<Void> updateUser(@RequestBody @Valid PutSysUserDTO putSysUserDTO) {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		platformAdminManager.updateCompanyUser(putSysUserDTO, sysUserVO);
+		return R.ok();
+	}
+
+	/**
+	 * 根據ID移除User 使用者
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@Operation(summary = "根據ID刪除使用者 (企業管理者)")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
+	@SaCheckRole("super-admin")
+	@DeleteMapping("{id}")
+	public R<Void> removeUser(@PathVariable Long id) {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		platformAdminManager.removeCompanyUser(id, sysUserVO);
+		return R.ok();
+	}
+
+}

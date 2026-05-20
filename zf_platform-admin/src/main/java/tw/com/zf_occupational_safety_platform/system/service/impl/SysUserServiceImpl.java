@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.AccountPasswordWrongException;
 import tw.com.zf_occupational_safety_platform.system.convert.SysUserConvert;
 import tw.com.zf_occupational_safety_platform.system.mapper.SysUserMapper;
@@ -73,9 +74,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		if (sysUser == null) {
 			throw new AccountPasswordWrongException("帳號或密碼錯誤");
 		}
+
+		if (CommonStatusEnum.NO.equals(sysUser.getIsActive())) {
+			throw new AccountPasswordWrongException("此帳戶已被停用");
+		}
+
 		return sysUser;
 
 	}
 
+	@Override
+	public void updateCompanyUserStatus(Long id, CommonStatusEnum activeStatus) {
+		SysUser user = new SysUser();
+		user.setSysUserId(id);
+		user.setIsActive(activeStatus);
+		baseMapper.updateById(user);
+	}
 
 }

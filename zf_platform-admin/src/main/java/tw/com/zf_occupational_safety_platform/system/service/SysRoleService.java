@@ -18,6 +18,15 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysRole;
 public interface SysRoleService extends IService<SysRole> {
 
 	/**
+	 * 透過角色權限符查詢<br>
+	 * 僅會有一筆資料
+	 * 
+	 * @param roleKey
+	 * @return
+	 */
+	SysRole getByRoleKey(String roleKey);
+	
+	/**
 	 * 透過ids 查詢角色列表
 	 * 
 	 * @param roleIds

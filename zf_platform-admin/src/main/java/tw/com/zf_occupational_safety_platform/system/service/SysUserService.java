@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.LoginInfo;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
@@ -56,6 +57,14 @@ public interface SysUserService extends IService<SysUser> {
 	 * 
 	 */
 	void remove(Long id);
+	
+	/**
+	 * 修改企業用戶啟用狀態
+	 * 
+	 * @param id 主鍵ID
+	 * @param activeStatus 啟用狀態
+	 */
+	void updateCompanyUserStatus(Long id, CommonStatusEnum activeStatus);
 
 	/**
 	 * 系統管理者登入方法,返回token、角色、權限

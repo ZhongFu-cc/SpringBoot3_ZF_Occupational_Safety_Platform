@@ -28,9 +28,13 @@ import tw.com.zf_occupational_safety_platform.system.service.SysRoleService;
 import tw.com.zf_occupational_safety_platform.system.service.SysUserRoleService;
 import tw.com.zf_occupational_safety_platform.system.service.SysUserService;
 
+/**
+ * 負責登入/校驗 管理層
+ * 
+ */
 @Component
 @RequiredArgsConstructor
-public class SystemManager {
+public class AuthManager {
 
 	private final SysUserService sysUserService;
 	private final SysUserConvert sysUserConvert;

@@ -19,6 +19,18 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysRole;
 public interface SysRoleMapper extends BaseMapper<SysRole> {
 
 	/**
+	 * 根據 roleKey 進行查詢
+	 * 
+	 * @param roleKey
+	 * @return
+	 */
+	default SysRole selectByRoleKey(String roleKey) {
+		LambdaQueryWrapper<SysRole> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysRole::getRoleKey, roleKey);
+		return this.selectOne(queryWrapper);
+	}
+
+	/**
 	 * 根據Ids查詢列表
 	 * 
 	 * @param ids

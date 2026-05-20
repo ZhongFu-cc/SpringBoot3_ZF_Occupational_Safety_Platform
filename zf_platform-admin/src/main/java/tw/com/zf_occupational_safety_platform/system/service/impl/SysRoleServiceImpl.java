@@ -24,11 +24,18 @@ import tw.com.zf_occupational_safety_platform.system.service.SysRoleService;
 public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRole> implements SysRoleService {
 
 	@Override
+	public SysRole getByRoleKey(String roleKey) {
+		return baseMapper.selectByRoleKey(roleKey);
+	}
+	
+	@Override
 	public List<SysRole> findBySysRoles(Collection<Long> roleIds) {
 		if (roleIds != null && roleIds.isEmpty()) {
 			return Collections.emptyList();
 		}
 		return baseMapper.selectByIds(roleIds);
 	}
+
+
 
 }

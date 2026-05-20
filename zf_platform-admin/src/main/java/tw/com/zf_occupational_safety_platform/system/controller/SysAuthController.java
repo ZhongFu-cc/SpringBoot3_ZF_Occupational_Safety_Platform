@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.system.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
@@ -21,7 +24,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import tw.com.zf_occupational_safety_platform.system.manager.SystemManager;
+import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.LoginInfo;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
@@ -32,20 +35,20 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 
 /**
  * <p>
- * 用戶表 - 存取系統用戶個人信息 前端控制器
+ * 用戶表 - 用戶登入/獲取權限 前端控制器
  * </p>
  *
  * @author Joey
  * @since 2024-05-10
  */
-@Tag(name = "後台用戶API")
+@Tag(name = "用戶登入/獲取權限 API")
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/system/sys-user")
-public class SysUserController {
+@RequestMapping("/system/auth")
+public class SysAuthController {
 
-	private final SystemManager systemManager;
+	private final AuthManager authManager;
 	private final SysUserService sysUserService;
 
 	/**
@@ -62,6 +65,16 @@ public class SysUserController {
 	public R<SysUser> getUser(@PathVariable("id") Long id) {
 		SysUser sysUser = sysUserService.get(id);
 		return R.ok(sysUser);
+	}
+
+	@GetMapping("slave/pagination")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢直系的slave使用者")
+	public R<List<SysUser>> findSlaveUser(@RequestParam Integer page, @RequestParam Integer size) {
+		SysUserVO userInfo = authManager.getUserInfo();
+
+		return null;
 	}
 
 	/**
@@ -125,7 +138,7 @@ public class SysUserController {
 	public R<SaTokenInfo> login(@RequestBody @Valid LoginInfo loginInfo) {
 
 		// 驗證登入資料
-		systemManager.login(loginInfo);
+		authManager.login(loginInfo);
 
 		// 登入後才能獲得token信息，獲取token
 		SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
@@ -147,7 +160,7 @@ public class SysUserController {
 	@PostMapping("logout")
 	public R<Void> logout() {
 		// 驗證登入資料
-		systemManager.logout();
+		authManager.logout();
 		return R.ok();
 	}
 
@@ -164,8 +177,8 @@ public class SysUserController {
 	@GetMapping("getUserInfo")
 	public R<SysUserVO> GetUserInfo() {
 
-		// 驗證登入資料
-		SysUserVO userInfo = systemManager.getUserInfo();
+		// 獲取使用者的緩存資料
+		SysUserVO userInfo = authManager.getUserInfo();
 
 		// 返回token
 		return R.ok(userInfo);

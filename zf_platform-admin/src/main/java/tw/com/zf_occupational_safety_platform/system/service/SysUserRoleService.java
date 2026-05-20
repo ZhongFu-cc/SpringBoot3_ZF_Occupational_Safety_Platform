@@ -23,5 +23,12 @@ public interface SysUserRoleService extends IService<SysUserRole> {
 	 * @return
 	 */
 	List<SysUserRole> findBySysUser(Long sysUserId);
+	
+	/**
+	 * 為使用者 添加 角色
+	 * @param sysUserId
+	 * @param sysRoleId
+	 */
+	void assignRole2User(Long sysUserId,Long sysRoleId);
 
 }

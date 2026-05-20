@@ -15,4 +15,5 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
 
+	
 }

@@ -8,10 +8,6 @@ import lombok.Data;
 @Data
 public class AddSysUserDTO {
 
-	@NotNull
-	@Schema(description = "父級ID")
-	private Long parentId;
-
 	@NotBlank
 	@Schema(description = "帳號")
 	private String account;
