@@ -8,10 +8,14 @@ import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
+import cn.dev33.satoken.session.SaSession;
+import cn.dev33.satoken.stp.SaTokenInfo;
+import cn.dev33.satoken.stp.StpUtil;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.system.convert.SysMenuConvert;
 import tw.com.zf_occupational_safety_platform.system.convert.SysUserConvert;
 import tw.com.zf_occupational_safety_platform.system.pojo.BO.RouteBO;
+import tw.com.zf_occupational_safety_platform.system.pojo.DTO.LoginInfo;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysMenu;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysRole;
@@ -36,7 +40,84 @@ public class SystemManager {
 	private final SysMenuService sysMenuService;
 	private final SysMenuConvert sysMenuConvert;
 
-	// 以下為Service層,各個function同樣會使用的私有方法
+	/**
+	 * 獲取使用者的資料、角色、權限
+	 * 
+	 * @param sysUserId
+	 * @return
+	 */
+	public SysUserVO getSysUserVO(Long sysUserId) {
+
+		// 獲取用戶資料
+		SysUser sysUser = sysUserService.get(sysUserId);
+
+		// 調用Service層私有方法,來獲取需要組裝的SysUserVO
+		SysUserVO sysUserVO = buildUserPermissions(sysUser);
+
+		// 返回組裝過的SysUserVO
+		return sysUserVO;
+	}
+
+	/**
+	 * 使用者登入，返回基本資料、角色、權限<br>
+	 * 並將組裝好的sysUserInfo 放到緩存中
+	 * 
+	 * @param loginInfo
+	 * @return
+	 */
+	public SysUserVO login(LoginInfo loginInfo) {
+
+		// 登入查詢
+		SysUser sysUser = sysUserService.login(loginInfo);
+
+		// 調用Service層私有方法,來獲取需要組裝的SysUserVO
+		SysUserVO sysUserVO = buildUserPermissions(sysUser);
+
+		// 透過userId做登入
+		StpUtil.login(sysUserVO.getSysUserId());
+
+		// 登入後才能取得session
+		SaSession session = StpUtil.getSession();
+
+		// 登入後才能獲得token信息
+		SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+
+		// 將登入信息進行組裝
+		sysUserVO.setSaTokenInfo(tokenInfo);
+
+		// 設定session
+		session.set("userInfo", sysUserVO);
+
+		// 返回susUserVO對象給前端
+		return sysUserVO;
+
+	}
+
+	/**
+	 * 使用者登出
+	 */
+	public void logout() {
+		// 當前會話註銷登錄
+		StpUtil.logout();
+
+	}
+
+	/**
+	 * 獲取使用者登入的快取資料
+	 * 
+	 * @return
+	 */
+	public SysUserVO getUserInfo() {
+
+		// 登入後才能取得session
+		SaSession session = StpUtil.getSession();
+		// 獲取當前使用者的資料
+		SysUserVO sysUserVO = (SysUserVO) session.get("userInfo");
+
+		return sysUserVO;
+	}
+
+	// 組裝使用者角色 及 權限的私有方法
 	private SysUserVO buildUserPermissions(SysUser sysUser) {
 
 		// VO對象,填充用戶資訊

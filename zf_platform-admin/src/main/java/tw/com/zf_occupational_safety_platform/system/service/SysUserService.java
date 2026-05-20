@@ -4,7 +4,9 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.LoginInfo;
+import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 
@@ -19,33 +21,42 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 public interface SysUserService extends IService<SysUser> {
 
 	/**
-	 * 根據ID查詢系統管理者的資料、角色、權限
+	 * 根據主鍵ID查詢使用者的資料
 	 * 
-	 * @param id 管理者ID
-	 * @return 系統管理者詳細資訊
+	 * @param id 主鍵ID
+	 * @return
 	 */
-	SysUserVO selectSysUser(Long id);
-	
+	SysUser get(Long id);
+
 	/**
-	 * 查詢所有系統管理者的資料、角色、權限
-	 * @return 系統管理者列表詳細資訊
+	 * 查詢所有查詢使用者的資料
+	 * 
+	 * @return
 	 */
-	List<SysUserVO> selectAllSysUser();
-	
-	Void insertSysUser();
-	
-	Void updateSysUser();
-	
+	List<SysUser> list();
+
 	/**
-	 * 根據ID查詢刪除系統管理者
+	 * 創建使用者
 	 * 
-	 * @param id 管理者ID
+	 * @param addSysUserDTO
+	 */
+	SysUser create(AddSysUserDTO addSysUserDTO);
+
+	/**
+	 * 更新使用者
+	 * 
+	 * @param putSysUserDTO
+	 */
+	void update(PutSysUserDTO putSysUserDTO);
+
+	/**
+	 * 根據主鍵ID刪除使用者
+	 * 
+	 * @param id 主鍵ID
 	 * 
 	 */
-	Void deleteSysUser(Long id);
-	
-	
-	
+	void remove(Long id);
+
 	/**
 	 * 系統管理者登入方法,返回token、角色、權限
 	 * 前端傳來一個由email 和 password組裝的 LoginInfo對象 先判斷帳號密碼取得SysUser的ID
@@ -54,17 +65,14 @@ public interface SysUserService extends IService<SysUser> {
 	 * @param LoginInfo
 	 * @return SysUserVO
 	 */
-	SysUserVO login(LoginInfo loginInfo);
-	
-	
+
 	/**
-	 * 登出方法
+	 * 用戶登入<br>
+	 * 前端傳遞 account 和 password 進行校驗
 	 * 
-	 * 
+	 * @param loginInfo
+	 * @return
 	 */
-	void logout();
-	
-	
-	SysUserVO getUserInfo();
-	
+	SysUser login(LoginInfo loginInfo);
+
 }

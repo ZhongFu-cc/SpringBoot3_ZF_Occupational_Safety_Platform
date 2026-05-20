@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class addUserDTO {
+public class AddSysUserDTO {
 
 	@NotNull
 	@Schema(description = "父級ID")
