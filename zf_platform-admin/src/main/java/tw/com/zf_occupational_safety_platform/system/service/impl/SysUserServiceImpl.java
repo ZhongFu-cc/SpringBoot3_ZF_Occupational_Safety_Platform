@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	@Override
 	public List<SysUser> list() {
 		return baseMapper.selectList(null);
+	}
+
+	@Override
+	public IPage<SysUser> findDirectChild(IPage<SysUser> pageInfo, Long parentId, String queryText) {
+		return baseMapper.selectByParentIdAndQuery(pageInfo, parentId, queryText);
 	}
 
 	@Override

@@ -279,6 +279,25 @@ public class GlobalExceptionHandler {
 	}
 
 	/**
+	 * 自定義權限異常
+	 * @param npe
+	 * @return
+	 * @throws Exception
+	 */
+	@ExceptionHandler(PermissionException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	@ResponseBody
+	public R<Map<String, Object>> handlerPermissionException(PermissionException npe) throws Exception {
+
+		// 打印堆栈，以供调试
+		npe.printStackTrace();
+		log.error(npe.getMessage());
+
+		return R.fail(403, "權限不足，" + npe.getMessage());
+
+	}
+
+	/**
 	 * 
 	 * @param npe
 	 * @return

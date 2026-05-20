@@ -1,6 +1,8 @@
 package tw.com.zf_occupational_safety_platform.system.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 
@@ -15,5 +17,26 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
 
-	
+	/**
+	 * 分頁查詢 - 根據父級ID 和 查詢條件
+	 * 
+	 * @param pageInfo  分頁對象
+	 * @param parentId  父級ID
+	 * @param queryText 查詢條件
+	 * @return
+	 */
+	default IPage<SysUser> selectByParentIdAndQuery(IPage<SysUser> pageInfo, Long parentId, String queryText) {
+
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysUser::getParentId, parentId).and(wrap -> {
+			wrap.like(SysUser::getEmail, queryText)
+					.or()
+					.like(SysUser::getPhone, queryText)
+					.or()
+					.like(SysUser::getRealName, queryText);
+		});
+
+		return this.selectPage(pageInfo, queryWrapper);
+	}
+
 }

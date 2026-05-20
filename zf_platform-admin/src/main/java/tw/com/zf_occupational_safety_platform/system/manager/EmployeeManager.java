@@ -12,4 +12,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmployeeManager {
 
+	//查看課程
+	
+	//參與職安測驗
+	
+	//下載結業證書
+	
+	//查看個人學習歷程 (已完成、未完成、進度%數)
 }
