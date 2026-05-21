@@ -40,6 +40,20 @@ public class GlobalExceptionHandler {
 	//	}
 
 	/**
+	 * 跟 課程 相關的業務邏輯錯誤
+	 * 
+	 * @param exception
+	 * @return
+	 */
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ExceptionHandler(value = CourseException.class)
+	public R<Map<String, Object>> courseException(CourseException exception) {
+		String message = exception.getMessage();
+		return R.fail(409, message);
+	}
+
+	/**
 	 * 跟自定義表單相關的業務邏輯錯誤
 	 * 
 	 * @param exception
@@ -280,6 +294,7 @@ public class GlobalExceptionHandler {
 
 	/**
 	 * 自定義權限異常
+	 * 
 	 * @param npe
 	 * @return
 	 * @throws Exception

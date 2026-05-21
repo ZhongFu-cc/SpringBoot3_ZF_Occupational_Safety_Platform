@@ -45,8 +45,8 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/system/auth")
-public class SysAuthController {
+@RequestMapping("/system/sys-user")
+public class SysUserController {
 
 	private final AuthManager authManager;
 	private final SysUserService sysUserService;

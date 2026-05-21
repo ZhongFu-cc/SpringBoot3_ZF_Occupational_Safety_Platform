@@ -23,5 +23,5 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	void update(PutCourseChapterDTO putCourseChapterDTO);
 
 	void remove(Long courseChapterId);
-	
+
 }

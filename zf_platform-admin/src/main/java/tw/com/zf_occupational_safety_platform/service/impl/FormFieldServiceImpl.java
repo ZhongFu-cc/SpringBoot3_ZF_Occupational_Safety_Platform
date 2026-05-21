@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.FormFieldConvert;
+import tw.com.zf_occupational_safety_platform.helper.S3Helper;
 import tw.com.zf_occupational_safety_platform.mapper.FormFieldMapper;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddFormFieldDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutFormFieldDTO;
@@ -21,7 +22,6 @@ import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutFormField
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormFieldVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormField;
 import tw.com.zf_occupational_safety_platform.service.FormFieldService;
-import tw.com.zf_occupational_safety_platform.utils.S3Util;
 
 /**
  * <p>
@@ -40,7 +40,7 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 	@Value("${spring.cloud.aws.s3.bucketName}")
 	private String bucketName;
 
-	private final S3Util s3Util;
+	private final S3Helper s3Helper;
 	private final FormFieldConvert formFieldConvert;
 
 	@Override
@@ -84,10 +84,10 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 			// 1-1 優先查找舊資料 , 要移除沒在使用的檔案
 			FormField oldFormField = baseMapper.selectById(putFormFieldDTO.getFormFieldId());
 			// 這邊使用寬鬆刪除,也就是ImageUrl 如果為null 或為 空字串 , 自動忽略
-			s3Util.removeFileIfPresent(bucketName, oldFormField.getImageUrl());
+			s3Helper.removeFileIfPresent(bucketName, oldFormField.getImageUrl());
 
 			// 1-2 上傳新檔案,拿到DB儲存路徑
-			String dbUrl = s3Util.upload(BASE_PATH + putFormFieldDTO.getFormId(), file.getOriginalFilename(), file);
+			String dbUrl = s3Helper.upload(BASE_PATH + putFormFieldDTO.getFormId(), file.getOriginalFilename(), file);
 
 			// 1-3 將DB儲存路徑,放到 currentFormField
 			putFormFieldDTO.setImageUrl(dbUrl);
@@ -134,7 +134,7 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 		FormField oldFormField = baseMapper.selectById(formFieldId);
 
 		// 2.這邊使用寬鬆刪除,也就是ImageUrl 如果為null 或為 空字串 , 自動忽略
-		s3Util.removeFileIfPresent(bucketName, oldFormField.getImageUrl());
+		s3Helper.removeFileIfPresent(bucketName, oldFormField.getImageUrl());
 
 		// 3.刪除資料本身
 		baseMapper.deleteById(formFieldId);
@@ -147,7 +147,7 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 		
 		// 2.遍歷使用寬鬆刪除,也就是ImageUrl 如果為null 或為 空字串 , 自動忽略
 		for (FormField formField : listByFormId) {
-			s3Util.removeFileIfPresent(bucketName, formField.getImageUrl());
+			s3Helper.removeFileIfPresent(bucketName, formField.getImageUrl());
 		}
 		
 		// 3.刪除所有符合的資料

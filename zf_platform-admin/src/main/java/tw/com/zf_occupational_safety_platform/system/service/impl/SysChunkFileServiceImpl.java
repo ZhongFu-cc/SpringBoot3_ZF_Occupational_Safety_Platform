@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tw.com.zf_occupational_safety_platform.helper.S3Helper;
 import tw.com.zf_occupational_safety_platform.system.exception.SysChunkFileException;
 import tw.com.zf_occupational_safety_platform.system.mapper.SysChunkFileMapper;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.ChunkUploadDTO;
@@ -30,7 +31,6 @@ import tw.com.zf_occupational_safety_platform.system.pojo.VO.CheckFileVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.ChunkResponseVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysChunkFile;
 import tw.com.zf_occupational_safety_platform.system.service.SysChunkFileService;
-import tw.com.zf_occupational_safety_platform.utils.S3Util;
 
 /**
  * <p>
@@ -58,7 +58,7 @@ public class SysChunkFileServiceImpl extends ServiceImpl<SysChunkFileMapper, Sys
 	@Value("${spring.cloud.aws.s3.bucketName}")
 	private String bucketName;
 
-	private final S3Util s3Util;
+	private final S3Helper s3Helper;
 
 	// Redisson Keys 儲存 uploadId, totalChunks
 	private static final String S3_META_KEY_PREFIX = "s3:meta:";
@@ -166,11 +166,11 @@ public class SysChunkFileServiceImpl extends ServiceImpl<SysChunkFileMapper, Sys
 						String extension = chunkUploadDTO.getFileName().substring(lastDotIndex);
 
 						// 組裝S3 Key
-						s3Key = s3Util.normalizePath(mergedBasePath) + baseName + "_" + primaryKey + extension;
+						s3Key = s3Helper.normalizePath(mergedBasePath) + baseName + "_" + primaryKey + extension;
 
 						System.out.println("開始初始化");
-						// 呼叫 S3Util 初始化
-						uploadId = s3Util.initializeMultipartUpload(s3Key, chunkUploadDTO.getFileType(),
+						// 呼叫 S3Helper 初始化
+						uploadId = s3Helper.initializeMultipartUpload(s3Key, chunkUploadDTO.getFileType(),
 								Map.of("sha256", sha256));
 
 						System.out.println("初始化成功");
@@ -202,8 +202,8 @@ public class SysChunkFileServiceImpl extends ServiceImpl<SysChunkFileMapper, Sys
 
 			System.out.println(partNumber + "分片開始上傳");
 
-			// 呼叫 S3Util 上傳分片
-			String eTag = s3Util.uploadPart(s3Key, uploadId, partNumber, file);
+			// 呼叫 S3Helper 上傳分片
+			String eTag = s3Helper.uploadPart(s3Key, uploadId, partNumber, file);
 
 			// 記錄 ETag 到 Redis
 			uploadedPartsMap.put(partNumber, eTag);
@@ -286,10 +286,10 @@ public class SysChunkFileServiceImpl extends ServiceImpl<SysChunkFileMapper, Sys
 		try {
 			// 1. 準備 PartInfo 列表
 			// S3 合併要求 PartInfo 必須按 PartNumber 升序排列
-			List<S3Util.PartInfo> parts = uploadedPartsMap.entrySet()
+			List<S3Helper.PartInfo> parts = uploadedPartsMap.entrySet()
 					.stream()
-					.map(e -> new S3Util.PartInfo(e.getKey(), e.getValue()))
-					.sorted(Comparator.comparingInt(S3Util.PartInfo::getPartNumber))
+					.map(e -> new S3Helper.PartInfo(e.getKey(), e.getValue()))
+					.sorted(Comparator.comparingInt(S3Helper.PartInfo::getPartNumber))
 					.collect(Collectors.toList());
 
 			// 2. 獲取 DB 紀錄 
@@ -299,16 +299,16 @@ public class SysChunkFileServiceImpl extends ServiceImpl<SysChunkFileMapper, Sys
 				throw new SysChunkFileException("DB record missing: Cannot proceed with merge.");
 			}
 
-			// 3. 呼叫 S3Util 完成合併
+			// 3. 呼叫 S3Helper 完成合併
 			// 註：S3 合併不會改變 Key，所以 s3Key 就是最終路徑
-			finalUrl = s3Util.completeMultipartUpload(s3Key, uploadId, parts);
+			finalUrl = s3Helper.completeMultipartUpload(s3Key, uploadId, parts);
 
 			// 4. 更新資料庫
 			sysChunkFile.setFilePath(s3Key); // S3 Key 就是路徑
 			sysChunkFile.setUploadedChunks(totalChunks);
 			sysChunkFile.setStatus(1);
 			//S3 合併後要獲取 FileSize 
-			long fileSize = s3Util.getFileSize(s3Key);
+			long fileSize = s3Helper.getFileSize(s3Key);
 			sysChunkFile.setFileSize(fileSize);
 			baseMapper.updateById(sysChunkFile);
 
@@ -321,7 +321,7 @@ public class SysChunkFileServiceImpl extends ServiceImpl<SysChunkFileMapper, Sys
 
 		} catch (Exception e) {
 			// 合併失敗，必須取消上傳以避免費用和髒數據
-			s3Util.abortMultipartUpload(s3Key, uploadId);
+			s3Helper.abortMultipartUpload(s3Key, uploadId);
 
 			if (sysChunkFile != null) {
 				sysChunkFile.setUploadedChunks(totalChunks);

@@ -6,6 +6,9 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
 import tw.com.zf_occupational_safety_platform.convert.CourseCategoryConvert;
 import tw.com.zf_occupational_safety_platform.mapper.CourseCategoryMapper;
 import tw.com.zf_occupational_safety_platform.service.CourseCategoryService;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,11 @@ public class CourseCategoryServiceImpl extends ServiceImpl<CourseCategoryMapper,
 	@Override
 	public CourseCategory get(Long courseCategoryId) {
 		return baseMapper.selectById(courseCategoryId);
+	}
+
+	@Override
+	public IPage<CourseCategory> findPageByQuery(Page<CourseCategory> pageInfo, String queryText) {
+		return baseMapper.selectByQuery(pageInfo, queryText);
 	}
 
 	@Override

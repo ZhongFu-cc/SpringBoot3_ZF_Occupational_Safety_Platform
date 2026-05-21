@@ -1,4 +1,4 @@
-package tw.com.zf_occupational_safety_platform.utils;
+package tw.com.zf_occupational_safety_platform.helper;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -78,7 +78,7 @@ import tw.com.zf_occupational_safety_platform.pojo.sys.ObjectItem;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class S3Util {
+public class S3Helper {
 
 	// 私有静态常量：用于创建公共读取策略的 JSON 模板
 	private static final String PUBLIC_READ_POLICY_TEMPLATE = """
@@ -111,6 +111,17 @@ public class S3Util {
 	// 「預設」存储桶名称
 	@Value("${spring.cloud.aws.s3.bucketName}") // 注意：这里的 Value key 可能需要对应您的配置
 	private String bucketName;
+
+	/**
+	 * 判斷是否有檔案<br>
+	 * true = 有 , false = 沒有
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static boolean hasFile(MultipartFile file) {
+		return file != null && !file.isEmpty() && file.getSize() > 0;
+	}
 
 	/**
 	 * 判斷是否存在，不存在則創建

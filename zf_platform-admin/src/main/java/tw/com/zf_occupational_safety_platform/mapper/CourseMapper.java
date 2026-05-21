@@ -1,7 +1,11 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
+import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
 
 /**
  * <p>
@@ -12,5 +16,23 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2026-05-21
  */
 public interface CourseMapper extends BaseMapper<Course> {
+
+	/**
+	 * 根據條件進行分頁查詢
+	 * 
+	 * @param pageInfo         分頁對象
+	 * @param courseCategoryId 課程類別ID
+	 * @param queryText        輸入查詢
+	 * @return
+	 */
+	default IPage<Course> selectByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText) {
+
+		LambdaQueryWrapper<Course> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(courseCategoryId != null, Course::getCourseCategoryId, courseCategoryId).and(wrap -> {
+			wrap.like(Course::getTitle, queryText);
+		});
+
+		return this.selectPage(pageInfo, queryWrapper);
+	}
 
 }

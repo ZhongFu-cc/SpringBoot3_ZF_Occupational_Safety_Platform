@@ -2,6 +2,8 @@ package tw.com.zf_occupational_safety_platform.service.impl;
 
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,11 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 	}
 
 	@Override
+	public IPage<Course> findPageByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText) {
+		return baseMapper.selectByQuery(pageInfo,courseCategoryId,queryText);
+	}
+	
+	@Override
 	public Course create(AddCourseDTO addCourseDTO) {
 		Course course = courseConvert.addDTOToEntity(addCourseDTO);
 		baseMapper.insert(course);
@@ -48,5 +55,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 	public void remove(Long courseCategoryId) {
 		baseMapper.deleteById(courseCategoryId);
 	}
+
+
 	
 }
