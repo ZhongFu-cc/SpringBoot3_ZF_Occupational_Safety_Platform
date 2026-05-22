@@ -29,4 +29,15 @@ public interface SysUserRoleMapper extends BaseMapper<SysUserRole> {
 		return this.selectList(queryWrapper);
 	}
 
+	/**
+	 * 根據用戶Id，刪除他擁有的角色
+	 * 
+	 * @param sysUserId
+	 */
+	default void deleteBySysUserId(Long sysUserId) {
+		LambdaQueryWrapper<SysUserRole> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysUserRole::getSysUserId, sysUserId);
+		this.delete(queryWrapper);
+	}
+
 }

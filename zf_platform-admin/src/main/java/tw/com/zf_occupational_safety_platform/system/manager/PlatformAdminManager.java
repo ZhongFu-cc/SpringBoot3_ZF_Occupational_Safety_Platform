@@ -100,6 +100,10 @@ public class PlatformAdminManager {
 		if (!targetSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
 			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
 		}
+
+		// 移除此用戶目前擁有的角色關係
+		sysUserRoleService.removeByUserId(sysUserId);
+
 		// 目前僅直接刪除資料，後續有其他需求再開發
 		sysUserService.remove(sysUserId);
 	}

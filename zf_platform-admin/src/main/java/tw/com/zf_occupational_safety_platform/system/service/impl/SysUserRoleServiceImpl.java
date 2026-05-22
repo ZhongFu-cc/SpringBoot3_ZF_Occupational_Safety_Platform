@@ -34,4 +34,9 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
 		baseMapper.insert(sysUserRole);
 	}
 
+	@Override
+	public void removeByUserId(Long sysUserId) {
+		baseMapper.deleteBySysUserId(sysUserId);
+	}
+
 }
