@@ -29,11 +29,11 @@ public class SysMenu implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Schema(description = "菜單ID")
+	@Schema(description = "菜單ID", type = "string")
 	@TableId("sys_menu_id")
 	private Long sysMenuId;
 
-	@Schema(description = "父級菜單ID")
+	@Schema(description = "父級菜單ID", type = "string")
 	@TableField("parent_id")
 	private Long parentId;
 

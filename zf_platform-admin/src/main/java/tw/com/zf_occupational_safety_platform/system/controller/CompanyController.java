@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +65,7 @@ public class CompanyController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("company_manager")
 	@GetMapping("{id}")
-	public R<SysUser> getUser(@PathVariable("id") Long id) {
+	public R<SysUser> getUser(@PathVariable("id") @Schema(type = "string") Long id) {
 		SysUser sysUser = sysUserService.get(id);
 		return R.ok(sysUser);
 	}
@@ -136,7 +137,7 @@ public class CompanyController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
 	@SaCheckRole("company_manager")
 	@DeleteMapping("{id}")
-	public R<Void> removeUser(@PathVariable Long id) {
+	public R<Void> removeUser(@PathVariable @Schema(type = "string") Long id) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		companyManager.removeCompanyUser(id, sysUserVO);
 		return R.ok();

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -30,6 +31,7 @@ public class SysRole implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@TableId("sys_role_id")
+	@Schema(description = "主鍵ID", type = "string")
 	private Long sysRoleId;
 
 	@Schema(description = "角色名稱")
@@ -67,6 +69,7 @@ public class SysRole implements Serializable {
 
 	@Schema(description = "創建時間")
 	@TableField(value = "create_date", fill = FieldFill.INSERT)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createDate;
 
 	@Schema(description = "更新者")
@@ -75,6 +78,7 @@ public class SysRole implements Serializable {
 
 	@Schema(description = "更新時間")
 	@TableField(value = "update_date", fill = FieldFill.INSERT_UPDATE)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime updateDate;
 
 	@Schema(description = "備註, 通常用來寫這個角色要做些什麼事情, 來凸顯為什麼需要某些權限")

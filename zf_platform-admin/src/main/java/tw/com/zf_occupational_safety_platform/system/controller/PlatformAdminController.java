@@ -1,7 +1,5 @@
 package tw.com.zf_occupational_safety_platform.system.controller;
 
-import java.util.List;
-
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,10 +19,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import tw.com.zf_occupational_safety_platform.pojo.entity.Form;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.manager.PlatformAdminManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
@@ -66,7 +64,7 @@ public class PlatformAdminController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@GetMapping("{id}")
-	public R<SysUser> getUser(@PathVariable("id") Long id) {
+	public R<SysUser> getUser(@PathVariable("id") @Schema(type = "string") Long id) {
 		SysUser sysUser = sysUserService.get(id);
 		return R.ok(sysUser);
 	}
@@ -130,7 +128,7 @@ public class PlatformAdminController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
 	@SaCheckRole("super-admin")
 	@DeleteMapping("{id}")
-	public R<Void> removeUser(@PathVariable Long id) {
+	public R<Void> removeUser(@PathVariable @Schema(type = "string") Long id) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		platformAdminManager.removeCompanyUser(id, sysUserVO);
 		return R.ok();

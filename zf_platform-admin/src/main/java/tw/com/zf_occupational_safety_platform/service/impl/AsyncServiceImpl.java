@@ -13,7 +13,7 @@ import tw.com.zf_occupational_safety_platform.service.AsyncService;
 @RequiredArgsConstructor
 public class AsyncServiceImpl implements AsyncService {
 
-	private final JavaMailSender mailSender;
+//	private final JavaMailSender mailSender;
 	private final S3Helper s3Helper;
 	
 

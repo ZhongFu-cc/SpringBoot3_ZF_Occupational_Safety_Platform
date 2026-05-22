@@ -72,7 +72,9 @@ public class AuthManager {
 	public SysUserVO login(LoginInfo loginInfo) {
 
 		// 登入查詢
+		System.out.println("開始登入");
 		SysUser sysUser = sysUserService.login(loginInfo);
+		System.out.println("登入完成" + sysUser);
 
 		// 調用Service層私有方法,來獲取需要組裝的SysUserVO
 		SysUserVO sysUserVO = buildUserPermissions(sysUser);

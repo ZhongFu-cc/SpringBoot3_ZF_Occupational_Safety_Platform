@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -28,15 +29,15 @@ public class SysRoleMenu implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	@Schema(description = "主鍵ID")
+	@Schema(description = "主鍵ID", type = "string")
 	@TableId(value = "sys_role_menu_id")
 	private Long sysRoleMenuId;
 
-	@Schema(description = "角色ID")
+	@Schema(description = "角色ID", type = "string")
 	@TableField("sys_role_id")
 	private Long sysRoleId;
 
-	@Schema(description = "菜單ID")
+	@Schema(description = "菜單ID", type = "string")
 	@TableField("sys_menu_id")
 	private Long sysMenuId;
 
@@ -50,6 +51,7 @@ public class SysRoleMenu implements Serializable {
 
 	@Schema(description = "創建時間")
 	@TableField(value = "create_date", fill = FieldFill.INSERT)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createDate;
 
 	@Schema(description = "更新者")
@@ -58,5 +60,6 @@ public class SysRoleMenu implements Serializable {
 
 	@Schema(description = "更新時間")
 	@TableField(value = "update_date", fill = FieldFill.INSERT_UPDATE)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime updateDate;
 }

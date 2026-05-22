@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
@@ -31,9 +32,10 @@ public class SysUser implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@TableId("sys_user_id")
+	@Schema(description = "主鍵ID",type = "string")
 	private Long sysUserId;
-	
-	@Schema(description = "父級ID")
+
+	@Schema(description = "父級ID",type = "string")
 	@TableField("parent_id")
 	private Long parentId;
 
@@ -56,7 +58,7 @@ public class SysUser implements Serializable {
 	@Schema(description = "電話號碼")
 	@TableField("phone")
 	private String phone;
-	
+
 	@Schema(description = "公司名稱")
 	@TableField("company_name")
 	private String companyName;
@@ -80,6 +82,7 @@ public class SysUser implements Serializable {
 
 	@Schema(description = "創建時間")
 	@TableField(value = "create_date", fill = FieldFill.INSERT)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createDate;
 
 	@Schema(description = "更新者")
@@ -88,6 +91,7 @@ public class SysUser implements Serializable {
 
 	@Schema(description = "更新時間")
 	@TableField(value = "update_date", fill = FieldFill.INSERT_UPDATE)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime updateDate;
 
 }

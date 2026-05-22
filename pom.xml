@@ -36,9 +36,8 @@
 
         <mybatis-plus-spring-boot3-starter>3.5.5</mybatis-plus-spring-boot3-starter>
         <mybatis-plus-generator>3.5.5</mybatis-plus-generator>
-        <freemarker>2.3.32</freemarker>
 
-        <apiDocKnife4j>4.5.0</apiDocKnife4j>
+        <apiDocKnife4j>5.0.6</apiDocKnife4j>
         <saToken>1.37.0</saToken>
         <minio>8.5.8</minio>
         <s3-starter>3.4.2</s3-starter>
@@ -51,11 +50,6 @@
         <commons-io-for-easyExcel>2.17.0</commons-io-for-easyExcel>
         <easy-captcha>1.6.2</easy-captcha>
 
-        <!-- JPA需要而已 -->
-        <apiDocKnife4jOther>4.6.0</apiDocKnife4jOther>
-        <springdoc>2.7.0</springdoc>
-        <redisson>3.40.2</redisson>
-        <jpamodelgen>6.6.4.Final</jpamodelgen>
 
     </properties>
 
@@ -138,16 +132,15 @@
                 <version>${mybatis-plus-generator}</version>
             </dependency>
 
-            <!-- 模板生成的輔助套件 -->
             <dependency>
-                <groupId>org.freemarker</groupId>
-                <artifactId>freemarker</artifactId>
-                <version>${freemarker}</version>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-freemarker</artifactId>
+                <version>${spring.boot.start.version}</version>
             </dependency>
 
-            <!-- knife4j 接口API 文檔擴展 -->
+            <!-- knife4j Next Spring Boot3 接口API 文檔擴展 (原knife4j 已不更新) -->
             <dependency>
-                <groupId>com.github.xiaoymin</groupId>
+                <groupId>com.baizhukui</groupId>
                 <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
                 <version>${apiDocKnife4j}</version>
             </dependency>
@@ -172,7 +165,7 @@
                 <version>${minio}</version>
             </dependency>
 
-            <!-- AWS S3 spring stater 啟動器 
+            <!-- AWS S3 spring stater 啟動器
             https://mvnrepository.com/artifact/io.awspring.cloud/spring-cloud-aws-starter-s3 -->
             <dependency>
                 <groupId>io.awspring.cloud</groupId>
@@ -270,17 +263,6 @@
             </dependency>
 
 
-
-            <!-- 因應spring Boot 3.4 有人做的knife4j修改 -->
-            <!--
-            <dependency>
-                <groupId>com.github.xingfudeshi</groupId>
-                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-                <version>${apiDocKnife4jOther}</version>
-            </dependency>
-             -->
-
-
             <!-- 配置Redisson 來連結並訪問redis -->
             <!-- 
             <dependency>
@@ -289,7 +271,6 @@
                 <version>${redisson}</version>
             </dependency>
             -->
-
 
 
         </dependencies>

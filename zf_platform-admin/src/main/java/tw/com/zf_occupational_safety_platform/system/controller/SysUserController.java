@@ -57,25 +57,25 @@ public class SysUserController {
 	 * @param id
 	 * @return User
 	 */
-	@Operation(summary = "根據ID查詢使用者資料")
-	@Parameters({
-			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@SaCheckRole("super-admin")
-	@GetMapping("{id}")
-	public R<SysUser> getUser(@PathVariable("id") Long id) {
-		SysUser sysUser = sysUserService.get(id);
-		return R.ok(sysUser);
-	}
+//	@Operation(summary = "根據ID查詢使用者資料")
+//	@Parameters({
+//			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+//	@SaCheckRole("super-admin")
+//	@GetMapping("{id}")
+//	public R<SysUser> getUser(@PathVariable("id") Long id) {
+//		SysUser sysUser = sysUserService.get(id);
+//		return R.ok(sysUser);
+//	}
 
-	@GetMapping("slave/pagination")
-	@Parameters({
-			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@Operation(summary = "查詢直系的slave使用者")
-	public R<List<SysUser>> findSlaveUser(@RequestParam Integer page, @RequestParam Integer size) {
-		SysUserVO userInfo = authManager.getUserInfo();
-
-		return null;
-	}
+//	@GetMapping("slave/pagination")
+//	@Parameters({
+//			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+//	@Operation(summary = "查詢直系的slave使用者")
+//	public R<List<SysUser>> findSlaveUser(@RequestParam Integer page, @RequestParam Integer size) {
+//		SysUserVO userInfo = authManager.getUserInfo();
+//
+//		return null;
+//	}
 
 	/**
 	 * 新增使用者
@@ -83,15 +83,15 @@ public class SysUserController {
 	 * @param addUserDTO
 	 * @return
 	 */
-	@Operation(summary = "新增使用者")
-	@Parameters({
-			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@SaCheckRole("super-admin")
-	@PostMapping
-	public R<Void> saveUser(@RequestBody @Valid AddSysUserDTO addUserDTO) {
-		// 待更新
-		return R.ok();
-	}
+//	@Operation(summary = "新增使用者")
+//	@Parameters({
+//			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+//	@SaCheckRole("super-admin")
+//	@PostMapping
+//	public R<Void> saveUser(@RequestBody @Valid AddSysUserDTO addUserDTO) {
+//		// 待更新
+//		return R.ok();
+//	}
 
 	/**
 	 * 根據實體類User 更新後台管理者 待更新
@@ -99,15 +99,15 @@ public class SysUserController {
 	 * @param user
 	 * @return
 	 */
-	@Operation(summary = "更新後台管理者資訊")
-	@Parameters({
-			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@SaCheckRole("super-admin")
-	@PutMapping
-	public R<Void> updateUser(@RequestBody @Valid PutSysUserDTO putSysUserDTO) {
-		// 待更新
-		return R.ok();
-	}
+//	@Operation(summary = "更新後台管理者資訊")
+//	@Parameters({
+//			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+//	@SaCheckRole("super-admin")
+//	@PutMapping
+//	public R<Void> updateUser(@RequestBody @Valid PutSysUserDTO putSysUserDTO) {
+//		// 待更新
+//		return R.ok();
+//	}
 
 	/**
 	 * 根據ID移除User 後台管理者 如果返回的User對象為null則返回R.fail
@@ -115,15 +115,15 @@ public class SysUserController {
 	 * @param id
 	 * @return
 	 */
-	@Operation(summary = "根據ID刪除使用者")
-	@Parameters({
-			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
-	@SaCheckRole("super-admin")
-	@DeleteMapping("{id}")
-	public R<Void> removeUser(@PathVariable Long id) {
-		sysUserService.remove(id);
-		return R.ok();
-	}
+//	@Operation(summary = "根據ID刪除使用者")
+//	@Parameters({
+//			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
+//	@SaCheckRole("super-admin")
+//	@DeleteMapping("{id}")
+//	public R<Void> removeUser(@PathVariable Long id) {
+//		sysUserService.remove(id);
+//		return R.ok();
+//	}
 
 	/**
 	 * 登入時只會獲得token資訊<br>
@@ -137,8 +137,11 @@ public class SysUserController {
 	@PostMapping("login")
 	public R<SaTokenInfo> login(@RequestBody @Valid LoginInfo loginInfo) {
 
+		System.out.println("進入登入API");
+		
 		// 驗證登入資料
 		authManager.login(loginInfo);
+		
 
 		// 登入後才能獲得token信息，獲取token
 		SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
