@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.AccountPasswordWrongException;
+import tw.com.zf_occupational_safety_platform.exception.AccountWrongException;
 import tw.com.zf_occupational_safety_platform.system.convert.SysUserConvert;
 import tw.com.zf_occupational_safety_platform.system.mapper.SysUserMapper;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
@@ -82,7 +83,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		}
 
 		if (CommonStatusEnum.NO.equals(sysUser.getIsActive())) {
-			throw new AccountPasswordWrongException("此帳戶已被停用");
+			throw new AccountWrongException("此帳戶已被停用/凍結");
 		}
 
 		return sysUser;

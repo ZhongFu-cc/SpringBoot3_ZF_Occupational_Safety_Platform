@@ -1,7 +1,11 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 
 /**
  * <p>
@@ -12,5 +16,18 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2026-05-21
  */
 public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
+
+	/**
+	 * 根據課程ID查詢
+	 * 
+	 * @param courseId
+	 * @return
+	 */
+	default List<CourseChapter> selectByCourseId(Long courseId) {
+		LambdaQueryWrapper<CourseChapter> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(CourseChapter::getCourseId, courseId);
+		return this.selectList(queryWrapper);
+
+	}
 
 }

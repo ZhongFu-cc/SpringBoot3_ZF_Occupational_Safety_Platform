@@ -42,8 +42,33 @@ public class CompanyManager {
 
 	/**
 	 * ----------------- 企業員工管理 --------------------
+	 */
+
+	/**
+	 * 查詢企業員工
 	 * 
-	 * /**
+	 * @param sysUserId
+	 * @param sysUserVO
+	 * @return
+	 */
+	public SysUser getEmployee(Long sysUserId, SysUserVO sysUserVO) {
+
+		SysUser sysUser = sysUserService.get(sysUserId);
+
+		// 父級ID == null , 最大權限者不給予操作
+		if (sysUser.getParentId() == null) {
+			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+		}
+
+		if (!sysUser.getParentId().equals(sysUserVO.getSysUserId())) {
+			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+		}
+
+		return sysUser;
+
+	}
+
+	/**
 	 * 分頁查詢 - 直接子用戶<br>
 	 * 默認會添加 parentId = 當前操作用戶ID
 	 * 
@@ -53,8 +78,7 @@ public class CompanyManager {
 	 * @return
 	 */
 	public IPage<SysUser> findDirectChild(Page<SysUser> pageInfo, SysUserVO sysUserVO, String queryText) {
-		sysUserService.findDirectChild(pageInfo, sysUserVO.getSysUserId(), queryText);
-		return null;
+		return sysUserService.findDirectChild(pageInfo, sysUserVO.getSysUserId(), queryText);
 	}
 
 	// 匯入 員工資料-待完成
@@ -64,7 +88,7 @@ public class CompanyManager {
 	 * 
 	 * @param addUserDTO
 	 */
-	public void createCompanyUser(AddSysUserDTO addSysUserDTO, SysUserVO sysUserVO) {
+	public void createEmployee(AddSysUserDTO addSysUserDTO, SysUserVO sysUserVO) {
 		// 資料轉換後，添加parentId，並新增
 		SysUser sysUser = sysUserConvert.addDTOToEntity(addSysUserDTO);
 		sysUser.setParentId(sysUserVO.getSysUserId());
@@ -83,9 +107,18 @@ public class CompanyManager {
 	 * @param putSysUserDTO
 	 * @param sysUserVO
 	 */
-	public void updateCompanyUser(PutSysUserDTO putSysUserDTO, SysUserVO sysUserVO) {
+	public void updateEmployee(PutSysUserDTO putSysUserDTO, SysUserVO sysUserVO) {
 
-		if (!putSysUserDTO.getParentId().equals(sysUserVO.getSysUserId())) {
+		// 獲取當前用戶
+		SysUser currentSysUser = sysUserService.get(putSysUserDTO.getSysUserId());
+		
+		// 父級ID == null , 最大權限者不給予操作
+		if (currentSysUser.getParentId() == null) {
+			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+		}
+
+		// 當前用戶的父級ID 與 token解析下當前操作者的ID 不一致則拋出錯誤信息
+		if (!currentSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
 			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
 		}
 
@@ -93,7 +126,9 @@ public class CompanyManager {
 		sysUserService.update(putSysUserDTO);
 	}
 
-	// 批量更新 員工資料
+	/**
+	 * 批量更新 員工資料
+	 */
 
 	/**
 	 * 刪除 企業員工用戶
@@ -101,43 +136,46 @@ public class CompanyManager {
 	 * @param sysUserId
 	 * @param sysUserVO
 	 */
-	public void removeCompanyUser(Long sysUserId, SysUserVO sysUserVO) {
+	public void removeEmployee(Long sysUserId, SysUserVO sysUserVO) {
 		SysUser targetSysUser = sysUserService.get(sysUserId);
 
+		// 父級ID == null , 最大權限者不給予操作
+		if (targetSysUser.getParentId() == null) {
+			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+		}
+		
 		if (!targetSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
 			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
 		}
+		
+		// 移除此用戶目前擁有的角色關係
+		sysUserRoleService.removeByUserId(sysUserId);
+		
 		// 目前僅直接刪除資料，後續有其他需求再開發
 		sysUserService.remove(sysUserId);
 	}
 
 	/**
-	 * 禁用/凍結 企業員工用戶
+	 * 更改企業員工狀態<br>
+	 * 啟用/禁用 用戶
 	 * 
 	 * @param sysUserId
+	 * @param status
+	 * @param operator
 	 */
-	public void disableCompanyUser(Long sysUserId, SysUserVO sysUserVO) {
+	public void switchEmployeeStatus(Long sysUserId, CommonStatusEnum status, SysUserVO operator) {
 		SysUser targetSysUser = sysUserService.get(sysUserId);
 
-		if (!targetSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
+		// 父級ID == null , 最大權限者不給予操作
+		if (targetSysUser.getParentId() == null) {
+			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+		}
+		
+		if (!targetSysUser.getParentId().equals(operator.getSysUserId())) {
 			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
 		}
 
-		sysUserService.updateCompanyUserStatus(sysUserId, CommonStatusEnum.NO);
-	}
-
-	/**
-	 * 啟用/解凍 企業員工用戶
-	 * 
-	 * @param sysUserId
-	 */
-	public void enableCompanyUser(Long sysUserId, SysUserVO sysUserVO) {
-		SysUser targetSysUser = sysUserService.get(sysUserId);
-
-		if (!targetSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
-			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
-		}
-		sysUserService.updateCompanyUserStatus(sysUserId, CommonStatusEnum.YES);
+		sysUserService.updateCompanyUserStatus(sysUserId, status);
 	}
 
 }

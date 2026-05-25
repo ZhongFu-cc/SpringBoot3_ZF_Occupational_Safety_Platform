@@ -50,8 +50,7 @@ public class PlatformAdminManager {
 	 * @return
 	 */
 	public IPage<SysUser> findDirectChild(Page<SysUser> pageInfo, SysUserVO sysUserVO, String queryText) {
-		sysUserService.findDirectChild(pageInfo, sysUserVO.getSysUserId(), queryText);
-		return null;
+		return sysUserService.findDirectChild(pageInfo, sysUserVO.getSysUserId(), queryText);
 	}
 
 	/**
@@ -80,7 +79,16 @@ public class PlatformAdminManager {
 	 */
 	public void updateCompanyUser(PutSysUserDTO putSysUserDTO, SysUserVO sysUserVO) {
 
-		if (!putSysUserDTO.getParentId().equals(sysUserVO.getSysUserId())) {
+		// 獲取當前用戶
+		SysUser currentSysUser = sysUserService.get(putSysUserDTO.getSysUserId());
+
+		// 父級ID == null , 最大權限者不給予操作
+		if (currentSysUser.getParentId() == null) {
+			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+		}
+
+		// 當前用戶的父級ID 與 token解析下當前操作者的ID 不一致則拋出錯誤信息
+		if (!currentSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
 			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
 		}
 
@@ -97,6 +105,11 @@ public class PlatformAdminManager {
 	public void removeCompanyUser(Long sysUserId, SysUserVO sysUserVO) {
 		SysUser targetSysUser = sysUserService.get(sysUserId);
 
+		// 父級ID == null , 最大權限者不給予操作
+		if (targetSysUser.getParentId() == null) {
+			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+		}
+		
 		if (!targetSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
 			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
 		}
@@ -109,32 +122,26 @@ public class PlatformAdminManager {
 	}
 
 	/**
-	 * 禁用/凍結 企業管理者用戶
+	 * 更改用戶狀態<br>
+	 * 啟用/禁用 用戶
 	 * 
 	 * @param sysUserId
+	 * @param status
+	 * @param operator
 	 */
-	public void disableCompanyUser(Long sysUserId, SysUserVO sysUserVO) {
+	public void switchCompanyUserStatus(Long sysUserId, CommonStatusEnum status, SysUserVO operator) {
 		SysUser targetSysUser = sysUserService.get(sysUserId);
 
-		if (!targetSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
+		// 父級ID == null , 最大權限者不給予操作
+		if (targetSysUser.getParentId() == null) {
+			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+		}
+		
+		if (!targetSysUser.getParentId().equals(operator.getSysUserId())) {
 			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
 		}
 
-		sysUserService.updateCompanyUserStatus(sysUserId, CommonStatusEnum.NO);
-	}
-
-	/**
-	 * 啟用/解凍 企業管理者用戶
-	 * 
-	 * @param sysUserId
-	 */
-	public void enableCompanyUser(Long sysUserId, SysUserVO sysUserVO) {
-		SysUser targetSysUser = sysUserService.get(sysUserId);
-
-		if (!targetSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
-			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
-		}
-		sysUserService.updateCompanyUserStatus(sysUserId, CommonStatusEnum.YES);
+		sysUserService.updateCompanyUserStatus(sysUserId, status);
 	}
 
 }

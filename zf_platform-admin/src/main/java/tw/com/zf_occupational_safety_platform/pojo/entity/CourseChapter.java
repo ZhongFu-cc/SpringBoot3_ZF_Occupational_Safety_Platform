@@ -25,7 +25,7 @@ import tw.com.zf_occupational_safety_platform.enums.CourseContentTypeEnum;
 @Getter
 @Setter
 @TableName("course_chapter")
-@Schema(name = "CourseChapter", description = "課程章節與自定義表單綁定結構表")
+@Schema(name = "CourseChapterManager", description = "課程章節與自定義表單綁定結構表")
 public class CourseChapter implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -85,5 +85,5 @@ public class CourseChapter implements Serializable {
     @Schema(description = "邏輯刪除,預設為0活耀,1為刪除")
     @TableField("is_deleted")
     @TableLogic
-    private Byte isDeleted;
+    private Integer isDeleted;
 }

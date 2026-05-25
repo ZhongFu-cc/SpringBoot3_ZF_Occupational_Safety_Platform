@@ -3,6 +3,7 @@ package tw.com.zf_occupational_safety_platform.mapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
@@ -27,7 +28,7 @@ public interface CourseCategoryMapper extends BaseMapper<CourseCategory> {
 	default IPage<CourseCategory> selectByQuery(Page<CourseCategory> pageInfo, String queryText) {
 
 		LambdaQueryWrapper<CourseCategory> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.and(wrap -> {
+		queryWrapper.and(StringUtils.isNotBlank(queryText), wrap -> {
 			wrap.like(CourseCategory::getCode, queryText).or().like(CourseCategory::getName, queryText);
 		});
 

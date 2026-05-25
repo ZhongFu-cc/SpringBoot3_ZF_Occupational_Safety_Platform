@@ -11,10 +11,6 @@ public class PutSysUserDTO {
 	@NotNull
 	@Schema(description = "主鍵ID")
 	private Long sysUserId;
-	
-	@NotNull
-	@Schema(description = "父級ID")
-	private Long parentId;
 
 	@NotBlank
 	@Schema(description = "帳號")

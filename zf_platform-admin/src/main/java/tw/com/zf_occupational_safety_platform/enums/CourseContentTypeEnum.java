@@ -12,7 +12,7 @@ import lombok.Getter;
 public enum CourseContentTypeEnum {
 
 	DIRECTORY("directory", "目錄", "Directory"), VIDEO("video", "影片", "Video"), QUIZ("quiz", "單元測驗", "Quiz"),
-	SURVEY("survey", "單元測驗", "Survey");
+	SURVEY("survey", "課程總測驗", "Survey");
 
 	@EnumValue
 	@JsonValue // JSON 輸出用

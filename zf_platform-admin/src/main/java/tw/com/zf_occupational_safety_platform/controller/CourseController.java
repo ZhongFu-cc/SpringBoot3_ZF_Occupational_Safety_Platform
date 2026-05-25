@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -63,7 +64,7 @@ public class CourseController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@GetMapping("{id}")
-	public R<Course> getCourse(@PathVariable("id") Long id) {
+	public R<Course> getCourse(@PathVariable("id") @Schema(type="string") Long id) {
 		Course course = courseService.get(id);
 		return R.ok(course);
 	}
@@ -102,10 +103,12 @@ public class CourseController {
 	@Operation(summary = "新增 課程", description = "請使用formData包裝,2個key <br>" + "1.data(value = DTO(json))<br>"
 			+ "2.縮圖檔案 imgFile(value = binary)<br>" + "knife4j Web 文檔顯示有問題, 真實傳輸方式為 「multipart/form-data」<br>"
 			+ "請用 http://localhost:8080/swagger-ui/index.html 測試 ")
-	@Parameters({
-			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+//	@Parameters({
+//			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
-	public R<Void> saveCourse(@RequestPart(value = "imgFile", required = false) MultipartFile imgFile,
+	public R<Void> saveCourse(
+			@RequestHeader(name = "Authorization", required = true) String authorization,
+			@RequestPart(value = "imgFile", required = false) MultipartFile imgFile,
 			@RequestPart("data") @Schema(name = "data", implementation = AddCourseDTO.class) String jsonData)
 			throws JsonMappingException, JsonProcessingException {
 
@@ -156,7 +159,7 @@ public class CourseController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
 	@SaCheckRole("super-admin")
 	@DeleteMapping("{id}")
-	public R<Void> removeCourse(@PathVariable Long id) {
+	public R<Void> removeCourse(@PathVariable @Schema(type="string") Long id) {
 		courseService.remove(id);
 		return R.ok();
 	}

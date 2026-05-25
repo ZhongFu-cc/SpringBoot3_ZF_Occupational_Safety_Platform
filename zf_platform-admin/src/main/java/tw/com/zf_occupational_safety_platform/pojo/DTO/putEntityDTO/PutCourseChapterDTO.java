@@ -10,8 +10,8 @@ import tw.com.zf_occupational_safety_platform.enums.CourseContentTypeEnum;
 public class PutCourseChapterDTO {
 
 	@NotNull
-    @Schema(description = "主鍵ID")
-    private Long courseChapterId;
+	@Schema(description = "主鍵ID")
+	private Long courseChapterId;
 
 	@NotNull
 	@Schema(description = "所屬課程ID")
@@ -34,11 +34,5 @@ public class PutCourseChapterDTO {
 	@NotNull
 	@Schema(description = "單元內容類型: directory(純目錄/大單元), video(影片內容), quiz(隨堂/課後測驗)")
 	private CourseContentTypeEnum contentType;
-
-	@Schema(description = "若為影片(video)，儲存其播放路徑")
-	private String videoUrl;
-
-	@Schema(description = "影片長度(秒), 用於精確學習時數計算")
-	private Integer durationSeconds;
 
 }

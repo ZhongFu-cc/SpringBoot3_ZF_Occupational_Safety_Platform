@@ -1,9 +1,12 @@
 package tw.com.zf_occupational_safety_platform.service;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseChapterDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCourseChapterDTO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseChapterVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 
 /**
@@ -18,6 +21,9 @@ public interface CourseChapterService extends IService<CourseChapter> {
 
 	CourseChapter get(Long courseChapterId);
 
+	
+	List<CourseChapterVO> findTreeByCourseId (Long courseId);
+	
 	CourseChapter create(AddCourseChapterDTO addCourseChapterDTO);
 
 	void update(PutCourseChapterDTO putCourseChapterDTO);

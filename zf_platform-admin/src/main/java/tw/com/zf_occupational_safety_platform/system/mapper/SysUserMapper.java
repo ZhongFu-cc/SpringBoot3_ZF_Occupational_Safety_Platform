@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.system.mapper;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -28,13 +30,15 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	default IPage<SysUser> selectByParentIdAndQuery(IPage<SysUser> pageInfo, Long parentId, String queryText) {
 
 		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(SysUser::getParentId, parentId).and(wrap -> {
-			wrap.like(SysUser::getEmail, queryText)
+
+		queryWrapper.eq(SysUser::getParentId, parentId).and(StringUtils.isNotBlank(queryText), w -> {
+			w.like(SysUser::getEmail, queryText)
 					.or()
 					.like(SysUser::getPhone, queryText)
 					.or()
 					.like(SysUser::getRealName, queryText);
 		});
+		IPage<SysUser> selectPage = this.selectPage(pageInfo, queryWrapper);
 
 		return this.selectPage(pageInfo, queryWrapper);
 	}

@@ -27,6 +27,7 @@ import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.manager.CompanyManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
+import tw.com.zf_occupational_safety_platform.system.pojo.DTO.UpdateUserStatus;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 import tw.com.zf_occupational_safety_platform.system.service.SysUserService;
@@ -66,7 +67,8 @@ public class CompanyController {
 	@SaCheckRole("company_manager")
 	@GetMapping("{id}")
 	public R<SysUser> getUser(@PathVariable("id") @Schema(type = "string") Long id) {
-		SysUser sysUser = sysUserService.get(id);
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		SysUser sysUser = companyManager.getEmployee(id, sysUserVO);
 		return R.ok(sysUser);
 	}
 
@@ -105,7 +107,7 @@ public class CompanyController {
 	public R<Void> saveUser(@RequestBody @Valid AddSysUserDTO addUserDTO) {
 
 		SysUserVO sysUserVO = authManager.getUserInfo();
-		companyManager.createCompanyUser(addUserDTO, sysUserVO);
+		companyManager.createEmployee(addUserDTO, sysUserVO);
 		return R.ok();
 	}
 
@@ -122,7 +124,7 @@ public class CompanyController {
 	@PutMapping
 	public R<Void> updateUser(@RequestBody @Valid PutSysUserDTO putSysUserDTO) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
-		companyManager.updateCompanyUser(putSysUserDTO, sysUserVO);
+		companyManager.updateEmployee(putSysUserDTO, sysUserVO);
 		return R.ok();
 	}
 
@@ -139,7 +141,24 @@ public class CompanyController {
 	@DeleteMapping("{id}")
 	public R<Void> removeUser(@PathVariable @Schema(type = "string") Long id) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
-		companyManager.removeCompanyUser(id, sysUserVO);
+		companyManager.removeEmployee(id, sysUserVO);
+		return R.ok();
+	}
+
+	/**
+	 * 切換使用者 (企業員工) 啟用狀態
+	 * 
+	 * @param updateUserStatus
+	 * @return
+	 */
+	@Operation(summary = "切換使用者 (企業員工) 啟用狀態")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("company_manager")
+	@PutMapping("/status")
+	public R<Void> switchStatus(@RequestBody @Valid UpdateUserStatus updateUserStatus) {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		companyManager.switchEmployeeStatus(updateUserStatus.getSysUserId(), updateUserStatus.getStatus(), sysUserVO);
 		return R.ok();
 	}
 

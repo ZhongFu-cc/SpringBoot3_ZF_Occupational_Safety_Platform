@@ -27,6 +27,7 @@ import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.manager.PlatformAdminManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
+import tw.com.zf_occupational_safety_platform.system.pojo.DTO.UpdateUserStatus;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 import tw.com.zf_occupational_safety_platform.system.service.SysUserService;
@@ -51,9 +52,10 @@ public class PlatformAdminController {
 	private final PlatformAdminManager platformAdminManager;
 	private final SysUserService sysUserService;
 
-	/** ------------------- 子級使用者管理 -------------------------
-	
 	/**
+	 * ------------------- 子級使用者管理 -------------------------
+	 * 
+	 * /**
 	 * 根據ID查詢使用者
 	 * 
 	 * @param id
@@ -77,6 +79,7 @@ public class PlatformAdminController {
 	public R<IPage<SysUser>> findDirectChildUser(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) String queryText) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
+		System.out.println("進入查詢child" + sysUserVO);
 		Page<SysUser> pageInfo = new Page<>(page, size);
 		IPage<SysUser> userPage = platformAdminManager.findDirectChild(pageInfo, sysUserVO, queryText);
 		return R.ok(userPage);
@@ -114,6 +117,24 @@ public class PlatformAdminController {
 	public R<Void> updateUser(@RequestBody @Valid PutSysUserDTO putSysUserDTO) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		platformAdminManager.updateCompanyUser(putSysUserDTO, sysUserVO);
+		return R.ok();
+	}
+
+	/**
+	 * 切換使用者 (企業管理者) 啟用狀態
+	 * 
+	 * @param updateUserStatus
+	 * @return
+	 */
+	@Operation(summary = "切換使用者 (企業管理者) 啟用狀態")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("super-admin")
+	@PutMapping("/status")
+	public R<Void> switchStatus(@RequestBody @Valid UpdateUserStatus updateUserStatus) {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		platformAdminManager.switchCompanyUserStatus(updateUserStatus.getSysUserId(), updateUserStatus.getStatus(),
+				sysUserVO);
 		return R.ok();
 	}
 
