@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
-import tw.com.zf_occupational_safety_platform.enums.CourseContentTypeEnum;
+import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 
 /**
  * <p>
@@ -57,7 +57,7 @@ public class CourseChapter implements Serializable {
 
 	@Schema(description = "單元內容類型: directory(純目錄/大單元), video(影片內容), quiz(隨堂/課後測驗)")
 	@TableField("content_type")
-	private CourseContentTypeEnum contentType;
+	private ChapterContentTypeEnum contentType;
 
 	@Schema(description = "若為影片(video)，儲存其播放路徑")
 	@TableField("video_url")

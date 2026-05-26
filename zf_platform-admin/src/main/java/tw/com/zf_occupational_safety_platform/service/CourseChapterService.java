@@ -21,6 +21,12 @@ public interface CourseChapterService extends IService<CourseChapter> {
 
 	CourseChapter get(Long courseChapterId);
 
+	/**
+	 * 獲得不是目錄型的 課程章節
+	 * @param courseId
+	 * @return
+	 */
+	List<CourseChapter> findNonDirectoryByCourseId(Long courseId);
 	
 	List<CourseChapterVO> findTreeByCourseId (Long courseId);
 	

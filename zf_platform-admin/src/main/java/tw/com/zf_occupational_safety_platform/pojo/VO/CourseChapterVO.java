@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import tw.com.zf_occupational_safety_platform.enums.CourseContentTypeEnum;
+import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 import tw.com.zf_occupational_safety_platform.utils.TreeNode;
 
 @Data
@@ -34,7 +34,7 @@ public class CourseChapterVO implements TreeNode<CourseChapterVO, Long> {
 	private Integer chapterOrder;
 
 	@Schema(description = "單元內容類型: directory(純目錄/大單元), video(影片內容), quiz(隨堂/課後測驗)")
-	private CourseContentTypeEnum contentType;
+	private ChapterContentTypeEnum contentType;
 
 	@Schema(description = "若為影片(video)，儲存其播放路徑")
 	private String videoUrl;

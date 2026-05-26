@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import tw.com.zf_occupational_safety_platform.enums.CourseContentTypeEnum;
+import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 
 @Data
 public class AddCourseChapterDTO {
@@ -29,7 +29,7 @@ public class AddCourseChapterDTO {
 
 	@NotNull
 	@Schema(description = "單元內容類型: directory(純目錄/大單元), video(影片內容), quiz(隨堂/課後測驗)")
-	private CourseContentTypeEnum contentType;
+	private ChapterContentTypeEnum contentType;
 
 
 }
