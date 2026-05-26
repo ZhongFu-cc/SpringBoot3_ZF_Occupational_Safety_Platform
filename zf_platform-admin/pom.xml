@@ -80,14 +80,21 @@
         </dependency>
         <!-- freemarker模板引擎（template engine）,用於搭配代碼生成器-->
         <!-- 概念上就像「照樣造句」，一段文字會有幾個地方被挖空，而我們要自己把詞語給填進去。 -->
+        <!--
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
         </dependency>
+        -->
 
-        <!-- knife4j 接口API 文檔擴展 -->
         <dependency>
-            <groupId>com.github.xiaoymin</groupId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+        </dependency>
+
+        <!-- knife4j Next Spring Boot3 接口API 文檔擴展 (原knife4j 已不更新) -->
+        <dependency>
+            <groupId>com.baizhukui</groupId>
             <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
         </dependency>
 
@@ -101,7 +108,7 @@
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-redisson-jackson</artifactId>
         </dependency>
-        
+
         <!-- minio 分布式文件儲存服務 -->
         <dependency>
             <groupId>io.minio</groupId>

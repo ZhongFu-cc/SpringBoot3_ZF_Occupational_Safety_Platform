@@ -1,0 +1,73 @@
+package tw.com.zf_occupational_safety_platform.service.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.convert.CourseChapterConvert;
+import tw.com.zf_occupational_safety_platform.mapper.CourseChapterMapper;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseChapterDTO;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCourseChapterDTO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseChapterVO;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
+import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
+import tw.com.zf_occupational_safety_platform.utils.TreeUtil;
+
+/**
+ * <p>
+ * 課程章節與自定義表單綁定結構表 服务实现类
+ * </p>
+ *
+ * @author Joey
+ * @since 2026-05-21
+ */
+@Service
+@RequiredArgsConstructor
+public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, CourseChapter>
+		implements CourseChapterService {
+
+	private final CourseChapterConvert courseChapterConvert;
+
+	@Override
+	public CourseChapter get(Long courseChapterId) {
+		return baseMapper.selectById(courseChapterId);
+	}
+
+	@Override
+	public List<CourseChapterVO> findTreeByCourseId(Long courseId) {
+		// 查詢課程的所有單元
+		List<CourseChapter> courseChapters = baseMapper.selectByCourseId(courseId);
+
+		// 轉換成vo對象
+		List<CourseChapterVO> voList = courseChapters.stream().map(courseChapter -> {
+			CourseChapterVO vo = courseChapterConvert.entityToVO(courseChapter);
+			return vo;
+		}).toList();
+
+		// 構建vo樹狀結構列表
+		return TreeUtil.buildTree(voList);
+
+	}
+
+	@Override
+	public CourseChapter create(AddCourseChapterDTO addCourseChapterDTO) {
+		CourseChapter courseChapter = courseChapterConvert.addDTOToEntity(addCourseChapterDTO);
+		baseMapper.insert(courseChapter);
+		return courseChapter;
+	}
+
+	@Override
+	public void update(PutCourseChapterDTO putCourseChapterDTO) {
+		CourseChapter courseChapter = courseChapterConvert.putDTOToEntity(putCourseChapterDTO);
+		baseMapper.updateById(courseChapter);
+	}
+
+	@Override
+	public void remove(Long courseChapterId) {
+		baseMapper.deleteById(courseChapterId);
+	}
+
+}
