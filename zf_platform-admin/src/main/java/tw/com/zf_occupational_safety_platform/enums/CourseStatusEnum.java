@@ -11,7 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum CourseStatusEnum {
 
-	NOT_STARTED("not-started", "未開始", "Not-Started"), IN_PROGRESS("in-progress", "進行中", "In-Progress"),
+	NOT_STARTED("not_started", "未開始", "Not-Started"), IN_PROGRESS("in_progress", "進行中", "In-Progress"),
 	COMPLETED("completed", "已完成", "Completed"), EXPIRED("expired", "已過期", "Expired"),
 	CANCELLED("cancelled", "已被取消", "cancelled");
 
