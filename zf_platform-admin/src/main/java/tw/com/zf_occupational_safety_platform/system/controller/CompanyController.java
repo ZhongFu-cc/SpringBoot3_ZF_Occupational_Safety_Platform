@@ -73,17 +73,17 @@ public class CompanyController {
 	}
 
 	/**
-	 * 查詢直系的clild使用者 (企業員工)
+	 * 查詢直系的child使用者 (企業員工)
 	 * 
 	 * @param page
 	 * @param size
 	 * @param queryText
 	 * @return
 	 */
-	@GetMapping("clild/pagination")
+	@GetMapping("child/pagination")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@Operation(summary = "查詢直系的clild使用者 (企業員工)")
+	@Operation(summary = "查詢直系的child使用者 (企業員工)")
 	@SaCheckRole("company_manager")
 	public R<IPage<SysUser>> findDirectChildUser(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) String queryText) {

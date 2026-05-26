@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.manager.CourseChapterManager;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseChapterDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCourseChapterDTO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseChapterVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
 import tw.com.zf_occupational_safety_platform.utils.R;
@@ -59,6 +59,14 @@ public class CourseChapterController {
 	public R<CourseChapter> getCourseChapter(@PathVariable("id") @Schema(type = "string") Long id) {
 		CourseChapter courseCategory = courseChapterService.get(id);
 		return R.ok(courseCategory);
+	}
+
+	@GetMapping("course")
+	@Operation(summary = "根據 課程ID 查詢 課程單元樹(父子結構)")
+	public R<List<CourseChapterVO>> getCourseChapterTree(
+			@RequestParam("courseId") @Schema(type = "string") Long courseId) {
+		List<CourseChapterVO> treeList = courseChapterManager.findTreeList(courseId);
+		return R.ok(treeList);
 	}
 
 	/**

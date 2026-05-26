@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.manager;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -8,6 +10,7 @@ import tw.com.zf_occupational_safety_platform.convert.CourseChapterConvert;
 import tw.com.zf_occupational_safety_platform.helper.S3Helper;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseChapterDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCourseChapterDTO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseChapterVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
 import tw.com.zf_occupational_safety_platform.service.CourseService;
@@ -35,8 +38,8 @@ public class CourseChapterManager {
 	 * 
 	 * @param courseId 課程ID
 	 */
-	public void findTreeList(Long courseId) {
-
+	public List<CourseChapterVO> findTreeList(Long courseId) {
+		return courseChapterService.findTreeByCourseId(courseId);
 	}
 
 	/**
