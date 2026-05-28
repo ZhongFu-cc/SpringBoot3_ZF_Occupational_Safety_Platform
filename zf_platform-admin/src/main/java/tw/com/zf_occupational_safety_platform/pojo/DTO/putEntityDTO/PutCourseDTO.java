@@ -21,9 +21,6 @@ public class PutCourseDTO {
     @Schema(description = "課程名稱")
     private String title;
 
-    @Schema(description = "課程封面圖片路徑")
-    private String coverImage;
-
     @NotBlank
     @Schema(description = "課程大綱與介紹")
     private String description;

@@ -103,11 +103,10 @@ public class CourseController {
 	@Operation(summary = "新增 課程", description = "請使用formData包裝,2個key <br>" + "1.data(value = DTO(json))<br>"
 			+ "2.縮圖檔案 imgFile(value = binary)<br>" + "knife4j Web 文檔顯示有問題, 真實傳輸方式為 「multipart/form-data」<br>"
 			+ "請用 http://localhost:8080/swagger-ui/index.html 測試 ")
-//	@Parameters({
-//			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	public R<Void> saveCourse(
-			@RequestHeader(name = "Authorization", required = true) String authorization,
 			@RequestPart(value = "imgFile", required = false) MultipartFile imgFile,
 			@RequestPart("data") @Schema(name = "data", implementation = AddCourseDTO.class) String jsonData)
 			throws JsonMappingException, JsonProcessingException {

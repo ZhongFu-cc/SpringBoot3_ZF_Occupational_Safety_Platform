@@ -57,7 +57,7 @@ public class CourseCategoryController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@GetMapping("{id}")
-	public R<CourseCategory> getCourseCategory(@PathVariable("id") @Schema(type="string") Long id) {
+	public R<CourseCategory> getCourseCategory(@PathVariable("id") @Schema(type = "string") Long id) {
 		CourseCategory courseCategory = courseCategoryService.get(id);
 		return R.ok(courseCategory);
 	}
@@ -124,7 +124,7 @@ public class CourseCategoryController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
 	@SaCheckRole("super-admin")
 	@DeleteMapping("{id}")
-	public R<Void> removeCourseCategory(@PathVariable @Schema(type="string") Long id) {
+	public R<Void> removeCourseCategory(@PathVariable @Schema(type = "string") Long id) {
 		courseCategoryService.remove(id);
 		return R.ok();
 	}

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.CourseChapterConvert;
+import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 import tw.com.zf_occupational_safety_platform.mapper.CourseChapterMapper;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseChapterDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCourseChapterDTO;
@@ -34,6 +35,18 @@ public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, C
 	@Override
 	public CourseChapter get(Long courseChapterId) {
 		return baseMapper.selectById(courseChapterId);
+	}
+
+	@Override
+	public List<CourseChapter> findNonDirectoryByCourseId(Long courseId) {
+		// 查詢課程的所有單元
+		List<CourseChapter> courseChapters = baseMapper.selectByCourseId(courseId);
+
+		// 過濾不是DIRECTORY類型的chapter
+		return courseChapters.stream()
+				.filter(chapter -> !ChapterContentTypeEnum.DIRECTORY.equals(chapter.getContentType()))
+				.toList();
+
 	}
 
 	@Override
