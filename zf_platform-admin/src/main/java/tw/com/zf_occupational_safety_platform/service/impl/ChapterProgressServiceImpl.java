@@ -39,6 +39,16 @@ public class ChapterProgressServiceImpl extends ServiceImpl<ChapterProgressMappe
 	}
 
 	@Override
+	public ChapterProgress getByOwner(Long chapterProgressId, Long userId) {
+		return baseMapper.selectByOwner(chapterProgressId, userId);
+	}
+
+	@Override
+	public ChapterProgress getByEnrollmentAndChapter(Long enrollmentId, Long chapterId, Long userId) {
+		return baseMapper.selectByEnrollmentAndChapter(enrollmentId, chapterId, userId);
+	}
+
+	@Override
 	public IPage<ChapterProgress> findPageByQuery(Page<ChapterProgress> pageInfo, String queryText) {
 		// TODO Auto-generated method stub
 		return null;

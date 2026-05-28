@@ -1,13 +1,16 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterWatchLog;
-import tw.com.zf_occupational_safety_platform.mapper.ChapterWatchLogMapper;
-import tw.com.zf_occupational_safety_platform.service.ChapterWatchLogService;
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import org.springframework.stereotype.Service;
+
+import tw.com.zf_occupational_safety_platform.mapper.ChapterWatchLogMapper;
+import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterWatchLog;
+import tw.com.zf_occupational_safety_platform.service.ChapterWatchLogService;
 
 /**
  * <p>
@@ -35,8 +38,19 @@ public class ChapterWatchLogServiceImpl extends ServiceImpl<ChapterWatchLogMappe
 	@Override
 	public ChapterWatchLog create(Long chapterProgressId, Long courseEnrollmentId, Long sysUserId,
 			Long courseChapterId) {
-		// TODO Auto-generated method stub
-		return null;
+
+		LocalDateTime now = LocalDateTime.now();
+
+		ChapterWatchLog chapterWatchLog = new ChapterWatchLog();
+		chapterWatchLog.setChapterProgressId(chapterProgressId);
+		chapterWatchLog.setCourseEnrollmentId(courseEnrollmentId);
+		chapterWatchLog.setCourseChapterId(courseChapterId);
+		chapterWatchLog.setSysUserId(sysUserId);
+		chapterWatchLog.setSessionStart(now);
+
+		baseMapper.insert(chapterWatchLog);
+
+		return chapterWatchLog;
 	}
 
 	@Override

@@ -16,6 +16,39 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface ChapterProgressMapper extends BaseMapper<ChapterProgress> {
 
 	/**
+	 * 查詢本人持有的 章節學習進度
+	 * 
+	 * @param chapterProgressId 主鍵ID
+	 * @param sysUserId         用戶ID
+	 * @return
+	 */
+	default ChapterProgress selectByOwner(Long chapterProgressId, Long sysUserId) {
+		LambdaQueryWrapper<ChapterProgress> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ChapterProgress::getChapterProgressId, chapterProgressId)
+				.eq(ChapterProgress::getSysUserId, sysUserId);
+
+		return this.selectOne(queryWrapper);
+
+	}
+
+	/**
+	 * 根據條件查詢 章節進度
+	 * 
+	 * @param courseEnrollmentId 報名ID
+	 * @param courseChapterId    課程章節ID
+	 * @param sysUserId          用戶id
+	 * @return
+	 */
+	default ChapterProgress selectByEnrollmentAndChapter(Long courseEnrollmentId, Long courseChapterId,
+			Long sysUserId) {
+		LambdaQueryWrapper<ChapterProgress> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ChapterProgress::getCourseEnrollmentId, courseEnrollmentId)
+				.eq(ChapterProgress::getCourseChapterId, courseChapterId)
+				.eq(ChapterProgress::getSysUserId, sysUserId);
+		return this.selectOne(queryWrapper);
+	};
+
+	/**
 	 * 根據報名ID刪除
 	 * 
 	 * @param courseEnrollmentId

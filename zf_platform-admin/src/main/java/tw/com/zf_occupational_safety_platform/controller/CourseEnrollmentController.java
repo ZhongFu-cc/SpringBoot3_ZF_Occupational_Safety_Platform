@@ -85,13 +85,16 @@ public class CourseEnrollmentController {
 	@Operation(summary = "查詢 報名課程分頁對象")
 	@SaCheckLogin
 	public R<IPage<CourseEnrollment>> findCourseEnrollmentPageByOwner(@RequestParam Integer page,
-			@RequestParam Integer size, @RequestParam(required = false) CourseStatusEnum status) {
+			@RequestParam Integer size,
+			@RequestParam(required = false) @Schema(description = "可選值:not_started、in_progress、completed、expired、cancelled") String status) {
+
+		CourseStatusEnum courseStatusEnum = CourseStatusEnum.fromValue(status);
 
 		SysUserVO sysUserVO = authManager.getUserInfo();
 
 		Page<CourseEnrollment> pageInfo = new Page<>(page, size);
-		IPage<CourseEnrollment> courseEnrollmentPage = courseEnrollmentService.findPageByOwner(pageInfo, status,
-				sysUserVO.getSysUserId());
+		IPage<CourseEnrollment> courseEnrollmentPage = courseEnrollmentService.findPageByOwner(pageInfo,
+				courseStatusEnum, sysUserVO.getSysUserId());
 		return R.ok(courseEnrollmentPage);
 	}
 

@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum CourseStatusEnum {
+public enum CourseStatusEnum  {
 
 	NOT_STARTED("not_started", "未開始", "Not-Started"), IN_PROGRESS("in_progress", "進行中", "In-Progress"),
 	COMPLETED("completed", "已完成", "Completed"), EXPIRED("expired", "已過期", "Expired"),

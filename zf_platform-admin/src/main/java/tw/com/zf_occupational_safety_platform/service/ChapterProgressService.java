@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 
 /**
  * <p>
@@ -20,6 +22,26 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 public interface ChapterProgressService extends IService<ChapterProgress> {
 
 	ChapterProgress get(Long chapterProgressId);
+
+	/**
+	 * 用戶查詢本人持有的 章節學習進度
+	 * 
+	 * @param chapterProgressId 主鍵ID
+	 * @param userId            用戶ID
+	 * @return
+	 */
+	ChapterProgress getByOwner(Long chapterProgressId, Long userId);
+
+	/**
+	 * 透過報名ID、章節ID、用戶ID<br>
+	 * 查詢 章節學習進度
+	 * 
+	 * @param enrollmentId 報名ID
+	 * @param chapterId    章節ID
+	 * @param userId       用戶ID
+	 * @return
+	 */
+	ChapterProgress getByEnrollmentAndChapter(Long enrollmentId, Long chapterId, Long userId);
 
 	IPage<ChapterProgress> findPageByQuery(Page<ChapterProgress> pageInfo, String queryText);
 
