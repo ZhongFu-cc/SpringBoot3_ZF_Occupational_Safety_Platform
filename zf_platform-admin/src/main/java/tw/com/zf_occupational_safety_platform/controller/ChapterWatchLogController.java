@@ -43,7 +43,7 @@ public class ChapterWatchLogController {
 	}
 
 	/**
-	 * 心跳 API，前端每 30 秒呼叫一次
+	 * 心跳 API，前端每 60 秒呼叫一次<br>
 	 * 回傳當前累積秒數，前端可用於顯示學習時數
 	 */
 	@Operation(summary = "心跳上報")
@@ -55,9 +55,9 @@ public class ChapterWatchLogController {
 	}
 
 	/**
-	 * 正常結束觀看（切換章節、主動離開）
-	 * 前端在 visibilitychange / 切換章節時呼叫
-	 * 注意：關掉頁面不可靠，靠 Redis TTL 過期自動處理
+	 * 正常結束觀看（切換章節、主動離開）<br>
+	 * 前端在 visibilitychange / 切換章節時呼叫 <br>
+	 * 注意：關掉頁面不可靠，還是要有 Redis TTL 過期自動處理
 	 */
 	@Operation(summary = "結束觀看章節")
 	@PostMapping("/end")

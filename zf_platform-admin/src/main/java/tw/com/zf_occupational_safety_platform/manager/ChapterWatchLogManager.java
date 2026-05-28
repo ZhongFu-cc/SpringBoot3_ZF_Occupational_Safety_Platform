@@ -24,34 +24,45 @@ public class ChapterWatchLogManager {
 	private final ChapterWatchLogService chapterWatchLogService;
 	private final RedissonClient redissonClient;
 
-	/** 前端心跳間隔 30 秒，小於 5 秒視為重複呼叫，不累加 */
-	private static final long MIN_ELAPSED_SEC = 5L;
+	/** 前端心跳間隔 60 秒，小於 15 秒視為重複呼叫，不累加 */
+	private static final long MIN_ELAPSED_SEC = 15L;
 	/** elapsed 上限：超過此值只累加 cap，防止開著頁面放著不動 */
 	private static final long ELAPSED_CAP_SEC = 60L;
-	/** last_beat TTL = 心跳間隔 3 倍，容許偶爾一次網路抖動 */
+	/** last_beat TTL = 心跳間隔 1.5 倍，容許偶爾一次網路抖動 */
 	private static final long LAST_BEAT_TTL_SEC = 90L;
 	/** duration 保留 24 小時，確保 last_beat 過期事件觸發時還能讀到 */
 	private static final long DURATION_TTL_SEC = 86400L;
 
-	// ── Key 命名 ────────────────────────────────────────────────────────────
-	// heartbeat:{sysUserId}:{chapterWatchLogId}:last_beat
-	// heartbeat:{sysUserId}:{chapterWatchLogId}:duration
-	private String lastBeatKey(Long sysUserId, Long logId) {
-		return "heartbeat:" + sysUserId + ":" + logId + ":last_beat";
+	/**
+	 * 最後的心跳包 Key 命名，只用sysUserId是避免同時瀏覽複數課程<br>
+	 * heartbeat:{sysUserId}:last_beat
+	 * 
+	 * @param sysUserId
+	 * @return
+	 */
+	private String lastBeatKey(Long sysUserId) {
+		return "heartbeat:" + sysUserId + ":last_beat";
 	}
 
+	/**
+	 * 觀看的秒數(期間) heartbeat:{sysUserId}:{chapterWatchLogId}:duration
+	 * 
+	 * @param sysUserId
+	 * @param logId
+	 * @return
+	 */
 	private String durationKey(Long sysUserId, Long logId) {
 		return "heartbeat:" + sysUserId + ":" + logId + ":duration";
 	}
 
-	// ── 心跳（由 Service.heartbeat 呼叫）────────────────────────────────────
+	// ── 心跳包 ────────────────────────────────────
 	public HeartbeatVO heartbeat(Long chapterWatchLogId, Long sysUserId) {
 		HeartbeatVO vo = new HeartbeatVO();
 
-		RBucket<Long> lastBeatBucket = redissonClient.getBucket(lastBeatKey(sysUserId, chapterWatchLogId));
+		RBucket<Long> lastBeatBucket = redissonClient.getBucket(lastBeatKey(sysUserId));
 		Long lastBeat = lastBeatBucket.get();
 
-		// last_beat 不存在 → TTL 已過期，session 無效
+		// last_beat 不存在 → TTL 已過期，session 無效，請前端重新刷新頁面
 		if (lastBeat == null) {
 			vo.setSessionAlive(false);
 			vo.setAccumulatedSeconds(0L);
@@ -97,8 +108,7 @@ public class ChapterWatchLogManager {
 	 * 代表已由過期事件處理，Service 層不需重複寫 DB。
 	 */
 	public void endWatch(Long chapterWatchLogId, Long sysUserId) {
-		// TODO Auto-generated method stub
-		RBucket<Long> lastBeatBucket = redissonClient.getBucket(lastBeatKey(sysUserId, chapterWatchLogId));
+		RBucket<Long> lastBeatBucket = redissonClient.getBucket(lastBeatKey(sysUserId));
 		Long lastBeat = lastBeatBucket.get();
 
 		if (lastBeat == null) {
@@ -121,6 +131,8 @@ public class ChapterWatchLogManager {
 		// 清除兩個 key
 		lastBeatBucket.delete();
 		durationBucket.delete();
+
+		// 更新 DB 時間
 
 	}
 
