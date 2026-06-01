@@ -1,11 +1,12 @@
 package tw.com.zf_occupational_safety_platform.service;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterWatchLog;
-import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterWatchLog;
 
 /**
  * <p>
@@ -18,6 +19,10 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface ChapterWatchLogService extends IService<ChapterWatchLog> {
 
 	ChapterWatchLog get(Long chapterWatchLogId);
+
+	List<ChapterWatchLog> findByEnrollmentId(Long enrollmentId);
+	
+	Integer calculateTotalDurationSec(Long enrollmentId);
 
 	IPage<ChapterWatchLog> findPageByQuery(Page<ChapterWatchLog> pageInfo, String queryText);
 

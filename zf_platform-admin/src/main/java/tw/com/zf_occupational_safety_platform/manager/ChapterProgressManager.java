@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import org.redisson.api.RBucket;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
+import org.redisson.client.codec.LongCodec;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -33,10 +34,6 @@ public class ChapterProgressManager {
 	private final ChapterWatchLogService chapterWatchLogService;
 	private final RedissonClient redissonClient;
 
-	/** 前端心跳間隔 60 秒，小於 15 秒視為重複呼叫，不累加 */
-	private static final Duration MIN_ELAPSED_SEC = Duration.ofSeconds(15L);
-	/** elapsed 上限：超過此值只累加 cap，防止開著頁面放著不動 */
-	private static final Duration ELAPSED_CAP_SEC = Duration.ofSeconds(15L);
 	/** last_beat TTL = 心跳間隔 3 倍，容許偶爾一次網路抖動 */
 	private static final Duration LAST_BEAT_TTL = Duration.ofSeconds(90L);
 	/** duration 保留 24 小時，確保 last_beat 過期事件觸發時還能讀到 */
@@ -147,11 +144,14 @@ public class ChapterProgressManager {
 		// 如果當前已經有心跳包，則直接拋出錯誤，這是為了防止多個頁面觀看，刷時數
 		RBucket<Long> lastBeat = redissonClient.getBucket(lastBeatKey(sysUserVO.getSysUserId()));
 
-		// duration map 同時存 logId 和累積秒數
-		RMap<String, Long> durationMap = redissonClient.getMap(durationKey(sysUserVO.getSysUserId()));
+		// duration map 同時存 logId 和累積秒數，兩個都剛好是Long類型，所以可以這樣操作，更複雜的情況建議分開
+		RMap<String, Long> durationMap = redissonClient.getMap(durationKey(sysUserVO.getSysUserId()),
+				LongCodec.INSTANCE);
 
 		// 如果已經有心跳包，則要判斷是否是當前課程的心跳包
 		if (lastBeat.isExists()) {
+
+			System.out.println("心跳包已存在");
 
 			// 先取出觀看紀錄的快取，拿到當前紀錄資料
 			Long watchLogId = durationMap.get(MAP_KEY_LOG_ID);
@@ -161,6 +161,7 @@ public class ChapterProgressManager {
 			if (chapterWatchLog.getChapterProgressId().equals(chapterProgressId)) {
 
 				// 把此心跳包對應的watchLog更新，把觀看結束時間填入，結束上次Session紀錄
+				// 心跳包只會存活90秒 , 先簡易拿當前時間，去相減，真的有問題再拿durationKey 中的時間去減
 				chapterWatchLog.setSessionEnd(LocalDateTime.now());
 				int seconds = (int) Duration.between(chapterWatchLog.getSessionStart(), chapterWatchLog.getSessionEnd())
 						.getSeconds();
@@ -170,7 +171,6 @@ public class ChapterProgressManager {
 				// 不是當前課程，代表用戶正在嘗試重複觀看課程，直接拋出錯誤
 				throw new ChapterWatchLogException("系統偵測到有重複開啟上課介面，禁止多重視窗瀏覽課程");
 			}
-
 		}
 
 		// 獲取當前時間

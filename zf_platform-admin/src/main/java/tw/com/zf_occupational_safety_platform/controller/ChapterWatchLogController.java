@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,6 +50,8 @@ public class ChapterWatchLogController {
 	 * 回傳當前累積秒數，前端可用於顯示學習時數
 	 */
 	@Operation(summary = "心跳上報")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@PostMapping("/heartbeat")
 	public R<HeartbeatVO> heartbeat(@RequestBody @Valid HeartbeatReq req) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
@@ -60,6 +65,8 @@ public class ChapterWatchLogController {
 	 * 注意：關掉頁面不可靠，還是要有 Redis TTL 過期自動處理
 	 */
 	@Operation(summary = "結束觀看章節")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@PostMapping("/end")
 	public R<Void> endWatch(@RequestBody @Valid HeartbeatReq req) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
