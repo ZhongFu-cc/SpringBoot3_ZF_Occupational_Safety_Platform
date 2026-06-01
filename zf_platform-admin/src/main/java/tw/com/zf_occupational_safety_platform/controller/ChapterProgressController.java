@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.time.Instant;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,6 +53,12 @@ public class ChapterProgressController {
 	 */
 	public record ChapterProgressRequest(
 			@NotNull @Schema(description = "課程章節進度 ID", type = "string") Long chapterProgressId) {
+	}
+
+	@GetMapping
+	public void test() {
+		System.out.println("系統時間" + Instant.now().getEpochSecond());
+
 	}
 
 	/**

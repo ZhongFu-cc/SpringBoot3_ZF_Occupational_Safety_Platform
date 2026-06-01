@@ -40,6 +40,20 @@ public class GlobalExceptionHandler {
 	//	}
 
 	/**
+	 * 跟 課程章節 觀看紀錄 相關的業務邏輯錯誤
+	 * 
+	 * @param exception
+	 * @return
+	 */
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ExceptionHandler(value = ChapterWatchLogException.class)
+	public R<Map<String, Object>> chapterWatchLogException(ChapterWatchLogException exception) {
+		String message = exception.getMessage();
+		return R.fail(409, message);
+	}
+
+	/**
 	 * 跟 課程 相關的業務邏輯錯誤
 	 * 
 	 * @param exception

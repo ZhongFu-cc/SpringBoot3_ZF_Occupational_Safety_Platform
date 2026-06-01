@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,16 @@ public class ChapterWatchLogServiceImpl extends ServiceImpl<ChapterWatchLogMappe
 	@Override
 	public ChapterWatchLog get(Long chapterWatchLogId) {
 		return baseMapper.selectById(chapterWatchLogId);
+	}
+
+	@Override
+	public List<ChapterWatchLog> findByEnrollmentId(Long enrollmentId) {
+		return baseMapper.selectByCourseEnrollmentId(enrollmentId);
+	}
+
+	@Override
+	public Integer calculateTotalDurationSec(Long enrollmentId) {
+		return baseMapper.selectTotalDurationSec(enrollmentId);
 	}
 
 	@Override

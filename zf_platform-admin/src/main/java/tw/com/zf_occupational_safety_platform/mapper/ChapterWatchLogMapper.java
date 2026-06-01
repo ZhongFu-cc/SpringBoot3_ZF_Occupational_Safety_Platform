@@ -1,9 +1,13 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterWatchLog;
+import java.util.List;
+
+import org.apache.ibatis.annotations.Select;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterWatchLog;
 
 /**
  * <p>
@@ -14,6 +18,26 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2026-05-26
  */
 public interface ChapterWatchLogMapper extends BaseMapper<ChapterWatchLog> {
+
+	@Select("""
+			SELECT SUM(COALESCE(duration_sec, 0)) AS totalDurationSec
+			FROM chapter_watch_log
+			WHERE course_enrollment_id = #{courseEnrollmentId}
+			GROUP BY course_enrollment_id
+			""")
+	Integer selectTotalDurationSec(Long courseEnrollmentId);
+
+	/**
+	 * 根據報名ID 查詢
+	 * 
+	 * @param courseEnrollmentId
+	 */
+	default List<ChapterWatchLog> selectByCourseEnrollmentId(Long courseEnrollmentId) {
+		LambdaQueryWrapper<ChapterWatchLog> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ChapterWatchLog::getCourseEnrollmentId, courseEnrollmentId);
+		return this.selectList(queryWrapper);
+
+	}
 
 	/**
 	 * 根據報名ID 刪除

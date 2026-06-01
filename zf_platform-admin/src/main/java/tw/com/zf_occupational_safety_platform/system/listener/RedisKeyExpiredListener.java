@@ -14,14 +14,14 @@ public class RedisKeyExpiredListener extends KeyExpirationEventMessageListener {
 
 	@Override
 	public void onMessage(Message message, byte[] pattern) {
-		String expiredKey = message.toString();
-		System.out.println("redis過期的key為: " + expiredKey);
-		if (expiredKey.startsWith("chunk:")) {
+//		String expiredKey = message.toString();
+//		System.out.println("redis過期的key為: " + expiredKey);
+//		if (expiredKey.startsWith("chunk:")) {
 			//            String fileMd5 = expiredKey.substring("chunk:".length());
 			//            System.out.println("檔案過期，fileSHA256 = " + fileMd5);
 
 			// TODO: 呼叫 MinIO 刪除 chunk，刪資料庫、log 等
-		}
+//		}
 	}
 
 }
