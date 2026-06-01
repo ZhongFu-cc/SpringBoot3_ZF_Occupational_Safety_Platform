@@ -83,7 +83,7 @@ public class ChapterWatchLogManager {
 
 		long now = Instant.now().getEpochSecond();
 		long elapsed = now - lastBeat;
-		RMap<String, Long> durationMap = redissonClient.getMap(durationKey(sysUserId),LongCodec.INSTANCE);
+		RMap<String, Long> durationMap = redissonClient.getMap(durationKey(sysUserId), LongCodec.INSTANCE);
 
 		// 重複呼叫過快，不累加、不重置 TTL，直接回傳現有數值
 		if (elapsed < MIN_ELAPSED_SEC) {
@@ -109,7 +109,7 @@ public class ChapterWatchLogManager {
 	 * 讀取後刪除，寫入 DB。
 	 */
 	public void getDurationAndClean(Long sysUserId) {
-		RMap<String, Long> durationMap = redissonClient.getMap(durationKey(sysUserId),LongCodec.INSTANCE);
+		RMap<String, Long> durationMap = redissonClient.getMap(durationKey(sysUserId), LongCodec.INSTANCE);
 
 		// 心跳包消失，如果durationMap還在，代表非自然結束所以做觀看時間補充
 		if (durationMap.isExists()) {
@@ -154,7 +154,7 @@ public class ChapterWatchLogManager {
 		// 正常心跳：累加實際經過時間，超過上限只算上限
 		long actual = Math.min(elapsed, ELAPSED_CAP_SEC);
 
-		RMap<String, Long> durationMap = redissonClient.getMap(durationKey(sysUserId),LongCodec.INSTANCE);
+		RMap<String, Long> durationMap = redissonClient.getMap(durationKey(sysUserId), LongCodec.INSTANCE);
 		Integer seconds = durationMap.addAndGet(MAP_KEY_SECONDS, actual).intValue();
 		Long logId = durationMap.get(MAP_KEY_LOG_ID);
 
