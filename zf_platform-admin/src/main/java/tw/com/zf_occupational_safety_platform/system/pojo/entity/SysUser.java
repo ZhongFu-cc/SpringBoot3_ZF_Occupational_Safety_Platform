@@ -38,6 +38,14 @@ public class SysUser implements Serializable {
 	@Schema(description = "父級ID",type = "string")
 	@TableField("parent_id")
 	private Long parentId;
+	
+	@Schema(description = "公司ID",type = "string")
+	@TableField("company_id")
+	private Long companyId;
+	
+	@Schema(description = "部門ID",type = "string")
+	@TableField("department_id")
+	private Long departmentId;
 
 	@Schema(description = "帳號")
 	@TableField("account")

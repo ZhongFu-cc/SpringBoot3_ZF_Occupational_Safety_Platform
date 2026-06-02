@@ -12,6 +12,12 @@ public class PutSysUserDTO {
 	@Schema(description = "主鍵ID")
 	private Long sysUserId;
 
+	@Schema(description = "公司ID", type = "string")
+	private Long companyId;
+
+	@Schema(description = "部門ID", type = "string")
+	private Long departmentId;
+
 	@NotBlank
 	@Schema(description = "帳號")
 	private String account;

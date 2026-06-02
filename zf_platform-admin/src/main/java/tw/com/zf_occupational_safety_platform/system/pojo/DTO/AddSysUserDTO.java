@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.system.pojo.DTO;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +10,12 @@ import lombok.Data;
 @Data
 public class AddSysUserDTO {
 
+	@Schema(description = "公司ID",type = "string")
+	private Long companyId;
+	
+	@Schema(description = "部門ID",type = "string")
+	private Long departmentId;
+	
 	@NotBlank
 	@Schema(description = "帳號")
 	private String account;
@@ -15,7 +23,7 @@ public class AddSysUserDTO {
 	@NotBlank
 	@Schema(description = "密碼")
 	private String password;
-
+	
 	@NotBlank
 	@Schema(description = "真實姓名")
 	private String realName;
