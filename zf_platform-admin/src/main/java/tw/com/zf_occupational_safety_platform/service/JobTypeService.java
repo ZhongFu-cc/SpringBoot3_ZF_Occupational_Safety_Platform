@@ -1,7 +1,12 @@
 package tw.com.zf_occupational_safety_platform.service;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.JobType;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddJobTypeDTO;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutJobTypeDTO;
+import tw.com.zf_occupational_safety_platform.pojo.entity.JobType;
 
 /**
  * <p>
@@ -13,4 +18,15 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface JobTypeService extends IService<JobType> {
 
+	JobType get(Long jobTypeId);
+
+	IPage<JobType> findPageByQuery(Page<JobType> pageInfo, String queryText);
+
+	JobType create(AddJobTypeDTO addJobTypeDTO);
+
+	void update(PutJobTypeDTO putJobTypeDTO);
+
+	void remove(Long jobTypeId);
+	
+	
 }
