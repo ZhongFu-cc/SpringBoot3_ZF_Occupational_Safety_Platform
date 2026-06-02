@@ -124,7 +124,7 @@ public class MybatisPlusGeneratedBusinessReplenish {
 				// 策略配置
 				.strategyConfig(builder -> {
 					// 设置需要生成的表名,排除system類的table
-					builder.addInclude("company","company_job_type","company_course","job_type_course_category","department","department_course").addTablePrefix() // 设置过滤表前缀, sys_user設置成 user表,一般不用寫
+					builder.addInclude("job_type").addTablePrefix() // 设置过滤表前缀, sys_user設置成 user表,一般不用寫
 
 							.controllerBuilder().enableRestStyle().enableHyphenStyle().enableFileOverride() // controller層
 																											// 原檔案覆蓋
