@@ -82,4 +82,9 @@ public class CompanyJobTypeServiceImpl extends ServiceImpl<CompanyJobTypeMapper,
 		}
 	}
 
+	@Override
+	public void removeByTypeId(Long jobTypeId) {
+		baseMapper.deleteByJobTypeId(jobTypeId);
+	}
+
 }

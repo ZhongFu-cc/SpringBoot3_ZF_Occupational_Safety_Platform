@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.manager.JobTypeManager;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddJobTypeDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutJobTypeDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.JobType;
@@ -45,6 +48,7 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 public class JobTypeController {
 
 	private final JobTypeService jobTypeService;
+	private final JobTypeManager jobTypeManager;
 
 	/**
 	 * 根據ID 查詢 作業類別
@@ -55,8 +59,25 @@ public class JobTypeController {
 	@Operation(summary = "根據ID 查詢 作業類別")
 	@GetMapping("{id}")
 	public R<JobType> getJobType(@PathVariable("id") @Schema(type = "string") Long id) {
-		JobType courseCategory = jobTypeService.get(id);
-		return R.ok(courseCategory);
+		JobType jobType = jobTypeService.get(id);
+		return R.ok(jobType);
+	}
+
+	/**
+	 * 查詢 作業類別 列表對象
+	 * 
+	 * @param page
+	 * @param size
+	 * @return
+	 */
+	@GetMapping()
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢 作業類別 列表對象")
+	public R<List<JobType>> findJobTypePage(@RequestParam(required = false) String queryText) {
+
+		List<JobType> jobTypes = jobTypeService.list(queryText);
+		return R.ok(jobTypes);
 	}
 
 	/**
@@ -74,8 +95,8 @@ public class JobTypeController {
 			@RequestParam(required = false) String queryText) {
 
 		Page<JobType> pageInfo = new Page<>(page, size);
-		IPage<JobType> courseCategoryPage = jobTypeService.findPageByQuery(pageInfo, queryText);
-		return R.ok(courseCategoryPage);
+		IPage<JobType> jobTypePage = jobTypeService.findPageByQuery(pageInfo, queryText);
+		return R.ok(jobTypePage);
 	}
 
 	/**
@@ -122,7 +143,7 @@ public class JobTypeController {
 	@SaCheckRole("super-admin")
 	@DeleteMapping("{id}")
 	public R<Void> removeJobType(@PathVariable @Schema(type = "string") Long id) {
-		jobTypeService.remove(id);
+		jobTypeManager.removeJobType(id);
 		return R.ok();
 	}
 

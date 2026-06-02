@@ -1,5 +1,9 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -34,10 +38,18 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 	}
 
 	@Override
-	public IPage<Course> findPageByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText) {
-		return baseMapper.selectByQuery(pageInfo,courseCategoryId,queryText);
+	public List<Course> findByCategoryIds(Collection<Long> courseCategoryIds) {
+		if (courseCategoryIds != null && courseCategoryIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByCourseCategoryIds(courseCategoryIds);
 	}
-	
+
+	@Override
+	public IPage<Course> findPageByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText) {
+		return baseMapper.selectByQuery(pageInfo, courseCategoryId, queryText);
+	}
+
 	@Override
 	public Course create(AddCourseDTO addCourseDTO) {
 		Course course = courseConvert.addDTOToEntity(addCourseDTO);
@@ -56,6 +68,4 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 		baseMapper.deleteById(courseCategoryId);
 	}
 
-
-	
 }

@@ -14,6 +14,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +35,11 @@ public class JobTypeServiceImpl extends ServiceImpl<JobTypeMapper, JobType> impl
 	@Override
 	public JobType get(Long jobTypeId) {
 		return baseMapper.selectById(jobTypeId);
+	}
+	
+	@Override
+	public List<JobType> list(String queryText) {
+		return baseMapper.selectByQuery(queryText);
 	}
 
 	@Override
@@ -57,5 +64,7 @@ public class JobTypeServiceImpl extends ServiceImpl<JobTypeMapper, JobType> impl
 	public void remove(Long jobTypeId) {
 		baseMapper.deleteById(jobTypeId);
 	}
+
+
 
 }

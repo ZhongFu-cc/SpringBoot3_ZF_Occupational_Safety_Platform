@@ -17,6 +17,7 @@ public class PutCompanyDTO {
     @Schema(description = "公司名")
     private String name;
 
+	@NotNull
     @Schema(description = "啟用狀態")
     private CompanyStatusEnum status;
 	

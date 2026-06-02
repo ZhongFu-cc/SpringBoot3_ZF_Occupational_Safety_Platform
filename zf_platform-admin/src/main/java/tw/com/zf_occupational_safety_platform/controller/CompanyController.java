@@ -1,7 +1,6 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.manager.CompanyCourseManager;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCompanyDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCompanyDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Company;
@@ -45,6 +45,7 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 public class CompanyController {
 
 	private final CompanyService companyService;
+	private final CompanyCourseManager CompanyCourseManager;
 
 	/**
 	 * 根據ID 查詢 公司
@@ -54,6 +55,7 @@ public class CompanyController {
 	 */
 	@Operation(summary = "根據ID 查詢 公司")
 	@GetMapping("{id}")
+	@SaCheckRole("super-admin")
 	public R<Company> getCompany(@PathVariable("id") @Schema(type = "string") Long id) {
 		Company courseCategory = companyService.get(id);
 		return R.ok(courseCategory);
@@ -70,6 +72,7 @@ public class CompanyController {
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 公司分頁對象")
+	@SaCheckRole("super-admin")
 	public R<IPage<Company>> findCompanyPage(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) String queryText) {
 
@@ -90,7 +93,7 @@ public class CompanyController {
 	@SaCheckRole("super-admin")
 	@PostMapping
 	public R<Void> saveCompany(@RequestBody @Valid AddCompanyDTO addCompanyDTO) {
-		companyService.create(addCompanyDTO);
+		CompanyCourseManager.createCompany(addCompanyDTO);
 		return R.ok();
 	}
 
@@ -110,20 +113,20 @@ public class CompanyController {
 		return R.ok();
 	}
 
-	/**
-	 * 根據ID 刪除 公司
-	 * 
-	 * @param id
-	 * @return
-	 */
-	@Operation(summary = "根據ID 刪除 公司 ")
-	@Parameters({
-			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
-	@SaCheckRole("super-admin")
-	@DeleteMapping("{id}")
-	public R<Void> removeCompany(@PathVariable @Schema(type = "string") Long id) {
-		companyService.remove(id);
-		return R.ok();
-	}
+	//	/**
+	//	 * 根據ID 刪除 公司，暫時不讓他刪除
+	//	 * 
+	//	 * @param id
+	//	 * @return
+	//	 */
+	//	@Operation(summary = "根據ID 刪除 公司 ")
+	//	@Parameters({
+	//			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
+	//	@SaCheckRole("super-admin")
+	//	@DeleteMapping("{id}")
+	//	public R<Void> removeCompany(@PathVariable @Schema(type = "string") Long id) {
+	//		companyService.remove(id);
+	//		return R.ok();
+	//	}
 
 }

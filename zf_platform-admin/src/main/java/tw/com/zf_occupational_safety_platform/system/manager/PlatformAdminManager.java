@@ -34,10 +34,7 @@ public class PlatformAdminManager {
 	private final SysUserRoleService sysUserRoleService;
 	private final SysRoleService sysRoleService;
 
-	/** --------------------- 平台課程類別管理 ------------------------ */
-
-	/** --------------------- 平台課程管理 ------------------------ */
-
+	
 	/** --------------------- 平台用戶管理 ------------------------ */
 
 	/**

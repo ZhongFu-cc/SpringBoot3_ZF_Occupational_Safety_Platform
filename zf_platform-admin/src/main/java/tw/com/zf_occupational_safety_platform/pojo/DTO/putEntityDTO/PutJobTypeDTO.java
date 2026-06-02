@@ -10,17 +10,18 @@ import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 public class PutJobTypeDTO {
 
 	@NotNull
-    @Schema(description = "主鍵ID")
-    private Long jobTypeId;
+	@Schema(description = "主鍵ID")
+	private Long jobTypeId;
 
 	@NotBlank
-    @Schema(description = "作業類別名稱")
-    private String name;
+	@Schema(description = "作業類別名稱")
+	private String name;
 
-    @Schema(description = "作業類別描述")
-    private String description;
+	@Schema(description = "作業類別描述")
+	private String description;
 
-    @Schema(description = "是否啟用 ; 0=否 , 1=是")
-    private CommonStatusEnum isActive;
-	
+	@NotNull
+	@Schema(description = "是否啟用 ; 0=否 , 1=是")
+	private CommonStatusEnum isActive;
+
 }

@@ -18,7 +18,9 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyJobType;
 public interface CompanyJobTypeService extends IService<CompanyJobType> {
 
 	List<CompanyJobType> findByCompanyId(Long companyId);
-	
-	void assignType2Company(Long companyId , Collection<Long> jobTypeIds);
-	
+
+	void assignType2Company(Long companyId, Collection<Long> jobTypeIds);
+
+	void removeByTypeId(Long jobTypeId);
+
 }

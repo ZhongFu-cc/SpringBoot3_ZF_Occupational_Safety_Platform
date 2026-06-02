@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,24 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 	public IPage<CompanyCourse> findPageBycourseIds(Page<CompanyCourse> pageInfo, Collection<Long> courseIds) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void batchAdd(Long companyId, Collection<Long> courseIds) {
+
+		if (courseIds != null && !courseIds.isEmpty()) {
+			return;
+		}
+
+		List<CompanyCourse> CompanyCourseList = courseIds.stream().map(courseId -> {
+			CompanyCourse companyCourse = new CompanyCourse();
+			companyCourse.setCompanyId(companyId);
+			companyCourse.setCourseId(courseId);
+			return companyCourse;
+		}).toList();
+
+		this.saveBatch(CompanyCourseList);
+
 	}
 
 	@Override

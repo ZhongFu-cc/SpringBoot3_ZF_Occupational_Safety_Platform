@@ -36,4 +36,12 @@ public interface CompanyJobTypeMapper extends BaseMapper<CompanyJobType> {
 
 	}
 
+	// 根據 作業類型ID 進行刪除
+	default void deleteByJobTypeId(Long jobTypeId) {
+		LambdaQueryWrapper<CompanyJobType> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(CompanyJobType::getJobTypeId, jobTypeId);
+		this.delete(queryWrapper);
+
+	}
+
 }

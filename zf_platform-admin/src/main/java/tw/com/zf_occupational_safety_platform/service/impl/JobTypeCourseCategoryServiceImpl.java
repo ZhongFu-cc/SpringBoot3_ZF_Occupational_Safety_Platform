@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -36,6 +38,14 @@ public class JobTypeCourseCategoryServiceImpl extends ServiceImpl<JobTypeCourseC
 	}
 
 	@Override
+	public List<JobTypeCourseCategory> findByTypeIds(Collection<Long> jobTypeIds) {
+		if (jobTypeIds == null || jobTypeIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByJobTypeIds(jobTypeIds);
+	}
+
+	@Override
 	public JobTypeCourseCategory add(AddTypeCategoryDTO addTypeCategoryDTO) {
 
 		JobTypeCourseCategory currentJobTypeCourseCategory = baseMapper.selectByTypeIdAndCategoryId(
@@ -59,6 +69,11 @@ public class JobTypeCourseCategoryServiceImpl extends ServiceImpl<JobTypeCourseC
 	@Override
 	public void remove(Long typeCategoryId) {
 		baseMapper.deleteById(typeCategoryId);
+	}
+
+	@Override
+	public void removeByTypeId(Long jobTypeId) {
+		baseMapper.deleteByJobTypeId(jobTypeId);
 	}
 
 }

@@ -1,6 +1,8 @@
 package tw.com.zf_occupational_safety_platform.service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -25,11 +27,21 @@ public interface JobTypeCourseCategoryService extends IService<JobTypeCourseCate
 	 * @return
 	 */
 	List<JobTypeCourseCategory> findByTypeId(Long jobTypeId);
+	
+	/**
+	 * 根據 多個作業類別查詢關聯
+	 * 
+	 * @param jobTypeIds
+	 * @return
+	 */
+	List<JobTypeCourseCategory> findByTypeIds(Collection<Long> jobTypeIds);
 
 	JobTypeCourseCategory add(AddTypeCategoryDTO addTypeCategoryDTO);
 
 	void update(PutTypeCategoryDTO putTypeCategoryDTO);
 
 	void remove(Long typeCategoryId);
+	
+	void removeByTypeId(Long jobTypeId);
 
 }
