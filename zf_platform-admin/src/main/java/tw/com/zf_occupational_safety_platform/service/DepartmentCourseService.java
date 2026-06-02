@@ -1,7 +1,11 @@
 package tw.com.zf_occupational_safety_platform.service;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
+import java.util.Collection;
+import java.util.List;
+
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
 
 /**
  * <p>
@@ -13,4 +17,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface DepartmentCourseService extends IService<DepartmentCourse> {
 
+	List<DepartmentCourse> findByDepartmentId(Long departmentId);
+	
+	void assignCourse2Department(Long departmentId , Collection<Long> courseIds);
+	
 }

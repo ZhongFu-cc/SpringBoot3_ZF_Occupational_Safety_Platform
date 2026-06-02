@@ -1,10 +1,19 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
-import tw.com.zf_occupational_safety_platform.mapper.CompanyCourseMapper;
-import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import java.util.Collection;
+
 import org.springframework.stereotype.Service;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.convert.CompanyCourseConvert;
+import tw.com.zf_occupational_safety_platform.mapper.CompanyCourseMapper;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCompanyCourseDTO;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
+import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
 
 /**
  * <p>
@@ -15,6 +24,33 @@ import org.springframework.stereotype.Service;
  * @since 2026-06-02
  */
 @Service
-public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, CompanyCourse> implements CompanyCourseService {
+@RequiredArgsConstructor
+public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, CompanyCourse>
+		implements CompanyCourseService {
+
+	private final CompanyCourseConvert companyCourseConvert;
+
+	@Override
+	public CompanyCourse get(Long companyCourseId) {
+		return baseMapper.selectById(companyCourseId);
+	}
+
+	@Override
+	public IPage<CompanyCourse> findPageBycourseIds(Page<CompanyCourse> pageInfo, Collection<Long> courseIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public CompanyCourse add(AddCompanyCourseDTO addCompanyCourseDTO) {
+		CompanyCourse companyCourse = companyCourseConvert.addDTOToEntity(addCompanyCourseDTO);
+		baseMapper.insert(companyCourse);
+		return companyCourse;
+	}
+
+	@Override
+	public void remove(Long companyCourseId) {
+		baseMapper.deleteById(companyCourseId);
+	}
 
 }

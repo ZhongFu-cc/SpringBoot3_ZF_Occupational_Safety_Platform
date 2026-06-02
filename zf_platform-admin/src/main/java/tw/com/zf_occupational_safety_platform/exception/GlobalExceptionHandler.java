@@ -40,6 +40,34 @@ public class GlobalExceptionHandler {
 	//	}
 
 	/**
+	 * 跟 作業類別 * 課程類別 相關的業務邏輯錯誤
+	 * 
+	 * @param exception
+	 * @return
+	 */
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ExceptionHandler(value = JobTypeCourseCategoryException.class)
+	public R<Map<String, Object>> jobTypeCourseCategoryException(JobTypeCourseCategoryException exception) {
+		String message = exception.getMessage();
+		return R.fail(409, message);
+	}
+
+	/**
+	 * 跟 作業類別 相關的業務邏輯錯誤
+	 * 
+	 * @param exception
+	 * @return
+	 */
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ExceptionHandler(value = JobTypeException.class)
+	public R<Map<String, Object>> jobTypeException(JobTypeException exception) {
+		String message = exception.getMessage();
+		return R.fail(409, message);
+	}
+
+	/**
 	 * 跟 課程章節 觀看紀錄 相關的業務邏輯錯誤
 	 * 
 	 * @param exception
