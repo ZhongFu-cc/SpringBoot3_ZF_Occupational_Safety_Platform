@@ -41,6 +41,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	}
 
 	@Override
+	public SysUser getByIdAndCompany(Long id, Long companyId) {
+		return baseMapper.selectByIdAndCompanyId(id, companyId);
+	}
+
+	@Override
 	public List<SysUser> list() {
 		return baseMapper.selectList(null);
 	}
@@ -48,6 +53,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	@Override
 	public IPage<SysUser> findDirectChild(IPage<SysUser> pageInfo, Long parentId, String queryText) {
 		return baseMapper.selectByParentIdAndQuery(pageInfo, parentId, queryText);
+	}
+
+	@Override
+	public IPage<SysUser> findByCompany(IPage<SysUser> pageInfo, Long parentId, Long companyId, String queryText) {
+		return baseMapper.selectByParentIdAndQueryExcludeCompanyId(pageInfo, parentId, companyId, queryText);
 	}
 
 	@Override

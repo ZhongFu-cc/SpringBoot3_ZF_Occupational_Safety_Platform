@@ -4,6 +4,7 @@ import java.util.List;
 
 import cn.dev33.satoken.stp.SaTokenInfo;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.system.pojo.BO.RouteBO;
@@ -20,6 +21,12 @@ public class SysUserVO {
 
 	@Schema(description = "父級ID")
 	private Long parentId;
+	
+	@Schema(description = "公司ID",type = "string")
+	private Long companyId;
+	
+	@Schema(description = "部門ID",type = "string")
+	private Long departmentId;
 
 	@Schema(description = "帳號")
 	private String account;

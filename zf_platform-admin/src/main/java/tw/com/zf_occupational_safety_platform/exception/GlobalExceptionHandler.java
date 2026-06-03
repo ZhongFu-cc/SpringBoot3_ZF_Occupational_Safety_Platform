@@ -206,6 +206,15 @@ public class GlobalExceptionHandler {
 		return R.fail(413, exception.getMessage());
 	}
 
+	
+	@ResponseBody
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(MissingRequestParameterException.class)
+	public R<?> handleMissingRequestParameter(MissingRequestParameterException ex) {
+		ex.printStackTrace();
+		return R.fail(400, ex.getMessage());
+	}
+	
 	/**
 	 * 呼叫端傳了「語意上不合法」的參數，但物件本身狀態是正常的<br>
 	 * 通常用於Enum

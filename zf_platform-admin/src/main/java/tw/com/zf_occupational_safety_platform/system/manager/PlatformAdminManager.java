@@ -34,7 +34,6 @@ public class PlatformAdminManager {
 	private final SysUserRoleService sysUserRoleService;
 	private final SysRoleService sysRoleService;
 
-	
 	/** --------------------- 平台用戶管理 ------------------------ */
 
 	/**
@@ -106,7 +105,7 @@ public class PlatformAdminManager {
 		if (targetSysUser.getParentId() == null) {
 			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
 		}
-		
+
 		if (!targetSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
 			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
 		}
@@ -133,7 +132,7 @@ public class PlatformAdminManager {
 		if (targetSysUser.getParentId() == null) {
 			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
 		}
-		
+
 		if (!targetSysUser.getParentId().equals(operator.getSysUserId())) {
 			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
 		}

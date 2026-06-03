@@ -30,6 +30,15 @@ public interface SysUserService extends IService<SysUser> {
 	SysUser get(Long id);
 
 	/**
+	 * 根據主鍵ID & 公司ID 查詢使用者的資料
+	 * 
+	 * @param id
+	 * @param companyId
+	 * @return
+	 */
+	SysUser getByIdAndCompany(Long id, Long companyId);
+
+	/**
 	 * 查詢所有查詢使用者的資料
 	 * 
 	 * @return
@@ -45,6 +54,18 @@ public interface SysUserService extends IService<SysUser> {
 	 * @return
 	 */
 	IPage<SysUser> findDirectChild(IPage<SysUser> pageInfo, Long parentId, String queryText);
+
+	/**
+	 * 分頁查詢 - by公司<br>
+	 * exclude 同個 parentId，避免查詢到管理者
+	 * 
+	 * @param pageInfo  分頁資訊
+	 * @param parentId  父級ID ,
+	 * @param companyId 公司ID
+	 * @param queryText 文字查詢
+	 * @return
+	 */
+	IPage<SysUser> findByCompany(IPage<SysUser> pageInfo, Long parentId, Long companyId, String queryText);
 
 	/**
 	 * 創建使用者

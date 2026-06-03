@@ -23,10 +23,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.manager.DepartmentManager;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddDepartmentDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutDepartmentDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Department;
 import tw.com.zf_occupational_safety_platform.service.DepartmentService;
+import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.utils.R;
 
 /**
@@ -44,6 +47,8 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 @RequestMapping("/department")
 public class DepartmentController {
 
+	private final AuthManager authManager;
+	private final DepartmentManager departmentManager;
 	private final DepartmentService departmentService;
 
 	/**
@@ -92,7 +97,8 @@ public class DepartmentController {
 	@SaCheckRole("company_manager")
 	@PostMapping
 	public R<Void> saveDepartment(@RequestBody @Valid AddDepartmentDTO addDepartmentDTO) {
-		departmentService.create(addDepartmentDTO);
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		departmentManager.createDepartment(addDepartmentDTO, sysUserVO);
 		return R.ok();
 	}
 
