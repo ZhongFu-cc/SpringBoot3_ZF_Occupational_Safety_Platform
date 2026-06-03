@@ -2,7 +2,6 @@ package tw.com.zf_occupational_safety_platform.service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -20,6 +19,8 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.JobTypeCourseCategory;
  */
 public interface JobTypeCourseCategoryService extends IService<JobTypeCourseCategory> {
 
+	JobTypeCourseCategory get(Long jobTypeCourseCategoryId);
+	
 	/**
 	 * 根據作業類別查詢關聯
 	 * 

@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service;
 
+import java.util.Collection;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -21,6 +23,9 @@ public interface CourseCategoryService extends IService<CourseCategory> {
 	CourseCategory get(Long courseCategoryId);
 
 	IPage<CourseCategory> findPageByQuery(Page<CourseCategory> pageInfo, String queryText);
+
+	IPage<CourseCategory> findPageByCategoryIdAndQuery(Collection<Long> categoryIds, Page<CourseCategory> pageInfo,
+			String queryText);
 
 	CourseCategory create(AddCourseCategoryDTO addCourseCategoryDTO);
 

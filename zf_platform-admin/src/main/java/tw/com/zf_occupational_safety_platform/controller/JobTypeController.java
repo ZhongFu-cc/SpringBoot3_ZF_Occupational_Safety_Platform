@@ -66,16 +66,14 @@ public class JobTypeController {
 	/**
 	 * 查詢 作業類別 列表對象
 	 * 
-	 * @param page
-	 * @param size
+	 * @param queryText
 	 * @return
 	 */
-	@GetMapping()
+	@GetMapping
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 作業類別 列表對象")
 	public R<List<JobType>> findJobTypePage(@RequestParam(required = false) String queryText) {
-
 		List<JobType> jobTypes = jobTypeService.list(queryText);
 		return R.ok(jobTypes);
 	}

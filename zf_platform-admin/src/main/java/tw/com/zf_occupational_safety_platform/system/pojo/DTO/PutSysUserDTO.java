@@ -9,11 +9,8 @@ import lombok.Data;
 public class PutSysUserDTO {
 
 	@NotNull
-	@Schema(description = "主鍵ID")
+	@Schema(description = "主鍵ID", type = "string")
 	private Long sysUserId;
-
-	@Schema(description = "公司ID", type = "string")
-	private Long companyId;
 
 	@Schema(description = "部門ID", type = "string")
 	private Long departmentId;

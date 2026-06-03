@@ -13,6 +13,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collection;
+
 import org.springframework.stereotype.Service;
 
 /**
@@ -38,6 +40,17 @@ public class CourseCategoryServiceImpl extends ServiceImpl<CourseCategoryMapper,
 	@Override
 	public IPage<CourseCategory> findPageByQuery(Page<CourseCategory> pageInfo, String queryText) {
 		return baseMapper.selectByQuery(pageInfo, queryText);
+	}
+
+	@Override
+	public IPage<CourseCategory> findPageByCategoryIdAndQuery(Collection<Long> categoryIds,
+			Page<CourseCategory> pageInfo, String queryText) {
+
+		if (categoryIds != null && !categoryIds.isEmpty()) {
+			new Page<CourseCategory>(pageInfo.getCurrent(), pageInfo.getSize());
+		}
+
+		return baseMapper.selectByCategoryIdsAndQuery(categoryIds, pageInfo, queryText);
 	}
 
 	@Override

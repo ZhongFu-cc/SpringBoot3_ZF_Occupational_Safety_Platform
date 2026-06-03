@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
-import tw.com.zf_occupational_safety_platform.system.manager.CompanyManager;
+import tw.com.zf_occupational_safety_platform.system.manager.PlatformAdminManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.UpdateUserStatus;
@@ -35,22 +35,22 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 
 /**
  * <p>
- * 用戶表 - 用戶-企業管理者 前端控制器
+ * 用戶表 - 用戶-平台管理者 前端控制器
  * </p>
  *
  * @author Joey
  * @since 2024-05-10
  */
-@Tag(name = "用戶-企業管理者 API")
+@Tag(name = "用戶-平台管理者 API")
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/system/company")
-public class CompanyController {
+@RequestMapping("/system/admin")
+public class SysPlatformAdminController {
 
 	private final AuthManager authManager;
+	private final PlatformAdminManager platformAdminManager;
 	private final SysUserService sysUserService;
-	private final CompanyManager companyManager;
 
 	/**
 	 * ------------------- 子級使用者管理 -------------------------
@@ -64,16 +64,15 @@ public class CompanyController {
 	@Operation(summary = "根據ID查詢使用者")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@SaCheckRole("company_manager")
+	@SaCheckRole("super-admin")
 	@GetMapping("{id}")
 	public R<SysUser> getUser(@PathVariable("id") @Schema(type = "string") Long id) {
-		SysUserVO sysUserVO = authManager.getUserInfo();
-		SysUser sysUser = companyManager.getEmployee(id, sysUserVO);
+		SysUser sysUser = sysUserService.get(id);
 		return R.ok(sysUser);
 	}
 
 	/**
-	 * 查詢直系的child使用者 (企業員工)
+	 * 查詢直系的child使用者 (企業管理者)
 	 * 
 	 * @param page
 	 * @param size
@@ -83,82 +82,84 @@ public class CompanyController {
 	@GetMapping("child/pagination")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@Operation(summary = "查詢直系的child使用者 (企業員工)")
-	@SaCheckRole("company_manager")
+	@Operation(summary = "查詢直系的child使用者 (企業管理者)")
+	@SaCheckRole("super-admin")
 	public R<IPage<SysUser>> findDirectChildUser(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) String queryText) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
+		System.out.println("進入查詢child" + sysUserVO);
 		Page<SysUser> pageInfo = new Page<>(page, size);
-		IPage<SysUser> userPage = companyManager.findDirectChild(pageInfo, sysUserVO, queryText);
+		IPage<SysUser> userPage = platformAdminManager.findDirectChild(pageInfo, sysUserVO, queryText);
 		return R.ok(userPage);
 	}
 
 	/**
-	 * 新增使用者 (企業員工)
+	 * 新增使用者 (企業管理者)
 	 * 
 	 * @param addUserDTO
 	 * @return
 	 */
-	@Operation(summary = "新增使用者 (企業員工)")
+	@Operation(summary = "新增使用者 (企業管理者)")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@SaCheckRole("company_manager")
+	@SaCheckRole("super-admin")
 	@PostMapping
 	public R<Void> saveUser(@RequestBody @Valid AddSysUserDTO addUserDTO) {
 
 		SysUserVO sysUserVO = authManager.getUserInfo();
-		companyManager.createEmployee(addUserDTO, sysUserVO);
+		platformAdminManager.createCompanyUser(addUserDTO, sysUserVO);
 		return R.ok();
 	}
 
 	/**
-	 * 更新使用者 (企業員工)
+	 * 更新使用者 (企業管理者)
 	 * 
 	 * @param user
 	 * @return
 	 */
-	@Operation(summary = "更新使用者 (企業員工)")
+	@Operation(summary = "更新使用者 (企業管理者)")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@SaCheckRole("company_manager")
+	@SaCheckRole("super-admin")
 	@PutMapping
 	public R<Void> updateUser(@RequestBody @Valid PutSysUserDTO putSysUserDTO) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
-		companyManager.updateEmployee(putSysUserDTO, sysUserVO);
+		platformAdminManager.updateCompanyUser(putSysUserDTO, sysUserVO);
 		return R.ok();
 	}
 
 	/**
-	 * 根據ID刪除使用者 (企業員工)
-	 * 
-	 * @param id
-	 * @return
-	 */
-	@Operation(summary = "根據ID刪除使用者 (企業員工)")
-	@Parameters({
-			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
-	@SaCheckRole("company_manager")
-	@DeleteMapping("{id}")
-	public R<Void> removeUser(@PathVariable @Schema(type = "string") Long id) {
-		SysUserVO sysUserVO = authManager.getUserInfo();
-		companyManager.removeEmployee(id, sysUserVO);
-		return R.ok();
-	}
-
-	/**
-	 * 切換使用者 (企業員工) 啟用狀態
+	 * 切換使用者 (企業管理者) 啟用狀態
 	 * 
 	 * @param updateUserStatus
 	 * @return
 	 */
-	@Operation(summary = "切換使用者 (企業員工) 啟用狀態")
+	@Operation(summary = "切換使用者 (企業管理者) 啟用狀態")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@SaCheckRole("company_manager")
+	@SaCheckRole("super-admin")
 	@PutMapping("/status")
 	public R<Void> switchStatus(@RequestBody @Valid UpdateUserStatus updateUserStatus) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
-		companyManager.switchEmployeeStatus(updateUserStatus.getSysUserId(), updateUserStatus.getStatus(), sysUserVO);
+		platformAdminManager.switchCompanyUserStatus(updateUserStatus.getSysUserId(), updateUserStatus.getStatus(),
+				sysUserVO);
+		return R.ok();
+	}
+
+	/**
+	 * 根據ID刪除使用者 (企業管理者)
+	 * 
+	 * @param id
+	 * @return
+	 */
+	@Operation(summary = "根據ID刪除使用者 (企業管理者)")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
+	@SaCheckRole("super-admin")
+	@DeleteMapping("{id}")
+	public R<Void> removeUser(@PathVariable @Schema(type = "string") Long id) {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		platformAdminManager.removeCompanyUser(id, sysUserVO);
 		return R.ok();
 	}
 

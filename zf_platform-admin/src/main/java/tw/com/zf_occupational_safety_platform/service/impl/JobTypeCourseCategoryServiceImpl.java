@@ -33,6 +33,11 @@ public class JobTypeCourseCategoryServiceImpl extends ServiceImpl<JobTypeCourseC
 	private final TypeCategoryConvert typeCategoryConvert;
 
 	@Override
+	public JobTypeCourseCategory get(Long jobTypeCourseCategoryId) {
+		return baseMapper.selectById(jobTypeCourseCategoryId);
+	}
+
+	@Override
 	public List<JobTypeCourseCategory> findByTypeId(Long jobTypeId) {
 		return baseMapper.selectByJobTypeId(jobTypeId);
 	}

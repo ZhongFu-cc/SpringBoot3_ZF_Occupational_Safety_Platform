@@ -21,7 +21,7 @@ import tw.com.zf_occupational_safety_platform.system.manager.EmployeeManager;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/employee")
-public class EmployeeController {
+public class SysEmployeeController {
 
 	private final EmployeeManager employeeManager;
 
