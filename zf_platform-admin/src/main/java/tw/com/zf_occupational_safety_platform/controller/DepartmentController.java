@@ -30,7 +30,6 @@ import tw.com.zf_occupational_safety_platform.manager.DepartmentManager;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddDepartmentDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutDepartmentDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Department;
-import tw.com.zf_occupational_safety_platform.service.DepartmentService;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.utils.R;
@@ -52,7 +51,6 @@ public class DepartmentController {
 
 	private final AuthManager authManager;
 	private final DepartmentManager departmentManager;
-	private final DepartmentService departmentService;
 
 	/**
 	 * 臨時AddDTO, 部門x課程 關聯 <br>
@@ -149,7 +147,7 @@ public class DepartmentController {
 	}
 
 	/**
-	 * 分配部門課程
+	 * 分配/移除 部門課程
 	 * 
 	 * @param addDepartmentDTO
 	 * @return
@@ -161,7 +159,7 @@ public class DepartmentController {
 	@PostMapping("assign-course")
 	public R<Void> assignCourse2Department(@RequestBody @Valid AddDepartmentCourse addDepartmentCourse) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
-//		departmentManager.createDepartment(addDepartmentDTO, sysUserVO);
+		departmentManager.assignCourse2Department(addDepartmentCourse, sysUserVO);
 		return R.ok();
 	}
 

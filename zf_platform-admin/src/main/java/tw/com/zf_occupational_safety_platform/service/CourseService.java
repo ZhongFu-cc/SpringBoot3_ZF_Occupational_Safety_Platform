@@ -2,6 +2,7 @@ package tw.com.zf_occupational_safety_platform.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -24,6 +25,10 @@ public interface CourseService extends IService<Course> {
 	Course get(Long courseId);
 
 	List<Course> findByCategoryIds(Collection<Long> courseCategoryIds);
+	
+	List<Course> findByQuery(String queryText);
+	
+	Map<Long,Course> findCourseIdMapByQuery(String queryText);
 	
 	IPage<Course> findPageByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText);
 

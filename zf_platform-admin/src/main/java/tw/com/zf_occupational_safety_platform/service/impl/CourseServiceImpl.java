@@ -3,6 +3,9 @@ package tw.com.zf_occupational_safety_platform.service.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -43,6 +46,17 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 			return Collections.emptyList();
 		}
 		return baseMapper.selectByCourseCategoryIds(courseCategoryIds);
+	}
+
+	@Override
+	public List<Course> findByQuery(String queryText) {
+		return baseMapper.selectByQuery(queryText);
+	}
+
+	@Override
+	public Map<Long, Course> findCourseIdMapByQuery(String queryText) {
+		List<Course> courses = this.findByQuery(queryText);
+		return courses.stream().collect(Collectors.toMap(Course::getCourseId, Function.identity()));
 	}
 
 	@Override

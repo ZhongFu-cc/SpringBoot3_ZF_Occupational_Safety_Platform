@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -20,13 +21,17 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
 public interface CompanyCourseService extends IService<CompanyCourse> {
 
 	CompanyCourse get(Long companyCourseId);
-	
-	IPage<CompanyCourse> findPageBycourseIds(Page<CompanyCourse> pageInfo,  Collection<Long> courseIds);
+
+	List<CompanyCourse> findByIdsAndCompany(Collection<Long> companyCourseIds, Long companyId);
+
+	IPage<CompanyCourse> findPageBycourseIds(Page<CompanyCourse> pageInfo, Collection<Long> courseIds);
+
+	IPage<CompanyCourse> findPageBycourseIds(Page<CompanyCourse> pageInfo, Collection<Long> courseIds, Long companyId);
 
 	CompanyCourse add(AddCompanyCourseDTO addCompanyCourseDTO);
 
 	void remove(Long companyCourseId);
-	
+
 	void batchAdd(Long companyId, Collection<Long> courseIds);
-	
+
 }

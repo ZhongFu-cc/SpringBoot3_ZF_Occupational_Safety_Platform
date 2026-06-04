@@ -62,7 +62,6 @@ public class CourseController {
 	@Operation(summary = "根據ID 查詢 課程")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@SaCheckRole("super-admin")
 	@GetMapping("{id}")
 	public R<Course> getCourse(@PathVariable("id") @Schema(type="string") Long id) {
 		Course course = courseService.get(id);

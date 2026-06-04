@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -40,6 +41,24 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 	public IPage<CompanyCourse> findPageBycourseIds(Page<CompanyCourse> pageInfo, Collection<Long> courseIds) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public IPage<CompanyCourse> findPageBycourseIds(Page<CompanyCourse> pageInfo, Collection<Long> courseIds,
+			Long companyId) {
+		if (courseIds != null && courseIds.isEmpty()) {
+			Page<CompanyCourse> page = new Page<>(pageInfo.getCurrent(), pageInfo.getSize());
+			return page;
+		}
+		return baseMapper.selectByCourseIdsAndCompanyId(pageInfo, courseIds, companyId);
+	}
+
+	@Override
+	public List<CompanyCourse> findByIdsAndCompany(Collection<Long> companyCourseIds, Long companyId) {
+		if (companyCourseIds != null && companyCourseIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByIdsAndCompanyId(companyCourseIds, companyId);
 	}
 
 	@Override
