@@ -13,10 +13,6 @@ public class PutDepartmentDTO {
 	@Schema(description = "主鍵ID")
 	private Long departmentId;
 
-	@NotNull
-	@Schema(description = "公司 ID")
-	private Long companyId;
-
 	@NotBlank
 	@Schema(description = "部門名")
 	private String name;

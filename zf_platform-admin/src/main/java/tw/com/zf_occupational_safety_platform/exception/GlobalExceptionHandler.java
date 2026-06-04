@@ -40,6 +40,20 @@ public class GlobalExceptionHandler {
 	//	}
 
 	/**
+	 * 跟 部門 相關的業務邏輯錯誤
+	 * 
+	 * @param exception
+	 * @return
+	 */
+	@ResponseBody
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ExceptionHandler(value = DepartmentException.class)
+	public R<Map<String, Object>> departmentException(DepartmentException exception) {
+		String message = exception.getMessage();
+		return R.fail(409, message);
+	}
+
+	/**
 	 * 跟 作業類別 * 課程類別 相關的業務邏輯錯誤
 	 * 
 	 * @param exception
@@ -206,7 +220,6 @@ public class GlobalExceptionHandler {
 		return R.fail(413, exception.getMessage());
 	}
 
-	
 	@ResponseBody
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ExceptionHandler(MissingRequestParameterException.class)
@@ -214,7 +227,7 @@ public class GlobalExceptionHandler {
 		ex.printStackTrace();
 		return R.fail(400, ex.getMessage());
 	}
-	
+
 	/**
 	 * 呼叫端傳了「語意上不合法」的參數，但物件本身狀態是正常的<br>
 	 * 通常用於Enum

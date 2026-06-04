@@ -32,11 +32,22 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	public Department get(Long departmentId) {
 		return baseMapper.selectById(departmentId);
 	}
+	
+	@Override
+	public Department getByIdAndCompany(Long departmentId, Long companyId) {
+		return baseMapper.selectByIdAndCompanyId(departmentId, companyId);
+	}
 
 	@Override
 	public IPage<Department> findPageByQuery(Page<Department> pageInfo, String queryText) {
 		return baseMapper.selectByQuery(pageInfo, queryText);
 	}
+	
+	@Override
+	public IPage<Department> findPageByQuery(Page<Department> pageInfo, String queryText, Long companyId) {
+		return baseMapper.selectByQuery(pageInfo,queryText,companyId);
+	}
+
 
 	@Override
 	public Department create(AddDepartmentDTO addDepartmentDTO) {
@@ -55,5 +66,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	public void remove(Long departmentId) {
 		baseMapper.deleteById(departmentId);
 	}
+
+
+
 
 }

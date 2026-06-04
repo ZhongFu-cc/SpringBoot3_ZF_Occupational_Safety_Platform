@@ -21,4 +21,6 @@ public interface DepartmentCourseService extends IService<DepartmentCourse> {
 	
 	void assignCourse2Department(Long departmentId , Collection<Long> courseIds);
 	
+	void removeByDepartment(Long departmentId);
+	
 }

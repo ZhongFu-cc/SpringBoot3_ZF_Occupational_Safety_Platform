@@ -19,6 +19,12 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
 
+	default long countByDepartmentId(Long departmentId) {
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysUser::getDepartmentId, departmentId);
+		return this.selectCount(queryWrapper);
+	}
+
 	/**
 	 * 根據主鍵ID 和 公司ID 查詢
 	 * 
@@ -66,8 +72,8 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	 * @param queryText 查詢條件
 	 * @return
 	 */
-	default IPage<SysUser> selectByParentIdAndQueryExcludeCompanyId(IPage<SysUser> pageInfo, Long parentId, Long companyId,
-			String queryText) {
+	default IPage<SysUser> selectByParentIdAndQueryExcludeCompanyId(IPage<SysUser> pageInfo, Long parentId,
+			Long companyId, String queryText) {
 
 		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
 

@@ -38,4 +38,15 @@ public interface DepartmentCourseMapper extends BaseMapper<DepartmentCourse> {
 
 	}
 
+	/**
+	 * 根據部門ID移除
+	 * 
+	 * @param departmentId
+	 */
+	default void removeByDepartmentId(Long departmentId) {
+		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(DepartmentCourse::getDepartmentId, departmentId);
+		this.delete(queryWrapper);
+	}
+
 }

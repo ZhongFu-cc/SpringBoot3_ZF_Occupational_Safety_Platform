@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.manager.DepartmentManager;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddDepartmentDTO;
@@ -52,6 +55,13 @@ public class DepartmentController {
 	private final DepartmentService departmentService;
 
 	/**
+	 * 臨時AddDTO, 部門x課程 關聯 <br>
+	 */
+	public record AddDepartmentCourse(@NotNull @Schema(description = "部門 ID", type = "string") Long departmentId,
+			@NotNull @Schema(description = "企業課程 ID", type = "string") List<Long> companyCourseId) {
+	}
+
+	/**
 	 * 根據ID 查詢 部門
 	 * 
 	 * @param id
@@ -61,7 +71,8 @@ public class DepartmentController {
 	@GetMapping("{id}")
 	@SaCheckRole("company_manager")
 	public R<Department> getDepartment(@PathVariable("id") @Schema(type = "string") Long id) {
-		Department courseCategory = departmentService.get(id);
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		Department courseCategory = departmentManager.getDepartment(id, sysUserVO);
 		return R.ok(courseCategory);
 	}
 
@@ -80,9 +91,10 @@ public class DepartmentController {
 	public R<IPage<Department>> findDepartmentPage(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) String queryText) {
 
+		SysUserVO sysUserVO = authManager.getUserInfo();
 		Page<Department> pageInfo = new Page<>(page, size);
-		IPage<Department> courseCategoryPage = departmentService.findPageByQuery(pageInfo, queryText);
-		return R.ok(courseCategoryPage);
+		IPage<Department> departmentPage = departmentManager.findDepartmentPage(pageInfo, queryText, sysUserVO);
+		return R.ok(departmentPage);
 	}
 
 	/**
@@ -114,7 +126,8 @@ public class DepartmentController {
 	@SaCheckRole("company_manager")
 	@PutMapping
 	public R<Void> updateDepartment(@RequestBody @Valid PutDepartmentDTO putDepartmentDTO) {
-		departmentService.update(putDepartmentDTO);
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		departmentManager.updateDepartment(putDepartmentDTO, sysUserVO);
 		return R.ok();
 	}
 
@@ -130,7 +143,25 @@ public class DepartmentController {
 	@SaCheckRole("company_manager")
 	@DeleteMapping("{id}")
 	public R<Void> removeDepartment(@PathVariable @Schema(type = "string") Long id) {
-		departmentService.remove(id);
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		departmentManager.removeDepartment(id, sysUserVO);
+		return R.ok();
+	}
+
+	/**
+	 * 分配部門課程
+	 * 
+	 * @param addDepartmentDTO
+	 * @return
+	 */
+	@Operation(summary = "分配部門課程")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("company_manager")
+	@PostMapping("assign-course")
+	public R<Void> assignCourse2Department(@RequestBody @Valid AddDepartmentCourse addDepartmentCourse) {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+//		departmentManager.createDepartment(addDepartmentDTO, sysUserVO);
 		return R.ok();
 	}
 

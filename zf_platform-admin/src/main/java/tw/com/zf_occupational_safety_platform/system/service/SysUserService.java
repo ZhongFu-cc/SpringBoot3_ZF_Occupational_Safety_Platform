@@ -22,6 +22,14 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 public interface SysUserService extends IService<SysUser> {
 
 	/**
+	 * 該部門的總人數
+	 * 
+	 * @param departmentId
+	 * @return
+	 */
+	long countByDepartment(Long departmentId);
+
+	/**
 	 * 根據主鍵ID查詢使用者的資料
 	 * 
 	 * @param id 主鍵ID

@@ -19,9 +19,22 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 public interface DepartmentMapper extends BaseMapper<Department> {
 
+	default Department selectByIdAndCompanyId(Long departmentId, Long companyId) {
+		LambdaQueryWrapper<Department> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(Department::getDepartmentId, departmentId).eq(Department::getCompanyId, companyId);
+		return this.selectOne(queryWrapper);
+	}
+
 	default IPage<Department> selectByQuery(Page<Department> pageInfo, String queryText) {
 		LambdaQueryWrapper<Department> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.like(StringUtils.isNotBlank(queryText), Department::getName, queryText);
+		return this.selectPage(pageInfo, queryWrapper);
+	}
+
+	default IPage<Department> selectByQuery(Page<Department> pageInfo, String queryText, Long companyId) {
+		LambdaQueryWrapper<Department> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(Department::getCompanyId, companyId)
+				.like(StringUtils.isNotBlank(queryText), Department::getName, queryText);
 		return this.selectPage(pageInfo, queryWrapper);
 	}
 

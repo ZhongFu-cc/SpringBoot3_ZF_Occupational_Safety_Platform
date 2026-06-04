@@ -58,11 +58,11 @@ public class CompanyManager {
 
 		// 父級ID == null , 最大權限者不給予操作
 		if (sysUser.getParentId() == null) {
-			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		if (!sysUser.getCompanyId().equals(sysUserVO.getCompanyId())) {
-			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		return sysUser;
@@ -123,12 +123,12 @@ public class CompanyManager {
 
 		// 父級ID == null , 最大權限者不給予操作
 		if (currentSysUser.getParentId() == null) {
-			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		// 當前用戶的companyId 與 token解析下當前操作者的companyId 不一致則拋出錯誤信息
 		if (!currentSysUser.getCompanyId().equals(sysUserVO.getCompanyId())) {
-			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		// 目前僅更新基本資料，後續有其他需求再開發
@@ -150,11 +150,11 @@ public class CompanyManager {
 
 		// 父級ID == null , 最大權限者不給予操作
 		if (targetSysUser.getParentId() == null) {
-			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		if (!targetSysUser.getCompanyId().equals(sysUserVO.getCompanyId())) {
-			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		// 移除此用戶目前擁有的角色關係
@@ -177,11 +177,11 @@ public class CompanyManager {
 
 		// 父級ID == null , 最大權限者不給予操作
 		if (targetSysUser.getParentId() == null) {
-			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		if (!targetSysUser.getCompanyId().equals(operator.getCompanyId())) {
-			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		sysUserService.updateCompanyUserStatus(sysUserId, status);

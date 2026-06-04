@@ -86,4 +86,9 @@ public class DepartmentCourseServiceImpl extends ServiceImpl<DepartmentCourseMap
 
 	}
 
+	@Override
+	public void removeByDepartment(Long departmentId) {
+		baseMapper.removeByDepartmentId(departmentId);
+	}
+
 }

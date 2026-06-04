@@ -19,13 +19,17 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.Department;
 public interface DepartmentService extends IService<Department> {
 
 	Department get(Long departmentId);
+	
+	Department getByIdAndCompany(Long departmentId,Long companyId);
 
 	IPage<Department> findPageByQuery(Page<Department> pageInfo, String queryText);
+	
+	IPage<Department> findPageByQuery(Page<Department> pageInfo, String queryText,Long companyId);
 
 	Department create(AddDepartmentDTO addDepartmentDTO);
 
 	void update(PutDepartmentDTO putDepartmentDTO);
 
 	void remove(Long departmentId);
-	
+
 }

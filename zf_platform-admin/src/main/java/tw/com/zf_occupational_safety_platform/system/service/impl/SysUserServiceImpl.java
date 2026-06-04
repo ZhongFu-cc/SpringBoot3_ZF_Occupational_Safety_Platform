@@ -108,4 +108,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		baseMapper.updateById(user);
 	}
 
+	@Override
+	public long countByDepartment(Long departmentId) {
+		return baseMapper.countByDepartmentId(departmentId);
+	}
+
 }
