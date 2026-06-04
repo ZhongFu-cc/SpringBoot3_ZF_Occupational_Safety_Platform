@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import tw.com.zf_occupational_safety_platform.manager.CompanyCourseManager;
+import tw.com.zf_occupational_safety_platform.manager.CompanyRegisterManager;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCompanyDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCompanyDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Company;
@@ -45,7 +45,7 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 public class CompanyController {
 
 	private final CompanyService companyService;
-	private final CompanyCourseManager CompanyCourseManager;
+	private final CompanyRegisterManager companyRegisterManager;
 
 	/**
 	 * 根據ID 查詢 公司
@@ -93,7 +93,7 @@ public class CompanyController {
 	@SaCheckRole("super-admin")
 	@PostMapping
 	public R<Void> saveCompany(@RequestBody @Valid AddCompanyDTO addCompanyDTO) {
-		CompanyCourseManager.createCompany(addCompanyDTO);
+		companyRegisterManager.createCompany(addCompanyDTO);
 		return R.ok();
 	}
 
