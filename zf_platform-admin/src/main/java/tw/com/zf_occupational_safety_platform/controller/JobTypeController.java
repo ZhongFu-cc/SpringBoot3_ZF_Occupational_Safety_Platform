@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -58,6 +59,7 @@ public class JobTypeController {
 	 */
 	@Operation(summary = "根據ID 查詢 作業類別")
 	@GetMapping("{id}")
+	@SaCheckLogin
 	public R<JobType> getJobType(@PathVariable("id") @Schema(type = "string") Long id) {
 		JobType jobType = jobTypeService.get(id);
 		return R.ok(jobType);
@@ -73,6 +75,7 @@ public class JobTypeController {
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 作業類別 列表對象")
+	@SaCheckLogin
 	public R<List<JobType>> findJobTypePage(@RequestParam(required = false) String queryText) {
 		List<JobType> jobTypes = jobTypeService.list(queryText);
 		return R.ok(jobTypes);
@@ -89,6 +92,7 @@ public class JobTypeController {
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 作業類別分頁對象")
+	@SaCheckLogin
 	public R<IPage<JobType>> findJobTypePage(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) String queryText) {
 
