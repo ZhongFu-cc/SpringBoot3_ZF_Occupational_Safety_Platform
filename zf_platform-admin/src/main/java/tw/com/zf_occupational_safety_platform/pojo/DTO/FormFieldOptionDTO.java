@@ -27,6 +27,8 @@ public class FormFieldOptionDTO {
 		String id;
 		String label;
 		String imgUrl;
+		// 是否為正確答案
+		boolean isCorrectAnswer;
 	}
 
 }

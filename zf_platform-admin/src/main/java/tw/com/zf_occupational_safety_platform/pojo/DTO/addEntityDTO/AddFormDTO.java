@@ -1,9 +1,5 @@
 package tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,11 +8,10 @@ import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.FormStatusEnum;
 import tw.com.zf_occupational_safety_platform.validation.annotation.ValidStartEndTimeRequiredTogether;
 import tw.com.zf_occupational_safety_platform.validation.constraint.HasLoginAndMultipleSubmissionRules;
-import tw.com.zf_occupational_safety_platform.validation.constraint.HasStartEndTime;
 
 @Data
 @ValidStartEndTimeRequiredTogether
-public class AddFormDTO implements HasStartEndTime,HasLoginAndMultipleSubmissionRules {
+public class AddFormDTO implements HasLoginAndMultipleSubmissionRules {
 
 	@Schema(description = "表單名稱")
 	@NotBlank
@@ -40,13 +35,5 @@ public class AddFormDTO implements HasStartEndTime,HasLoginAndMultipleSubmission
 	@Schema(description = "是否為簽退必填表單: 0為false(不是,簽退必填表單), 1為true(是,簽退必填表單)")
 	@NotNull
 	private CommonStatusEnum requiredForCheckout;
-
-	@Schema(description = "表單填寫開放時間")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime startTime;
-
-	@Schema(description = "表單填寫截止時間")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime endTime;
 
 }

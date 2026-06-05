@@ -66,7 +66,7 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 		// 這邊在後續開發也要注意 , 複製在option.choices 裡面的id 也會重複 , 注意有沒有衝突問題
 		// 如果複製的問題剛好有圖片 , 則圖片也要進行複製後 , 重新set圖片路徑
 		if (StringUtils.isNotBlank(formField.getImageUrl())) {
-
+			
 		}
 
 		baseMapper.insert(formField);

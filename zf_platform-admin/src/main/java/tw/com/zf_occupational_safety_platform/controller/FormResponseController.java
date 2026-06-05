@@ -29,6 +29,8 @@ import tw.com.zf_occupational_safety_platform.pojo.VO.FormResponseVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
 import tw.com.zf_occupational_safety_platform.saToken.StpKit;
+import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.utils.R;
 
 /**
@@ -44,11 +46,12 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 @RequiredArgsConstructor
 public class FormResponseController {
 
+	private final AuthManager authManager;
 	private final FormResponseManager formResponseManager;
 
 	@GetMapping("{id}")
 	@Parameters({
-		@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 「要修改」 表單回覆 , 包含表單欄位 及 之前填寫數據")
 	public R<FormVO> getEditableForm(@PathVariable("id") Long responseId) {
 		return R.ok(formResponseManager.getEditableForm(responseId));
@@ -56,7 +59,7 @@ public class FormResponseController {
 
 	@GetMapping("pagination")
 	@Parameters({
-		@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢表單分頁對象")
 	public R<IPage<FormResponseVO>> getFormResponsePage(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam Long formId) {
@@ -77,10 +80,8 @@ public class FormResponseController {
 		Long memberId = null;
 
 		// 2.如果有傳token , 且是有在Redis中紀錄的登入狀態,會拿到loginId , 業務上來說也是memberId
-		Object loginId = StpKit.MEMBER.getLoginIdDefaultNull();
-		if (loginId != null) {
-			memberId = Long.valueOf(loginId.toString());
-		}
+		SysUserVO userInfo = authManager.getUserInfo();
+		memberId = userInfo.getSysUserId();
 
 		// 3.不論memberId是否有值,都放進DTO中
 		formResponseDTO.setMemberId(memberId);
@@ -93,10 +94,9 @@ public class FormResponseController {
 
 	@PutMapping
 	@Parameters({
-		@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "修改 單一表單回覆，只給管理者修改")
-	public R<Void> updateFormResponse(
-			@RequestBody @Valid PutFormResponseDTO putFormResponseDTO) {
+	public R<Void> updateFormResponse(@RequestBody @Valid PutFormResponseDTO putFormResponseDTO) {
 		formResponseManager.updateFormResponse(putFormResponseDTO);
 		return R.ok();
 
@@ -104,7 +104,7 @@ public class FormResponseController {
 
 	@DeleteMapping("{id}")
 	@Parameters({
-		@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "刪除 單一表單回覆，只給管理者刪除")
 	public R<Void> deleteFormResponse(@PathVariable("id") Long formResponseId) {
 		formResponseManager.deleteFormResponse(formResponseId);
@@ -113,12 +113,12 @@ public class FormResponseController {
 
 	@GetMapping("get-download-url")
 	@Parameters({
-		@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "獲取,某個表單回覆 Excel 下載URL")
 	public R<String> getDownloadUrl(Long formId) throws IOException {
-		return R.ok("操作成功","/form-response/download-excel?formId="+ formId);
+		return R.ok("操作成功", "/form-response/download-excel?formId=" + formId);
 	}
-	
+
 	@GetMapping("download-excel")
 	@Operation(summary = "下載某個表單的 Excel 所有回覆")
 	public void downloadFormResponseExcel(HttpServletResponse response, Long formId) throws IOException {

@@ -1,7 +1,5 @@
 package tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -21,8 +19,7 @@ public class AddFormFieldDTO implements HasFieldOptions {
 	private Long formId;
 
 	@Schema(description = "text (簡答) , textarea(詳答) , number(數字) , email(信箱) , 	select (下拉式選單) ,"
-			+ " radio(單選題) , rate(評分題) , checkbox(多選題) , date(日期題) , 	section(非問題,區塊段落) ,"
-			+ " image(非問題,區塊圖片)")
+			+ " radio(單選題) , rate(評分題) , checkbox(多選題) , date(日期題) , 	section(非問題,區塊段落) ," + " image(非問題,區塊圖片)")
 	private FormFieldTypeEnum fieldType;
 
 	@Schema(description = "問題文字")
@@ -38,12 +35,15 @@ public class AddFormFieldDTO implements HasFieldOptions {
 	private String imageUrl;
 
 	@Schema(description = "圖片說明文字")
-	@TableField("image_caption")
 	private String imageCaption;
 
 	@Schema(description = "是否必填 , 0為false(不是必填) , 1為true(必填)")
 	@NotNull
 	private CommonStatusEnum isRequired;
+
+	@Schema(description = "是否標記正確答案 , 0=否, 1=是")
+	@NotNull
+	private CommonStatusEnum isMarkCorrectAnwser;
 
 	@Schema(description = "顯示順序 , 數字越小排的越前面")
 	private Integer fieldOrder;
@@ -55,5 +55,5 @@ public class AddFormFieldDTO implements HasFieldOptions {
 	@Schema(description = "驗證規則，沒有可填null")
 	@Valid
 	private FormFieldValidationRuleDTO validationRules;
-	
+
 }

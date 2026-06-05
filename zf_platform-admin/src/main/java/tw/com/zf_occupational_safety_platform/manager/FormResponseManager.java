@@ -54,7 +54,6 @@ public class FormResponseManager {
 	private final FormResponseService formResponseService;
 	private final ResponseAnswerService responseAnswerService;
 
-
 	/**
 	 * 獲取 可編輯的 表單對象
 	 * 
@@ -139,30 +138,6 @@ public class FormResponseManager {
 
 	}
 
-	/**
-	 * 
-	 * @param startTime
-	 * @param endTime
-	 * @return
-	 */
-	private boolean isNowWithin(LocalDateTime startTime, LocalDateTime endTime) {
-		// 無時間限制
-		if (startTime == null && endTime == null) {
-			return true;
-		}
-
-		LocalDateTime now = LocalDateTime.now();
-
-		if (startTime != null && now.isBefore(startTime)) {
-			return false;
-		}
-
-		if (endTime != null && now.isAfter(endTime)) {
-			return false;
-		}
-
-		return true;
-	}
 
 	/**
 	 * 新增 表單回覆 及 回覆細項
@@ -184,12 +159,7 @@ public class FormResponseManager {
 			throw new FormException("表單不處於發佈狀態");
 		}
 
-		// 4.判斷表單是否處於可填寫日期中
-		if (!this.isNowWithin(form.getStartTime(), form.getEndTime())) {
-			throw new FormException("表單不處於填寫時間");
-		}
-
-		// 5.如果不允許重複填寫 , 根據 memberId 查詢是否有回覆紀錄 
+		// 4.如果不允許重複填寫 , 根據 memberId 查詢是否有回覆紀錄 
 		if (CommonStatusEnum.NO.getValue().equals(form.getAllowMultipleSubmissions())
 				&& formResponseDTO.getMemberId() != null) {
 			List<FormResponse> formResponses = formResponseService
@@ -200,10 +170,10 @@ public class FormResponseManager {
 
 		}
 
-		// 6.先輸入這筆表單回覆,拿到表單回覆ID
+		// 5.先輸入這筆表單回覆,拿到表單回覆ID
 		FormResponse formResponse = formResponseService.submit(formResponseDTO);
 
-		// 7.拿到回答結果,進行轉換,最終拿到詳細回覆結果
+		// 6.拿到回答結果,進行轉換,最終拿到詳細回覆結果
 		List<ResponseAnswer> responseAnswerList = formResponseDTO.getResponseAnswerList()
 				.stream()
 				.map(responseAnswerDTO -> {
@@ -218,7 +188,7 @@ public class FormResponseManager {
 				})
 				.toList();
 
-		// 8.批量插入
+		// 7.批量插入
 		responseAnswerService.saveBatch(responseAnswerList);
 
 	}
@@ -330,16 +300,16 @@ public class FormResponseManager {
 			}
 
 			// 6-2. 會員資訊（只有需要時才加入）
-//			if (needMemberInfo) {
-//				Long memberId = res.getMemberId();
-//				String memberName = Optional.ofNullable(memberId)
-//						.map(memberService::getById) // 如果 memberId 不為 null，查詢 member
-//						.map(memberService::getOnlyMemberName) // 如果 member 不為 null，計算姓名
-//						.orElse(""); // 否則回空字串
-//
-//				rowData.add(memberId != null ? memberId.toString() : "");
-//				rowData.add(memberName);
-//			}
+			//			if (needMemberInfo) {
+			//				Long memberId = res.getMemberId();
+			//				String memberName = Optional.ofNullable(memberId)
+			//						.map(memberService::getById) // 如果 memberId 不為 null，查詢 member
+			//						.map(memberService::getOnlyMemberName) // 如果 member 不為 null，計算姓名
+			//						.orElse(""); // 否則回空字串
+			//
+			//				rowData.add(memberId != null ? memberId.toString() : "");
+			//				rowData.add(memberName);
+			//			}
 
 			// 6-3. 時間資訊
 			rowData.add(res.getCreateDate() != null ? res.getCreateDate().format(formatter) : "");
