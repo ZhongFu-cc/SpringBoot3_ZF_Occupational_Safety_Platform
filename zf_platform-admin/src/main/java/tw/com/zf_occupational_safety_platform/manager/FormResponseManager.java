@@ -3,7 +3,6 @@ package tw.com.zf_occupational_safety_platform.manager;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +33,7 @@ import tw.com.zf_occupational_safety_platform.pojo.VO.FormFieldVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormResponseVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Form;
+import tw.com.zf_occupational_safety_platform.pojo.entity.FormField;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
 import tw.com.zf_occupational_safety_platform.pojo.entity.ResponseAnswer;
 import tw.com.zf_occupational_safety_platform.service.FormFieldService;
@@ -138,7 +138,6 @@ public class FormResponseManager {
 
 	}
 
-
 	/**
 	 * 新增 表單回覆 及 回覆細項
 	 * 
@@ -173,6 +172,8 @@ public class FormResponseManager {
 		// 5.先輸入這筆表單回覆,拿到表單回覆ID
 		FormResponse formResponse = formResponseService.submit(formResponseDTO);
 
+		Map<Long, FormField> mapByFieldId = formFieldService.findMapByFieldId(formResponseDTO.getFormId());
+
 		// 6.拿到回答結果,進行轉換,最終拿到詳細回覆結果
 		List<ResponseAnswer> responseAnswerList = formResponseDTO.getResponseAnswerList()
 				.stream()
@@ -183,7 +184,22 @@ public class FormResponseManager {
 					// 塞入本次表單回覆ID
 					responseAnswer.setFormResponseId(formResponse.getFormResponseId());
 
+					// 批改：找到對應題目，比對正確答案
+					FormField field = mapByFieldId.get(responseAnswerDTO.getFormFieldId());
+//					if (field != null && field.getOptions() != null) {
+//						field.getOptions()
+//								.getChoices()
+//								.stream()
+//								.filter(Choice::isCorrectAnswer)
+//								.findFirst()
+//								.ifPresent(correct -> {
+//									boolean isCorrect = correct.getId().equals(responseAnswerDTO.getAnswerValue());
+//									responseAnswer.setIsCorrect(isCorrect);
+//								});
+//					}
+
 					return responseAnswer;
+
 
 				})
 				.toList();

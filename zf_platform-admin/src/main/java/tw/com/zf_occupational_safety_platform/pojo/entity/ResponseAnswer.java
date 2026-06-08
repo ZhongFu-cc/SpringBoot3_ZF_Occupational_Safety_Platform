@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 
 /**
  * <p>
@@ -29,44 +30,48 @@ import lombok.ToString;
 @ToString
 public class ResponseAnswer implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    @Schema(description = "主鍵ID")
-    @TableId("response_answer_id")
-    private Long responseAnswerId;
+	@Schema(description = "主鍵ID")
+	@TableId("response_answer_id")
+	private Long responseAnswerId;
 
-    @Schema(description = "表單回覆紀錄ID")
-    @TableField("form_response_id")
-    private Long formResponseId;
+	@Schema(description = "表單回覆紀錄ID")
+	@TableField("form_response_id")
+	private Long formResponseId;
 
-    @Schema(description = "表單欄位ID")
-    @TableField("form_field_id")
-    private Long formFieldId;
+	@Schema(description = "表單欄位ID")
+	@TableField("form_field_id")
+	private Long formFieldId;
 
-    @Schema(description = "回覆值")
-    @TableField("answer_value")
-    private String answerValue;
+	@Schema(description = "回覆值")
+	@TableField("answer_value")
+	private String answerValue;
 
-    @Schema(description = "創建者")
-    @TableField("create_by")
-    private String createBy;
+	@Schema(description = "是否標記正確答案 , 0=否, 1=是")
+	@TableField("is_correct_anwser")
+	private CommonStatusEnum isCorrectAnwser;
 
-    @Schema(description = "創建時間")
-    @TableField(value = "create_date", fill = FieldFill.INSERT)
+	@Schema(description = "創建者")
+	@TableField("create_by")
+	private String createBy;
+
+	@Schema(description = "創建時間")
+	@TableField(value = "create_date", fill = FieldFill.INSERT)
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createDate;
+	private LocalDateTime createDate;
 
-    @Schema(description = "最後修改者")
-    @TableField("update_by")
-    private String updateBy;
+	@Schema(description = "最後修改者")
+	@TableField("update_by")
+	private String updateBy;
 
-    @Schema(description = "最後修改時間")
-    @TableField(value = "update_date", fill = FieldFill.UPDATE)
+	@Schema(description = "最後修改時間")
+	@TableField(value = "update_date", fill = FieldFill.UPDATE)
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateDate;
+	private LocalDateTime updateDate;
 
-    @Schema(description = "邏輯刪除,預設為0活耀,1為刪除")
-    @TableField("is_deleted")
-    @TableLogic
-    private Integer isDeleted;
+	@Schema(description = "邏輯刪除,預設為0活耀,1為刪除")
+	@TableField("is_deleted")
+	@TableLogic
+	private Integer isDeleted;
 }

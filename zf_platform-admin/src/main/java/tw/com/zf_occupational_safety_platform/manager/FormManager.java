@@ -53,14 +53,13 @@ public class FormManager {
 	}
 
 	/**
-	 * 獲得隨機數量題目表單
+	 * 獲得隨機數量 單元測試 表單
 	 * 
 	 * @param formId
 	 * @param count
 	 * @return
 	 */
-	public FormVO getRandomQuestionsForm(Long formId, int count) {
-
+	public FormVO getRandomQuizForm(Long formId, int count) {
 		// 1.查詢要填寫的表單
 		Form form = formService.searchForm(formId);
 

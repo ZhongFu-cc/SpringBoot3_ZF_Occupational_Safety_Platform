@@ -12,6 +12,9 @@ public class AddResponseAnswerDTO {
 	@NotNull
 	private Long formFieldId;
 
+	@Schema(description = "選擇題 ID")
+	private Long choiceId;
+
 	@Schema(description = "回覆值")
 	@NotBlank
 	private String answerValue;

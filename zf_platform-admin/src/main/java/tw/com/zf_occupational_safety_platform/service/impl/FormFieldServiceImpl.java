@@ -2,6 +2,7 @@ package tw.com.zf_occupational_safety_platform.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +44,14 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 	private final S3Helper s3Helper;
 	private final FormFieldConvert formFieldConvert;
 
+
+	@Override
+	public Map<Long, FormField> findMapByFieldId(Long formId) {
+		return baseMapper.listByFormId(formId)
+				.stream()
+				.collect(Collectors.toMap(FormField::getFormFieldId, Function.identity()));
+	}
+
 	@Override
 	public List<FormFieldVO> searchFormStructureByForm(Long formId) {
 		List<FormFieldVO> voList = baseMapper.listByFormId(formId).stream().map(formField -> {
@@ -66,7 +75,7 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 		// 這邊在後續開發也要注意 , 複製在option.choices 裡面的id 也會重複 , 注意有沒有衝突問題
 		// 如果複製的問題剛好有圖片 , 則圖片也要進行複製後 , 重新set圖片路徑
 		if (StringUtils.isNotBlank(formField.getImageUrl())) {
-			
+
 		}
 
 		baseMapper.insert(formField);
@@ -144,12 +153,12 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 	public void removeByForm(Long formId) {
 		// 1.優先查找舊資料 , 要移除沒在使用的檔案(圖檔)
 		List<FormField> listByFormId = baseMapper.listByFormId(formId);
-		
+
 		// 2.遍歷使用寬鬆刪除,也就是ImageUrl 如果為null 或為 空字串 , 自動忽略
 		for (FormField formField : listByFormId) {
 			s3Helper.removeFileIfPresent(bucketName, formField.getImageUrl());
 		}
-		
+
 		// 3.刪除所有符合的資料
 		baseMapper.deleteByFormId(formId);
 	}
