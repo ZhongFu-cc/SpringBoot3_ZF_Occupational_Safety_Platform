@@ -46,7 +46,7 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/company")
-public class CompanyController {
+public class SysCompanyController {
 
 	private final AuthManager authManager;
 	private final SysUserService sysUserService;
@@ -54,8 +54,9 @@ public class CompanyController {
 
 	/**
 	 * ------------------- 子級使用者管理 -------------------------
-	 * 
-	 * /**
+	 */
+
+	/**
 	 * 根據ID查詢使用者
 	 * 
 	 * @param id
@@ -73,7 +74,7 @@ public class CompanyController {
 	}
 
 	/**
-	 * 查詢直系的child使用者 (企業員工)
+	 * 查詢child使用者 (企業員工)
 	 * 
 	 * @param page
 	 * @param size
@@ -83,13 +84,13 @@ public class CompanyController {
 	@GetMapping("child/pagination")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@Operation(summary = "查詢直系的child使用者 (企業員工)")
+	@Operation(summary = "查詢child使用者 (企業員工)")
 	@SaCheckRole("company_manager")
 	public R<IPage<SysUser>> findDirectChildUser(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) String queryText) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		Page<SysUser> pageInfo = new Page<>(page, size);
-		IPage<SysUser> userPage = companyManager.findDirectChild(pageInfo, sysUserVO, queryText);
+		IPage<SysUser> userPage = companyManager.findEmployee(pageInfo, sysUserVO, queryText);
 		return R.ok(userPage);
 	}
 

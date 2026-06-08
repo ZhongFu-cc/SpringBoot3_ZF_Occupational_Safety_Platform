@@ -34,10 +34,6 @@ public class PlatformAdminManager {
 	private final SysUserRoleService sysUserRoleService;
 	private final SysRoleService sysRoleService;
 
-	/** --------------------- 平台課程類別管理 ------------------------ */
-
-	/** --------------------- 平台課程管理 ------------------------ */
-
 	/** --------------------- 平台用戶管理 ------------------------ */
 
 	/**
@@ -84,12 +80,12 @@ public class PlatformAdminManager {
 
 		// 父級ID == null , 最大權限者不給予操作
 		if (currentSysUser.getParentId() == null) {
-			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		// 當前用戶的父級ID 與 token解析下當前操作者的ID 不一致則拋出錯誤信息
 		if (!currentSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
-			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		// 目前僅更新基本資料，後續有其他需求再開發
@@ -107,11 +103,11 @@ public class PlatformAdminManager {
 
 		// 父級ID == null , 最大權限者不給予操作
 		if (targetSysUser.getParentId() == null) {
-			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
-		
+
 		if (!targetSysUser.getParentId().equals(sysUserVO.getSysUserId())) {
-			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		// 移除此用戶目前擁有的角色關係
@@ -134,11 +130,11 @@ public class PlatformAdminManager {
 
 		// 父級ID == null , 最大權限者不給予操作
 		if (targetSysUser.getParentId() == null) {
-			throw new PermissionException("您無權查詢此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
-		
+
 		if (!targetSysUser.getParentId().equals(operator.getSysUserId())) {
-			throw new PermissionException("您無權修改此資源，該資料不屬於您的負責範圍。");
+			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
 		sysUserService.updateCompanyUserStatus(sysUserId, status);

@@ -10,10 +10,13 @@ public class AddResponseAnswerDTO {
 
 	@Schema(description = "表單欄位ID")
 	@NotNull
-    private Long formFieldId;
+	private Long formFieldId;
 
-    @Schema(description = "回覆值")
-    @NotBlank
-    private String answerValue;
-	
+	@Schema(description = "選擇題 ID")
+	private Long choiceId;
+
+	@Schema(description = "回覆值")
+	@NotBlank
+	private String answerValue;
+
 }

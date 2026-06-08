@@ -8,6 +8,13 @@ import lombok.Data;
 @Data
 public class AddSysUserDTO {
 
+	@NotNull
+	@Schema(description = "公司ID",type = "string")
+	private Long companyId;
+	
+	@Schema(description = "部門ID",type = "string")
+	private Long departmentId;
+	
 	@NotBlank
 	@Schema(description = "帳號")
 	private String account;
@@ -15,7 +22,7 @@ public class AddSysUserDTO {
 	@NotBlank
 	@Schema(description = "密碼")
 	private String password;
-
+	
 	@NotBlank
 	@Schema(description = "真實姓名")
 	private String realName;

@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.pojo.VO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.FormFieldTypeEnum;
@@ -39,6 +40,10 @@ public class FormFieldVO {
 
 	@Schema(description = "是否必填 , 0為false(不是必填) , 1為true(必填)")
 	private CommonStatusEnum isRequired;
+	
+	@Schema(description = "是否標記正確答案 , 0=否, 1=是")
+	@NotNull
+	private CommonStatusEnum isMarkCorrectAnwser;
 
 	@Schema(description = "顯示順序 , 數字越小排的越前面")
 	private Integer fieldOrder;

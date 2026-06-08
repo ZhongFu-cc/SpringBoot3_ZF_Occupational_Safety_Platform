@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
+import java.util.Collection;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -31,6 +33,26 @@ public interface CourseCategoryMapper extends BaseMapper<CourseCategory> {
 		queryWrapper.and(StringUtils.isNotBlank(queryText), wrap -> {
 			wrap.like(CourseCategory::getCode, queryText).or().like(CourseCategory::getName, queryText);
 		});
+
+		return this.selectPage(pageInfo, queryWrapper);
+	}
+
+	/**
+	 * 
+	 * 查詢分頁對象 + categoryIds 內 +模糊查詢
+	 * 
+	 * @param categoryIds
+	 * @param pageInfo
+	 * @param queryText
+	 * @return
+	 */
+	default IPage<CourseCategory> selectByCategoryIdsAndQuery(Collection<Long> categoryIds,
+			Page<CourseCategory> pageInfo, String queryText) {
+		LambdaQueryWrapper<CourseCategory> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(CourseCategory::getCourseCategoryId, categoryIds)
+				.and(StringUtils.isNotBlank(queryText), wrap -> {
+					wrap.like(CourseCategory::getCode, queryText).or().like(CourseCategory::getName, queryText);
+				});
 
 		return this.selectPage(pageInfo, queryWrapper);
 	}

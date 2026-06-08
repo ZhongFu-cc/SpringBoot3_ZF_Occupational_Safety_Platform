@@ -1,8 +1,13 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
@@ -17,6 +22,27 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
  */
 public interface CourseMapper extends BaseMapper<Course> {
 
+	default List<Course> selectByCourseCategoryIds(Collection<Long> courseCategoryIds) {
+		if (courseCategoryIds != null && courseCategoryIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		LambdaQueryWrapper<Course> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(Course::getCourseCategoryId, courseCategoryIds);
+
+		return this.selectList(queryWrapper);
+
+	}
+
+	default List<Course> selectByQuery(String queryText) {
+		LambdaQueryWrapper<Course> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.and(StringUtils.isNotBlank(queryText), wrap -> {
+			wrap.like(Course::getTitle, queryText);
+		});
+
+		return this.selectList(queryWrapper);
+
+	}
+
 	/**
 	 * 根據條件進行分頁查詢
 	 * 
@@ -28,9 +54,10 @@ public interface CourseMapper extends BaseMapper<Course> {
 	default IPage<Course> selectByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText) {
 
 		LambdaQueryWrapper<Course> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(courseCategoryId != null, Course::getCourseCategoryId, courseCategoryId).and(wrap -> {
-			wrap.like(Course::getTitle, queryText);
-		});
+		queryWrapper.eq(courseCategoryId != null, Course::getCourseCategoryId, courseCategoryId)
+				.and(StringUtils.isNotBlank(queryText), wrap -> {
+					wrap.like(Course::getTitle, queryText);
+				});
 
 		return this.selectPage(pageInfo, queryWrapper);
 	}

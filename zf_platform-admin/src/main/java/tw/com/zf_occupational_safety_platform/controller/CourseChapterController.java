@@ -99,9 +99,9 @@ public class CourseChapterController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@PostMapping
-	public R<Void> saveCourseChapter(@RequestBody @Valid AddCourseChapterDTO addCourseChapterDTO) {
-		courseChapterManager.createCourseChapter(addCourseChapterDTO);
-		return R.ok();
+	public R<CourseChapter> saveCourseChapter(@RequestBody @Valid AddCourseChapterDTO addCourseChapterDTO) {
+		CourseChapter courseChapter = courseChapterManager.createCourseChapter(addCourseChapterDTO);
+		return R.ok(courseChapter);
 	}
 
 	/**

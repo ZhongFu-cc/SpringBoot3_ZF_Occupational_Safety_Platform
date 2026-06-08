@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.manager;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -47,6 +49,34 @@ public class FormManager {
 		// 4.VO填充欄位
 		formVO.setFormFields(formFieldVOList);
 
+		return formVO;
+	}
+
+	/**
+	 * 獲得隨機數量 單元測試 表單
+	 * 
+	 * @param formId
+	 * @param count
+	 * @return
+	 */
+	public FormVO getRandomQuizForm(Long formId, int count) {
+		// 1.查詢要填寫的表單
+		Form form = formService.searchForm(formId);
+
+		// 2.轉換資料
+		FormVO formVO = formConvert.entityToVO(form);
+
+		// 3.根據 formId 查詢表單 及其 欄位
+		List<FormFieldVO> formFieldVOList = formFieldService.searchFormStructureByForm(formId);
+
+		// 4.打亂列表
+		Collections.shuffle(formFieldVOList);
+
+		// 5.從打亂過的列表，再抽取限制數量的題目，最後放回表單
+		List<FormFieldVO> randomQuestions = formFieldVOList.stream()
+				.limit(Math.min(count, formFieldVOList.size()))
+				.toList();
+		formVO.setFormFields(randomQuestions);
 		return formVO;
 	}
 

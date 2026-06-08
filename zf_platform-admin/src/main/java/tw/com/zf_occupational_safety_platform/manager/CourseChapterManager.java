@@ -7,13 +7,19 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.CourseChapterConvert;
+import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
+import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
+import tw.com.zf_occupational_safety_platform.enums.FormStatusEnum;
 import tw.com.zf_occupational_safety_platform.helper.S3Helper;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseChapterDTO;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddFormDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCourseChapterDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CourseChapterVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
+import tw.com.zf_occupational_safety_platform.pojo.entity.Form;
 import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
 import tw.com.zf_occupational_safety_platform.service.CourseService;
+import tw.com.zf_occupational_safety_platform.service.FormService;
 
 /**
  * 課程單元 - 管理層
@@ -31,6 +37,7 @@ public class CourseChapterManager {
 	private final CourseService courseService;
 	private final CourseChapterService courseChapterService;
 	private final CourseChapterConvert courseChapterConvert;
+	private final FormService formService;
 	private final S3Helper s3Helper;
 
 	/**
@@ -49,7 +56,23 @@ public class CourseChapterManager {
 	 * @param imgFile
 	 */
 	public CourseChapter createCourseChapter(AddCourseChapterDTO addCourseChapterDTO) {
+
+		// 如果是 測驗型的,就創建 測驗表單
+		if (ChapterContentTypeEnum.QUIZ.equals(addCourseChapterDTO.getContentType())) {
+			AddFormDTO addFormDTO = new AddFormDTO();
+			addFormDTO.setTitle(addCourseChapterDTO.getTitle());
+			addFormDTO.setStatus(FormStatusEnum.PUBLISHED);
+			addFormDTO.setAllowMultipleSubmissions(CommonStatusEnum.YES);
+			addFormDTO.setRequireLogin(CommonStatusEnum.YES);
+			addFormDTO.setRequiredForCheckout(CommonStatusEnum.NO);
+
+			// 創建表單,並把表單 和 章節整合
+			Form form = formService.create(addFormDTO);
+			addCourseChapterDTO.setFormId(form.getFormId());
+		}
+
 		CourseChapter courseChapter = courseChapterService.create(addCourseChapterDTO);
+
 		return courseChapter;
 	}
 
@@ -60,6 +83,32 @@ public class CourseChapterManager {
 	 * @param imgFile
 	 */
 	public void updateCourseChapter(PutCourseChapterDTO putCourseChapterDTO) {
+
+		// 先查詢之前的資訊
+		CourseChapter currentCourseChapter = courseChapterService.get(putCourseChapterDTO.getCourseChapterId());
+
+		// 章節內容類型 有 變動，接著判斷變動情況
+		if (!currentCourseChapter.getContentType().equals(putCourseChapterDTO.getContentType())) {
+
+			// 如果要調整為Quiz，且沒有formId則建立表單
+			if (ChapterContentTypeEnum.QUIZ.equals(putCourseChapterDTO.getContentType())
+					&& currentCourseChapter.getFormId() == null) {
+				AddFormDTO addFormDTO = new AddFormDTO();
+				addFormDTO.setTitle(putCourseChapterDTO.getTitle());
+				addFormDTO.setStatus(FormStatusEnum.PUBLISHED);
+				addFormDTO.setAllowMultipleSubmissions(CommonStatusEnum.YES);
+				addFormDTO.setRequireLogin(CommonStatusEnum.YES);
+				addFormDTO.setRequiredForCheckout(CommonStatusEnum.NO);
+
+				// 創建表單,並把表單 和 章節整合
+				Form form = formService.create(addFormDTO);
+				putCourseChapterDTO.setFormId(form.getFormId());
+
+			}
+
+		}
+
+		// 最後進行更新
 		courseChapterService.update(putCourseChapterDTO);
 
 	}

@@ -1,5 +1,12 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -34,10 +41,29 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 	}
 
 	@Override
-	public IPage<Course> findPageByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText) {
-		return baseMapper.selectByQuery(pageInfo,courseCategoryId,queryText);
+	public List<Course> findByCategoryIds(Collection<Long> courseCategoryIds) {
+		if (courseCategoryIds != null && courseCategoryIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByCourseCategoryIds(courseCategoryIds);
 	}
-	
+
+	@Override
+	public List<Course> findByQuery(String queryText) {
+		return baseMapper.selectByQuery(queryText);
+	}
+
+	@Override
+	public Map<Long, Course> findCourseIdMapByQuery(String queryText) {
+		List<Course> courses = this.findByQuery(queryText);
+		return courses.stream().collect(Collectors.toMap(Course::getCourseId, Function.identity()));
+	}
+
+	@Override
+	public IPage<Course> findPageByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText) {
+		return baseMapper.selectByQuery(pageInfo, courseCategoryId, queryText);
+	}
+
 	@Override
 	public Course create(AddCourseDTO addCourseDTO) {
 		Course course = courseConvert.addDTOToEntity(addCourseDTO);
@@ -56,6 +82,4 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 		baseMapper.deleteById(courseCategoryId);
 	}
 
-
-	
 }

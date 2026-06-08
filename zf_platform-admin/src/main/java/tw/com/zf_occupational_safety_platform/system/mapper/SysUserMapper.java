@@ -19,6 +19,25 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
 
+	default long countByDepartmentId(Long departmentId) {
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysUser::getDepartmentId, departmentId);
+		return this.selectCount(queryWrapper);
+	}
+
+	/**
+	 * 根據主鍵ID 和 公司ID 查詢
+	 * 
+	 * @param id
+	 * @param companyId
+	 * @return
+	 */
+	default SysUser selectByIdAndCompanyId(Long id, Long companyId) {
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysUser::getSysUserId, id).eq(SysUser::getCompanyId, companyId);
+		return this.selectOne(queryWrapper);
+	}
+
 	/**
 	 * 分頁查詢 - 根據父級ID 和 查詢條件
 	 * 
@@ -39,6 +58,34 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 					.like(SysUser::getRealName, queryText);
 		});
 		IPage<SysUser> selectPage = this.selectPage(pageInfo, queryWrapper);
+
+		return this.selectPage(pageInfo, queryWrapper);
+	}
+
+	/**
+	 * 分頁查詢 - 根據父級ID 和 查詢條件<br>
+	 * 並排除公司ID
+	 * 
+	 * @param pageInfo  分頁對象
+	 * @param parentId  父級ID
+	 * @param companyId 公司ID
+	 * @param queryText 查詢條件
+	 * @return
+	 */
+	default IPage<SysUser> selectByParentIdAndQueryExcludeCompanyId(IPage<SysUser> pageInfo, Long parentId,
+			Long companyId, String queryText) {
+
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+
+		queryWrapper.ne(SysUser::getParentId, parentId)
+				.eq(SysUser::getCompanyId, companyId)
+				.and(StringUtils.isNotBlank(queryText), w -> {
+					w.like(SysUser::getEmail, queryText)
+							.or()
+							.like(SysUser::getPhone, queryText)
+							.or()
+							.like(SysUser::getRealName, queryText);
+				});
 
 		return this.selectPage(pageInfo, queryWrapper);
 	}

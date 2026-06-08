@@ -46,7 +46,7 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/system/admin")
-public class PlatformAdminController {
+public class SysPlatformAdminController {
 
 	private final AuthManager authManager;
 	private final PlatformAdminManager platformAdminManager;

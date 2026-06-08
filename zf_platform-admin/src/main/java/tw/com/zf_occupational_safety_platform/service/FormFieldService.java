@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +23,9 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.FormField;
  */
 public interface FormFieldService extends IService<FormField> {
 
+	
+	Map<Long, FormField> findMapByFieldId(Long formId);
+	
 	/**
 	 * 根據formId拿到 表單 及其 所有欄位 , 也就是整體表單結構<br>
 	 * 返回值 根據 FieldOrder 正序排列
@@ -30,7 +34,8 @@ public interface FormFieldService extends IService<FormField> {
 	 * @return 根據 FieldOrder 正序排列
 	 */
 	List<FormFieldVO> searchFormStructureByForm(Long formId);
-
+	
+	
 	/**
 	 * 新增表單欄位,第一次創建一定不會有圖片
 	 * 

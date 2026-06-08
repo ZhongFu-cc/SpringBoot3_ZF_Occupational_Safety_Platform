@@ -61,16 +61,6 @@ public class Form implements Serializable {
 	@TableField("allow_multiple_submissions")
 	private Integer allowMultipleSubmissions;
 
-	@Schema(description = "表單填寫開放時間")
-	@TableField("start_time")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime startTime;
-
-	@Schema(description = "表單填寫截止時間")
-	@TableField("end_time")
-	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private LocalDateTime endTime;
-
 	@Schema(description = "創建者")
 	@TableField(value = "create_by", fill = FieldFill.INSERT)
 	private String createBy;
