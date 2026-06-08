@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.FormResponseConvert;
 import tw.com.zf_occupational_safety_platform.mapper.FormResponseMapper;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.QuizResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddFormResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
 import tw.com.zf_occupational_safety_platform.service.FormResponseService;
@@ -33,9 +34,9 @@ public class FormResponseServiceImpl extends ServiceImpl<FormResponseMapper, For
 	public List<FormResponse> searchSubmissionsByForm(Long formId) {
 		return baseMapper.listByFormId(formId);
 	}
-	
+
 	@Override
-	public IPage<FormResponse> searchSubmissionsByForm(IPage<FormResponse> pageInfo,Long formId) {
+	public IPage<FormResponse> searchSubmissionsByForm(IPage<FormResponse> pageInfo, Long formId) {
 		return baseMapper.pageByFormId(pageInfo, formId);
 	}
 
@@ -52,10 +53,15 @@ public class FormResponseServiceImpl extends ServiceImpl<FormResponseMapper, For
 	}
 
 	@Override
+	public FormResponse submit(QuizResponseDTO quizResponseDTO) {
+		FormResponse formResponse = formResponseConvert.quizDTOToEntity(quizResponseDTO);
+		baseMapper.insert(formResponse);
+		return formResponse;
+	}
+
+	@Override
 	public void removeByForm(Long formId) {
 		baseMapper.deleteByFormId(formId);
 	}
-
-
 
 }

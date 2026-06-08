@@ -108,8 +108,8 @@ public class ChapterProgressManager {
 		// 章節觀看次數 + 1 
 		chapterProgress.setWatchCount(chapterProgress.getWatchCount() + 1);
 
-		// 當今天訪問非測驗型章節，直接代表他學習完了
-		if (chapterProgress.getIsQuizPassed().getBooleanValue()) {
+		// 當今天訪問 非測驗型章節，直接代表他學習完了
+		if (!chapterProgress.getIsQuizPassed().getBooleanValue()) {
 			LocalDateTime now = LocalDateTime.now();
 			chapterProgress.setCompletedAt(now);
 			chapterProgress.setStatus(CourseStatusEnum.COMPLETED);

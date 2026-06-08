@@ -3,6 +3,7 @@ package tw.com.zf_occupational_safety_platform.manager;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,26 +21,36 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.FormConvert;
+import tw.com.zf_occupational_safety_platform.convert.FormFieldConvert;
 import tw.com.zf_occupational_safety_platform.convert.FormResponseConvert;
 import tw.com.zf_occupational_safety_platform.convert.ResponseAnswerConvert;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
+import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.FormStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.FormException;
 import tw.com.zf_occupational_safety_platform.pojo.BO.ResponseAnswerMatrixBO;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.FormFieldOptionDTO.Choice;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.QuizResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddFormResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutFormResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutResponseAnswerDTO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.AnswerResultVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormFieldVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormResponseVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormVO;
+import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Form;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormField;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
 import tw.com.zf_occupational_safety_platform.pojo.entity.ResponseAnswer;
+import tw.com.zf_occupational_safety_platform.service.ChapterProgressService;
+import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 import tw.com.zf_occupational_safety_platform.service.FormFieldService;
 import tw.com.zf_occupational_safety_platform.service.FormResponseService;
 import tw.com.zf_occupational_safety_platform.service.FormService;
 import tw.com.zf_occupational_safety_platform.service.ResponseAnswerService;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 
 @Component
 @RequiredArgsConstructor
@@ -48,11 +59,15 @@ public class FormResponseManager {
 	private final FormConvert formConvert;
 	private final FormResponseConvert formResponseConvert;
 	private final ResponseAnswerConvert responseAnswerConvert;
+	private final FormFieldConvert formFieldConvert;
 
 	private final FormService formService;
 	private final FormFieldService formFieldService;
 	private final FormResponseService formResponseService;
 	private final ResponseAnswerService responseAnswerService;
+
+	private final CourseEnrollmentService courseEnrollmentService;
+	private final ChapterProgressService chapterProgressService;
 
 	/**
 	 * 獲取 可編輯的 表單對象
@@ -139,6 +154,124 @@ public class FormResponseManager {
 	}
 
 	/**
+	 * 單元測試 的 測驗回覆
+	 * 
+	 * @param quizResponseDTO
+	 */
+	public AnswerResultVO quizResponse(QuizResponseDTO quizResponseDTO, SysUserVO operator) {
+		// 1.表單回覆進來,先查詢表單基本資訊
+		Form form = formService.searchForm(quizResponseDTO.getFormId());
+
+		// 2.如果表單要求登入 , 但是memberId沒傳遞則代表不合規
+		if (CommonStatusEnum.YES.getValue().equals(form.getRequireLogin()) && quizResponseDTO.getMemberId() == null) {
+			throw new FormException("此表單填寫需先登入");
+		}
+
+		// 3.判斷表單是否開放
+		if (!FormStatusEnum.PUBLISHED.equals(form.getStatus())) {
+			throw new FormException("表單不處於發佈狀態");
+		}
+
+		// 4.如果不允許重複填寫 , 根據 memberId 查詢是否有回覆紀錄 
+		if (CommonStatusEnum.NO.getValue().equals(form.getAllowMultipleSubmissions())
+				&& quizResponseDTO.getMemberId() != null) {
+			List<FormResponse> formResponses = formResponseService
+					.searchSubmissionsByMember(quizResponseDTO.getFormId(), quizResponseDTO.getMemberId());
+			if (formResponses.size() > 0) {
+				throw new FormException("表單已填寫過");
+			}
+
+		}
+
+		// 5. 判斷是否為本人的章節
+		ChapterProgress chapterProgress = chapterProgressService.getByOwner(quizResponseDTO.getChapterProgressId(),
+				operator.getSysUserId());
+		if (chapterProgress == null) {
+			throw new FormException("不屬於本人的學習章節");
+		}
+
+		// 5.先輸入這筆表單回覆,拿到表單回覆ID
+		FormResponse formResponse = formResponseService.submit(quizResponseDTO);
+		Map<Long, FormField> mapByFieldId = formFieldService.findMapByFieldId(quizResponseDTO.getFormId());
+
+		// 轉換
+		ResponseAnswer responseAnswer = responseAnswerConvert.addDTOToEntity(quizResponseDTO.getResponseAnswer());
+		// 塞入本次表單回覆ID
+		responseAnswer.setFormResponseId(formResponse.getFormResponseId());
+		// 創建作答結果VO
+		AnswerResultVO answerResultVO = new AnswerResultVO();
+
+		// 批改：找到對應題目，比對正確答案
+		FormField field = mapByFieldId.get(responseAnswer.getFormFieldId());
+		if (field != null) {
+			FormFieldVO fieldVO = formFieldConvert.entityToVO(field);
+			fieldVO.getOptions()
+					.getChoices()
+					.stream()
+					.filter(Choice::isCorrectAnswer)
+					.findFirst()
+					.ifPresent(correct -> {
+						// 填入作答結果
+						answerResultVO.setCorrectAnswer(correct.getLabel());
+						answerResultVO.setYourAnswer(responseAnswer.getAnswerValue());
+
+						boolean isCorrect = correct.getId().equals(responseAnswer.getChoiceId());
+						// 提取回答次數 , +1後重設置
+						Integer quizAttempts = chapterProgress.getQuizAttempts();
+						quizAttempts = quizAttempts == null ? 0 : quizAttempts;
+						quizAttempts += 1;
+						chapterProgress.setQuizAttempts(quizAttempts);
+
+						// 當回答正確
+						if (isCorrect) {
+							responseAnswer.setIsCorrectAnwser(CommonStatusEnum.YES);
+							answerResultVO.setIsCorrect(CommonStatusEnum.YES);
+							// 設定章節測驗通過 , 100分 , 完成 , 設置完成時間
+							chapterProgress.setIsQuizPassed(CommonStatusEnum.YES);
+							chapterProgress.setQuizScore(100);
+							chapterProgress.setStatus(CourseStatusEnum.COMPLETED);
+							chapterProgress.setCompletedAt(LocalDateTime.now());
+
+							// 章節通過，同步更新課程報名的整體學習狀況
+							CourseEnrollment courseEnrollment = courseEnrollmentService
+									.get(chapterProgress.getCourseEnrollmentId());
+							// 同時更新 課程完成的整體狀態
+							Integer totalChapters = courseEnrollment.getTotalChapters();
+							Integer completedChapters = courseEnrollment.getCompletedChapters();
+							completedChapters += 1;
+							// 當完成課程章節數 大於等於 總共課程章節數
+							if (completedChapters >= totalChapters) {
+								courseEnrollment.setCompletedChapters(totalChapters);
+								courseEnrollment.setIsChaptersDone(CommonStatusEnum.YES);
+							} else {
+								// 當完成課程章節數 大於等於 總共課程章節數
+								courseEnrollment.setCompletedChapters(completedChapters);
+							}
+							courseEnrollmentService.updateById(courseEnrollment);
+
+						} else {
+							// 當回答錯誤
+							responseAnswer.setIsCorrectAnwser(CommonStatusEnum.NO);
+							answerResultVO.setIsCorrect(CommonStatusEnum.NO);
+							// 設定章節測驗失敗 , 0分 , 進行中
+							chapterProgress.setQuizScore(0);
+							chapterProgress.setStatus(CourseStatusEnum.IN_PROGRESS);
+
+						}
+
+					});
+
+		}
+
+		// 儲存作答結果
+		responseAnswerService.save(responseAnswer);
+
+		// 返回作答結果
+		return answerResultVO;
+
+	}
+
+	/**
 	 * 新增 表單回覆 及 回覆細項
 	 * 
 	 * @param formResponseDTO
@@ -186,26 +319,33 @@ public class FormResponseManager {
 
 					// 批改：找到對應題目，比對正確答案
 					FormField field = mapByFieldId.get(responseAnswerDTO.getFormFieldId());
-//					if (field != null && field.getOptions() != null) {
-//						field.getOptions()
-//								.getChoices()
-//								.stream()
-//								.filter(Choice::isCorrectAnswer)
-//								.findFirst()
-//								.ifPresent(correct -> {
-//									boolean isCorrect = correct.getId().equals(responseAnswerDTO.getAnswerValue());
-//									responseAnswer.setIsCorrect(isCorrect);
-//								});
-//					}
+					if (field != null) {
+						FormFieldVO fieldVO = formFieldConvert.entityToVO(field);
+						fieldVO.getOptions()
+								.getChoices()
+								.stream()
+								.filter(Choice::isCorrectAnswer)
+								.findFirst()
+								.ifPresent(correct -> {
+									boolean isCorrect = correct.getId().equals(responseAnswerDTO.getChoiceId());
+									if (isCorrect) {
+										responseAnswer.setIsCorrectAnwser(CommonStatusEnum.YES);
+									} else {
+										responseAnswer.setIsCorrectAnwser(CommonStatusEnum.NO);
+									}
+								});
+
+					}
 
 					return responseAnswer;
-
 
 				})
 				.toList();
 
 		// 7.批量插入
 		responseAnswerService.saveBatch(responseAnswerList);
+
+		// 8.
 
 	}
 

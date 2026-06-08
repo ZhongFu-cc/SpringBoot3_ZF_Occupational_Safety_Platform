@@ -13,7 +13,7 @@ public class AddResponseAnswerDTO {
 	private Long formFieldId;
 
 	@Schema(description = "選擇題 ID")
-	private Long choiceId;
+	private String choiceId;
 
 	@Schema(description = "回覆值")
 	@NotBlank

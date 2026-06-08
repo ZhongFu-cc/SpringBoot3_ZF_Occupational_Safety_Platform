@@ -44,6 +44,10 @@ public class ResponseAnswer implements Serializable {
 	@TableField("form_field_id")
 	private Long formFieldId;
 
+	@Schema(description = "選擇題ID")
+	@TableField("choice_id")
+	private String choiceId;
+
 	@Schema(description = "回覆值")
 	@TableField("answer_value")
 	private String answerValue;

@@ -2,6 +2,7 @@ package tw.com.zf_occupational_safety_platform.convert;
 
 import org.mapstruct.Mapper;
 
+import tw.com.zf_occupational_safety_platform.pojo.DTO.QuizResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddFormResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormResponseVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
@@ -15,6 +16,8 @@ public interface FormResponseConvert {
 //    }
 	
 	FormResponse addDTOToEntity(AddFormResponseDTO formResponseDTO);
+	
+	FormResponse quizDTOToEntity(QuizResponseDTO quizResponseDTO);
 	
 	FormResponseVO entityToVO(FormResponse formResponse);
 	
