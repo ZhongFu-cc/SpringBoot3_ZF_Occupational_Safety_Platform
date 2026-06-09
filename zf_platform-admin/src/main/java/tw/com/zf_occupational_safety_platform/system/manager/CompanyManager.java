@@ -79,7 +79,7 @@ public class CompanyManager {
 	 * @return
 	 */
 	public IPage<SysUser> findEmployee(Page<SysUser> pageInfo, SysUserVO sysUserVO, String queryText) {
-		return sysUserService.findByCompany(pageInfo, sysUserVO.getSysUserId(), sysUserVO.getCompanyId(), queryText);
+		return sysUserService.findByCompany(pageInfo, sysUserVO.getParentId(), sysUserVO.getCompanyId(), queryText);
 	}
 
 	// 匯入 員工資料-待完成
