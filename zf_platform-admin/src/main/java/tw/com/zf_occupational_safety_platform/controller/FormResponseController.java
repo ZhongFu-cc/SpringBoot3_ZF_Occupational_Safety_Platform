@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -23,12 +24,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.manager.FormResponseManager;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.QuizResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddFormResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutFormResponseDTO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.AnswerResultVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormResponseVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
-import tw.com.zf_occupational_safety_platform.saToken.StpKit;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.utils.R;
@@ -68,6 +70,29 @@ public class FormResponseController {
 
 		IPage<FormResponseVO> responsesPage = formResponseManager.searchResponsesPage(pageInfo, formId);
 		return R.ok(responsesPage);
+	}
+
+	@PostMapping("answering-quiz")
+	@Operation(summary = "單元測試作答")
+	@Parameters({
+			@Parameter(name = "Authorization-member", description = "請求頭token,token-value開頭必須為Bearer ", required = false, in = ParameterIn.HEADER) })
+	@SaCheckLogin
+	public R<AnswerResultVO> answeringQuiz(@RequestBody @Valid QuizResponseDTO quizResponseDTO) {
+
+		// 1.初始化memberId
+		Long memberId = null;
+
+		// 2.如果有傳token , 且是有在Redis中紀錄的登入狀態,會拿到loginId , 業務上來說也是memberId
+		SysUserVO userInfo = authManager.getUserInfo();
+		memberId = userInfo.getSysUserId();
+
+		// 3.不論memberId是否有值,都放進DTO中
+		quizResponseDTO.setMemberId(memberId);
+
+		// 4.調用表單回覆新增
+		AnswerResultVO answerResultVO = formResponseManager.quizResponse(quizResponseDTO,userInfo);
+
+		return R.ok(answerResultVO);
 	}
 
 	@PostMapping

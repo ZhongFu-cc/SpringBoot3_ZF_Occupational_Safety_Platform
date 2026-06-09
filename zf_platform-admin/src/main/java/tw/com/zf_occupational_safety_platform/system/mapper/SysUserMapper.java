@@ -77,8 +77,11 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 
 		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
 
+		// 避開所有 , 平台管理員創建 的 企業管理者
 		queryWrapper.ne(SysUser::getParentId, parentId)
+				// 查詢所有跟當前操作者(企業管理者) 同公司的數據
 				.eq(SysUser::getCompanyId, companyId)
+				// 加上查詢條件
 				.and(StringUtils.isNotBlank(queryText), w -> {
 					w.like(SysUser::getEmail, queryText)
 							.or()

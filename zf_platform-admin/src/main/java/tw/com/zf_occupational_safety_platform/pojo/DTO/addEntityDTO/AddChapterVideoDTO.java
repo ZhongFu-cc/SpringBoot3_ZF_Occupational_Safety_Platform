@@ -6,17 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class AddResponseAnswerDTO {
+public class AddChapterVideoDTO {
 
-	@Schema(description = "表單欄位ID")
+	@Schema(description = "課程章節ID")
 	@NotNull
-	private Long formFieldId;
+	private Long courseChapterId;
 
-	@Schema(description = "選擇題 ID")
-	private String choiceId;
-
-	@Schema(description = "回覆值")
+	@Schema(description = "檔案名稱-可與傳送時不同")
 	@NotBlank
-	private String answerValue;
-
+	private String fileName;
 }

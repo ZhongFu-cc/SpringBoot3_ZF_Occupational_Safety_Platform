@@ -5,6 +5,7 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import tw.com.zf_occupational_safety_platform.pojo.DTO.QuizResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddFormResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
 
@@ -17,7 +18,7 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
  * @since 2025-12-23
  */
 public interface FormResponseService extends IService<FormResponse> {
-	
+
 	/**
 	 * 根據formId 查詢此表單所有的回覆
 	 * 
@@ -25,15 +26,15 @@ public interface FormResponseService extends IService<FormResponse> {
 	 * @return
 	 */
 	List<FormResponse> searchSubmissionsByForm(Long formId);
-	
+
 	/**
 	 * 根據formId 查詢此表單所有的回覆(分頁)
 	 * 
 	 * @param formId
 	 * @return
 	 */
-	IPage<FormResponse> searchSubmissionsByForm(IPage<FormResponse> pageInfo,Long formId);
-	
+	IPage<FormResponse> searchSubmissionsByForm(IPage<FormResponse> pageInfo, Long formId);
+
 	/**
 	 * 根據 memberId 查詢此會員對此表單所有的回覆
 	 * 
@@ -41,8 +42,8 @@ public interface FormResponseService extends IService<FormResponse> {
 	 * @param memberId
 	 * @return
 	 */
-	List<FormResponse> searchSubmissionsByMember(Long formId,Long memberId);
-	
+	List<FormResponse> searchSubmissionsByMember(Long formId, Long memberId);
+
 	/**
 	 * 新增 表單回覆
 	 * 
@@ -51,11 +52,18 @@ public interface FormResponseService extends IService<FormResponse> {
 	 */
 	FormResponse submit(AddFormResponseDTO formResponseDTO);
 
-	
+	/**
+	 * 新增 單元測驗回覆
+	 * 
+	 * @param quizResponseDTO
+	 * @return
+	 */
+	FormResponse submit(QuizResponseDTO quizResponseDTO);
+
 	/**
 	 * 根據 表單ID 刪除對應的表單回覆
 	 * 
-	 * @param formId 表單ID 
+	 * @param formId 表單ID
 	 */
 	void removeByForm(Long formId);
 

@@ -135,5 +135,9 @@ public class CourseChapterController {
 		courseChapterService.remove(id);
 		return R.ok();
 	}
+	
+	/** ------------------- 章節影片相關 -----------------------------  */
+
+	
 
 }
