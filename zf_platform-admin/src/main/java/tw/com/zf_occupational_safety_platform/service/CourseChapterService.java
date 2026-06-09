@@ -19,17 +19,27 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
  */
 public interface CourseChapterService extends IService<CourseChapter> {
 
+	/**
+	 * 根據主鍵ID,清空VideoUrl
+	 * 
+	 * @param courseChapterId
+	 */
+	void clearVideoUrl(Long courseChapterId);
+
+	/** -------------------------------------------- */
+
 	CourseChapter get(Long courseChapterId);
 
 	/**
 	 * 獲得不是目錄型的 課程章節
+	 * 
 	 * @param courseId
 	 * @return
 	 */
 	List<CourseChapter> findNonDirectoryByCourseId(Long courseId);
-	
-	List<CourseChapterVO> findTreeByCourseId (Long courseId);
-	
+
+	List<CourseChapterVO> findTreeByCourseId(Long courseId);
+
 	CourseChapter create(AddCourseChapterDTO addCourseChapterDTO);
 
 	void update(PutCourseChapterDTO putCourseChapterDTO);
