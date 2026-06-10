@@ -51,7 +51,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 	@Override
 	public List<Course> findByCategoryIds(Collection<Long> courseCategoryIds) {
 		if (courseCategoryIds == null || courseCategoryIds.isEmpty()) {
-			
+			return Collections.emptyList();
 		}
 		return baseMapper.selectByCourseCategoryIds(courseCategoryIds);
 	}
