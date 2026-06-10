@@ -46,7 +46,7 @@ public class ChapterVideoManager {
 	private final S3Helper s3Helper;
 
 	/**
-	 * --------------------------- 投稿者-二階段稿件操作---------------------------------
+	 * --------------------------- 課程影片上傳 ---------------------------------
 	 */
 
 	/**
@@ -111,6 +111,10 @@ public class ChapterVideoManager {
 					chapterVideo.setFileName(fileName);
 					chapterVideo.setPath(filePath);
 					chapterVideoService.save(chapterVideo);
+
+					// 更新chapter 的 video_url
+					courseChapter.setVideoUrl(filePath);
+					courseChapterService.updateById(courseChapter);
 
 					//  4-3-3. 更新 Redis
 					bucket.set(chapterVideo.getChapterVideoId().toString(), 30, TimeUnit.SECONDS);
@@ -177,6 +181,9 @@ public class ChapterVideoManager {
 			chapterVideo.setFileName(putSlideUploadDTO.getChunkUploadDTO().getFileName());
 			// 更新資料庫
 			chapterVideoService.updateById(chapterVideo);
+			// 更新chapter 的 video_url
+			courseChapter.setVideoUrl(chunkResponseVO.getFilePath());
+			courseChapterService.updateById(courseChapter);
 
 		}
 

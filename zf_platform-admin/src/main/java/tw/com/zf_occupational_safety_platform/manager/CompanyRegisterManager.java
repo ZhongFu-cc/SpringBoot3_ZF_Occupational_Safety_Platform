@@ -41,7 +41,7 @@ public class CompanyRegisterManager {
 		// 2.為企業 分配 作業類別 
 		companyJobTypeService.assignType2Company(company.getCompanyId(), addCompanyDTO.getJobTypeIds());
 
-		// 3.查詢適用 企業作業類別 x 課程類別
+		// 3.查詢適用 企業作業類別 x 課程
 		List<JobTypeCourse> jobCourses = jobTypeCourseService.findByTypeIds(addCompanyDTO.getJobTypeIds());
 
 		// 4.拿到去重 且 必要的 課程類別

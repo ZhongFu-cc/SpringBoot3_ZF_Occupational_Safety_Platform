@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service;
 
+import java.util.Collection;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -39,6 +41,14 @@ public interface CourseEnrollmentService extends IService<CourseEnrollment> {
 	 * @return
 	 */
 	CourseEnrollment create(Long sysUserId, Long courseId);
+
+	/**
+	 * 批量幫同一位用戶，報名多個課程，並代入基礎設定
+	 * 
+	 * @param sysUserId
+	 * @param courseIds
+	 */
+	void batchCreate(Long sysUserId, Collection<Long> courseIds);
 
 	//	void update(PutCourseCategoryDTO putCourseCategoryDTO);
 

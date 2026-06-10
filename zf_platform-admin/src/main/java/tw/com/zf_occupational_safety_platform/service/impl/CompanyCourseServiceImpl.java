@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.CompanyCourseConvert;
+import tw.com.zf_occupational_safety_platform.exception.CourseException;
 import tw.com.zf_occupational_safety_platform.mapper.CompanyCourseMapper;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCompanyCourseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
@@ -35,6 +36,14 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 	@Override
 	public CompanyCourse get(Long companyCourseId) {
 		return baseMapper.selectById(companyCourseId);
+	}
+
+	@Override
+	public List<CompanyCourse> findByIds(Collection<Long> companyCourseIds) {
+		if (companyCourseIds == null || companyCourseIds.isEmpty()) {
+			Collections.emptyList();
+		}
+		return baseMapper.selectBatchIds(companyCourseIds);
 	}
 
 	@Override
@@ -81,6 +90,12 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 
 	@Override
 	public CompanyCourse add(AddCompanyCourseDTO addCompanyCourseDTO) {
+		CompanyCourse currentCompanyCourse = baseMapper.selectByCourseIdAndCompanyId(addCompanyCourseDTO.getCourseId(),
+				addCompanyCourseDTO.getCompanyId());
+		if (currentCompanyCourse != null) {
+			throw new CourseException("企業已持有此課程");
+		}
+
 		CompanyCourse companyCourse = companyCourseConvert.addDTOToEntity(addCompanyCourseDTO);
 		baseMapper.insert(companyCourse);
 		return companyCourse;

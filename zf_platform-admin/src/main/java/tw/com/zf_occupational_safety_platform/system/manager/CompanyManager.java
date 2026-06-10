@@ -1,5 +1,9 @@
 package tw.com.zf_occupational_safety_platform.system.manager;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -9,6 +13,11 @@ import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.MissingRequestParameterException;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
+import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
+import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
+import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
+import tw.com.zf_occupational_safety_platform.service.DepartmentCourseService;
 import tw.com.zf_occupational_safety_platform.system.convert.SysUserConvert;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
@@ -34,6 +43,9 @@ public class CompanyManager {
 	private final SysUserConvert sysUserConvert;
 	private final SysUserRoleService sysUserRoleService;
 	private final SysRoleService sysRoleService;
+	private final DepartmentCourseService departmentCourseService;
+	private final CompanyCourseService companyCourseService;
+	private final CourseEnrollmentService courseEnrollmentService;
 
 	// 指派 學習任務
 
@@ -108,6 +120,19 @@ public class CompanyManager {
 
 		// 為新的企業員工添加角色
 		sysUserRoleService.assignRole2User(sysUser.getSysUserId(), sysRole.getSysRoleId());
+
+		// 創建完後，查看目前部門有無分配課程，如果有則自動幫他報名
+		List<DepartmentCourse> departmentCourses = departmentCourseService
+				.findByDepartmentId(sysUser.getDepartmentId());
+		List<Long> companyCourseIds = departmentCourses.stream().map(DepartmentCourse::getCompanyCourseId).toList();
+		List<CompanyCourse> companyCourses = companyCourseService.findByIds(companyCourseIds);
+		// 如果沒有企業課程，直接return
+		if (companyCourses.isEmpty()) {
+			return;
+		}
+		Set<Long> courseIds = companyCourses.stream().map(CompanyCourse::getCourseId).collect(Collectors.toSet());
+
+		courseEnrollmentService.batchCreate(sysUser.getSysUserId(), courseIds);
 	}
 
 	/**

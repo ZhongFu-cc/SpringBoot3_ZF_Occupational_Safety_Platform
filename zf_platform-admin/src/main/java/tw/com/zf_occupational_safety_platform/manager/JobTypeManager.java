@@ -16,15 +16,15 @@ public class JobTypeManager {
 
 	private final CompanyJobTypeService companyJobTypeService;
 	private final JobTypeService jobTypeService;
-	private final JobTypeCourseService jobTypeCourseCategoryService;
+	private final JobTypeCourseService jobTypeCourseService;
 
 	public void removeJobType(Long jobTypeId) {
 
 		// 移除 企業 x 作業類別 的關聯
 		companyJobTypeService.removeByTypeId(jobTypeId);
 
-		// 移除 作業類別 x 課程類別的關聯
-		jobTypeCourseCategoryService.removeByTypeId(jobTypeId);
+		// 移除 作業類別 x 課程的關聯
+		jobTypeCourseService.removeByTypeId(jobTypeId);
 
 		// 移除 作業類別
 		jobTypeService.remove(jobTypeId);

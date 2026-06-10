@@ -1,6 +1,8 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -59,6 +61,29 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 		baseMapper.insert(courseEnrollment);
 
 		return courseEnrollment;
+	}
+
+	@Override
+	public void batchCreate(Long sysUserId, Collection<Long> courseIds) {
+		if (courseIds == null || courseIds.isEmpty()) {
+			return;
+		}
+		LocalDateTime now = LocalDateTime.now();
+
+		List<CourseEnrollment> courseEnrollments = courseIds.stream().map(courseId -> {
+			CourseEnrollment courseEnrollment = new CourseEnrollment();
+			courseEnrollment.setSysUserId(sysUserId);
+			courseEnrollment.setCourseId(courseId);
+			courseEnrollment.setCompletedChapters(0);
+			courseEnrollment.setStatus(CourseStatusEnum.NOT_STARTED);
+			courseEnrollment.setIsChaptersDone(CommonStatusEnum.NO);
+			courseEnrollment.setIsMinutesMet(CommonStatusEnum.NO);
+			courseEnrollment.setEnrolledAt(now);
+			return courseEnrollment;
+		}).toList();
+
+		this.saveBatch(courseEnrollments);
+
 	}
 
 	@Override
