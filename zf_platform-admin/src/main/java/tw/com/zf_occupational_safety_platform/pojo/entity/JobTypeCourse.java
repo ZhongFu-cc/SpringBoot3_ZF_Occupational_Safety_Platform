@@ -24,19 +24,19 @@ import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
  */
 @Getter
 @Setter
-@TableName("job_type_course_category")
-@Schema(name = "JobTypeCourseCategory", description = "作業類別 x 課程類別 關聯表")
-public class JobTypeCourseCategory implements Serializable {
+@TableName("job_type_course")
+@Schema(name = "JobTypeCourse", description = "作業類別 x 課程 關聯表")
+public class JobTypeCourse implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "主鍵ID")
-    @TableId("type_category_id")
-    private Long typeCategoryId;
+    @TableId("job_course_id")
+    private Long jobCourseId;
 
-    @Schema(description = "課程類別 ID")
-    @TableField("course_category_id")
-    private Long courseCategoryId;
+    @Schema(description = "課程 ID")
+    @TableField("course_id")
+    private Long courseId;
 
     @Schema(description = "作業類別 ID")
     @TableField("job_type_id")

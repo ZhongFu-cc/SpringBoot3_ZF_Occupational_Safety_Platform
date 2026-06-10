@@ -20,7 +20,7 @@ import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
 import tw.com.zf_occupational_safety_platform.service.CompanyJobTypeService;
 import tw.com.zf_occupational_safety_platform.service.CompanyService;
 import tw.com.zf_occupational_safety_platform.service.CourseService;
-import tw.com.zf_occupational_safety_platform.service.JobTypeCourseCategoryService;
+import tw.com.zf_occupational_safety_platform.service.JobTypeCourseService;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 
 /**
@@ -32,7 +32,7 @@ public class CompanyCourseManager {
 
 	private final CompanyService companyService;
 	private final CompanyJobTypeService companyJobTypeService;
-	private final JobTypeCourseCategoryService jobTypeCourseCategoryService;
+	private final JobTypeCourseService jobTypeCourseCategoryService;
 	private final CourseService courseService;
 	private final CompanyCourseService companyCourseService;
 	private final CourseConvert courseConvert;

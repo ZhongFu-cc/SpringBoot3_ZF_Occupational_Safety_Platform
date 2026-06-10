@@ -23,12 +23,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import tw.com.zf_occupational_safety_platform.manager.TypeCategoryManager;
-import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddTypeCategoryDTO;
-import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutTypeCategoryDTO;
-import tw.com.zf_occupational_safety_platform.pojo.VO.TypeCategoryVO;
-import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
-import tw.com.zf_occupational_safety_platform.service.JobTypeCourseCategoryService;
+import tw.com.zf_occupational_safety_platform.manager.JobCourseManager;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddJobCourseDTO;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutJobCourseDTO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.JobCourseVO;
+import tw.com.zf_occupational_safety_platform.pojo.entity.JobTypeCourse;
+import tw.com.zf_occupational_safety_platform.service.JobTypeCourseService;
 import tw.com.zf_occupational_safety_platform.utils.R;
 
 /**
@@ -39,15 +39,15 @@ import tw.com.zf_occupational_safety_platform.utils.R;
  * @author Joey
  * @since 2026-06-02
  */
-@Tag(name = "作業類別 x 課程類別 關聯 API")
+@Tag(name = "作業類別 x 課程 關聯 API")
 @Validated
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/job-type-course-category")
-public class JobTypeCourseCategoryController {
+@RequestMapping("/job-type-course")
+public class JobTypeCourseController {
 
-	private final JobTypeCourseCategoryService jobTypeCourseCategoryService;
-	private final TypeCategoryManager typeCategoryManager;
+	private final JobTypeCourseService jobTypeCourseService;
+	private final JobCourseManager jobCourseManager;
 
 	/**
 	 * 根據ID 查詢 作業類別 x 課程類別 關聯
@@ -57,13 +57,13 @@ public class JobTypeCourseCategoryController {
 	 */
 	//	@Operation(summary = "根據ID 查詢 作業類別 x 課程類別 關聯")
 	//	@GetMapping("{id}")
-	//	public R<JobTypeCourseCategory> getJobType(@PathVariable("id") @Schema(type = "string") Long id) {
-	//		JobTypeCourseCategory jobTypeCourseCategory = jobTypeCourseCategoryService.get(id);
+	//	public R<JobTypeCourse> getJobType(@PathVariable("id") @Schema(type = "string") Long id) {
+	//		JobTypeCourse jobTypeCourseCategory = jobTypeCourseCategoryService.get(id);
 	//		return R.ok(jobTypeCourseCategory);
 	//	}
 
 	/**
-	 * 查詢 作業類別 關聯的 課程類別分頁對象
+	 * 查詢 作業類別 關聯的 課程分頁對象
 	 * 
 	 * @param page
 	 * @param size
@@ -72,17 +72,17 @@ public class JobTypeCourseCategoryController {
 	@GetMapping("pagination")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@Operation(summary = "查詢 作業類別 關聯的 課程類別分頁對象")
-	public R<IPage<TypeCategoryVO>> findJobTypePage(@RequestParam @Schema(type = "string") Long jobTypeId,
+	@Operation(summary = "查詢 作業類別 關聯的 課程分頁對象")
+	public R<IPage<JobCourseVO>> findJobTypePage(@RequestParam @Schema(type = "string") Long jobTypeId,
 			@RequestParam Integer page, @RequestParam Integer size, @RequestParam(required = false) String queryText) {
 
-		Page<CourseCategory> pageInfo = new Page<>(page, size);
-		IPage<TypeCategoryVO> voPage = typeCategoryManager.findCatrgoryPageByJobType(jobTypeId, pageInfo, queryText);
+		Page<JobTypeCourse> pageInfo = new Page<>(page, size);
+		IPage<JobCourseVO> voPage = jobCourseManager.findJobCoursePageByJobType(pageInfo, jobTypeId, queryText);
 		return R.ok(voPage);
 	}
 
 	/**
-	 * 新增 作業類別 x 課程類別 關聯
+	 * 新增 作業類別 x 課程 關聯
 	 * 
 	 * @param addTypeCategoryDTO
 	 * @return
@@ -92,24 +92,24 @@ public class JobTypeCourseCategoryController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@PostMapping
-	public R<Void> addAssociation(@RequestBody @Valid AddTypeCategoryDTO addTypeCategoryDTO) {
-		jobTypeCourseCategoryService.add(addTypeCategoryDTO);
+	public R<Void> addAssociation(@RequestBody @Valid AddJobCourseDTO addTypeCategoryDTO) {
+		jobTypeCourseService.add(addTypeCategoryDTO);
 		return R.ok();
 	}
 
 	/**
-	 * 更新 作業類別 x 課程類別 關聯的 必要欄位
+	 * 更新 作業類別 x 課程 關聯的 必要欄位
 	 * 
 	 * @param putTypeCategoryDTO
 	 * @return
 	 */
-	@Operation(summary = "更新 作業類別 x 課程類別 關聯的 必要欄位")
+	@Operation(summary = "更新 作業類別 x 課程 關聯的 必要欄位")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@PutMapping
-	public R<Void> updateMandatory(@RequestBody @Valid PutTypeCategoryDTO putTypeCategoryDTO) {
-		jobTypeCourseCategoryService.update(putTypeCategoryDTO);
+	public R<Void> updateMandatory(@RequestBody @Valid PutJobCourseDTO putTypeCategoryDTO) {
+		jobTypeCourseService.update(putTypeCategoryDTO);
 		return R.ok();
 	}
 
@@ -125,7 +125,7 @@ public class JobTypeCourseCategoryController {
 	@SaCheckRole("super-admin")
 	@DeleteMapping("{id}")
 	public R<Void> removeAssociation(@PathVariable @Schema(type = "string") Long id) {
-		jobTypeCourseCategoryService.remove(id);
+		jobTypeCourseService.remove(id);
 		return R.ok();
 	}
 

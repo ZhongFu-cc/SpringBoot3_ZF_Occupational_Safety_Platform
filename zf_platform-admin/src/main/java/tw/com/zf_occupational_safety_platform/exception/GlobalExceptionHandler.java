@@ -61,8 +61,8 @@ public class GlobalExceptionHandler {
 	 */
 	@ResponseBody
 	@ResponseStatus(HttpStatus.CONFLICT)
-	@ExceptionHandler(value = JobTypeCourseCategoryException.class)
-	public R<Map<String, Object>> jobTypeCourseCategoryException(JobTypeCourseCategoryException exception) {
+	@ExceptionHandler(value = JobTypeCourseException.class)
+	public R<Map<String, Object>> jobTypeCourseCategoryException(JobTypeCourseException exception) {
 		String message = exception.getMessage();
 		return R.fail(409, message);
 	}

@@ -6,11 +6,11 @@ import lombok.Data;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 
 @Data
-public class PutTypeCategoryDTO {
+public class PutJobCourseDTO {
 
 	@NotNull
     @Schema(description = "主鍵ID")
-    private Long typeCategoryId;
+    private Long jobCourseId;
 
 	@NotNull
     @Schema(description = "是否為必填項 ; 0=否 , 1 = 是")

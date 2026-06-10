@@ -60,7 +60,6 @@ public class ChapterVideoManager {
 	public ChunkResponseVO uploadChunk(@Valid UploadChapterVideoDTO uploadChapterVideoDTO, MultipartFile file) {
 		// 1.courseChapterId 找到要上傳哪個課程章節的影片
 		CourseChapter courseChapter = courseChapterService.get(uploadChapterVideoDTO.getCourseChapterId());
-
 		if (courseChapter == null) {
 			throw new CourseException("沒有此課程章節");
 		}

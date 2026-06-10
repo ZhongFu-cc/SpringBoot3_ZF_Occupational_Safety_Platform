@@ -5,7 +5,9 @@ import org.mapstruct.Mapper;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCourseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CompanyCourseVO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.JobCourseVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
 
 @Mapper(componentModel = "spring")
 public interface CourseConvert {
@@ -15,6 +17,8 @@ public interface CourseConvert {
 	Course putDTOToEntity(PutCourseDTO putCourseDTO);
 	
 	CompanyCourseVO entityToCompanyCourseVO(Course course);
+	
+	JobCourseVO entityToJobCourseVO(Course course);
 	
 	
 }

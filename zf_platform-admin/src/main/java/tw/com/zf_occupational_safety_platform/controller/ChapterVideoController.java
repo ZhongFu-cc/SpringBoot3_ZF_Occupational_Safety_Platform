@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.manager.ChapterVideoManager;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.UpdateChapterVideoDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.UploadChapterVideoDTO;
+import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterVideo;
 import tw.com.zf_occupational_safety_platform.service.ChapterVideoService;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.CheckFileVO;
@@ -61,16 +63,10 @@ public class ChapterVideoController {
 	@Operation(summary = "查詢單一課程Video")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	public R<Void> getChapterVideos(@PathVariable("id") Long courseChapterId) {
-
-		//		// 1.根據token 拿取本人的數據
-		//		SysUserVO sysUserVO = authManager.getUserInfo();
-		//
-		//		// 2.透過 paperId 和 memberId 去獲取此稿件在第二階段上傳的所有附件
-		//		List<PaperFileUpload> secondStagePaperFile = paperService.getSecondStagePaperFile(paperId,
-		//				memberCache.getMemberId());
-
-		return R.ok();
+	@SaCheckLogin
+	public R<ChapterVideo> getChapterVideos(@PathVariable("id") Long courseChapterId) {
+		ChapterVideo chapterVideo = chapterVideoService.getByChapter(courseChapterId);
+		return R.ok(chapterVideo);
 	}
 
 	@GetMapping("check")
@@ -131,9 +127,7 @@ public class ChapterVideoController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	public R<Void> removeVideo(@PathVariable("id") Long chapterVideoId) {
-
 		chapterVideoManager.removeFile(chapterVideoId);
-
 		return R.ok();
 	}
 
