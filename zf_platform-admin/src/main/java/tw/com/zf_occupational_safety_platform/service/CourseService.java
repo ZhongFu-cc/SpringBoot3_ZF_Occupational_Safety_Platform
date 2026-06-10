@@ -23,6 +23,8 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
 public interface CourseService extends IService<Course> {
 
 	Course get(Long courseId);
+	
+	List<Course> findByIds(Collection<Long> courseIds);
 
 	List<Course> findByCategoryIds(Collection<Long> courseCategoryIds);
 	

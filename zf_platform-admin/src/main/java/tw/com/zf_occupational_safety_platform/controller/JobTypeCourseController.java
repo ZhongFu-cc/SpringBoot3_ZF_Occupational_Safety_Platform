@@ -84,23 +84,23 @@ public class JobTypeCourseController {
 	/**
 	 * 新增 作業類別 x 課程 關聯
 	 * 
-	 * @param addTypeCategoryDTO
+	 * @param addJobCourseDTO
 	 * @return
 	 */
-	@Operation(summary = "新增 作業類別 x 課程類別 關聯")
+	@Operation(summary = "新增 作業類別 x 課程 關聯")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@PostMapping
-	public R<Void> addAssociation(@RequestBody @Valid AddJobCourseDTO addTypeCategoryDTO) {
-		jobTypeCourseService.add(addTypeCategoryDTO);
+	public R<Void> addAssociation(@RequestBody @Valid AddJobCourseDTO addJobCourseDTO) {
+		jobTypeCourseService.add(addJobCourseDTO);
 		return R.ok();
 	}
 
 	/**
 	 * 更新 作業類別 x 課程 關聯的 必要欄位
 	 * 
-	 * @param putTypeCategoryDTO
+	 * @param putJobCourseDTO
 	 * @return
 	 */
 	@Operation(summary = "更新 作業類別 x 課程 關聯的 必要欄位")
@@ -108,18 +108,18 @@ public class JobTypeCourseController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@PutMapping
-	public R<Void> updateMandatory(@RequestBody @Valid PutJobCourseDTO putTypeCategoryDTO) {
-		jobTypeCourseService.update(putTypeCategoryDTO);
+	public R<Void> updateMandatory(@RequestBody @Valid PutJobCourseDTO putJobCourseDTO) {
+		jobTypeCourseService.update(putJobCourseDTO);
 		return R.ok();
 	}
 
 	/**
-	 * 根據ID 刪除 作業類別 x 課程類別 關聯
+	 * 根據ID 刪除 作業類別 x 課程 關聯
 	 * 
 	 * @param id
 	 * @return
 	 */
-	@Operation(summary = "根據ID 刪除 作業類別 x 課程類別 關聯 ")
+	@Operation(summary = "根據ID 刪除 作業類別 x 課程 關聯 ")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
 	@SaCheckRole("super-admin")

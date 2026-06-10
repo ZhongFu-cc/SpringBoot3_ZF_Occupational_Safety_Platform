@@ -45,7 +45,7 @@ public class CompanyRegisterManager {
 		List<JobTypeCourse> jobCourses = jobTypeCourseService.findByTypeIds(addCompanyDTO.getJobTypeIds());
 
 		// 4.拿到去重 且 必要的 課程類別
-		Set<Long> courseCategoryIds = jobCourses.stream()
+		Set<Long> courseIds = jobCourses.stream()
 				// 1. 先過濾：只保留 isMandatory 為 YES 的資料
 				.filter(tc -> CommonStatusEnum.YES.equals(tc.getIsMandatory()))
 				// 2. 再轉換：只提取課程類別 ID
@@ -54,15 +54,12 @@ public class CompanyRegisterManager {
 				.collect(Collectors.toSet());
 
 		// 5.沒有必要 要上的課需要排入 企業課程表，那就可以離開了
-		if (courseCategoryIds.isEmpty()) {
+		if (courseIds.isEmpty()) {
 			return;
 		}
 
-		// 6.透過課程類別Ids，獲得必要學習的課程列表
-		List<Course> courses = courseService.findByCategoryIds(courseCategoryIds);
-		List<Long> courseIds = courses.stream().map(Course::getCourseId).toList();
 
-		// 7.將這些課程放入 公司的課程庫
+		// 6.將這些課程放入 公司的課程庫
 		companyCourseService.batchAdd(company.getCompanyId(), courseIds);
 
 	}
