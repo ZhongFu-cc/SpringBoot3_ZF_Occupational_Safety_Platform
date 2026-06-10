@@ -12,12 +12,12 @@ import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCompanyDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Company;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
-import tw.com.zf_occupational_safety_platform.pojo.entity.JobTypeCourseCategory;
+import tw.com.zf_occupational_safety_platform.pojo.entity.JobTypeCourse;
 import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
 import tw.com.zf_occupational_safety_platform.service.CompanyJobTypeService;
 import tw.com.zf_occupational_safety_platform.service.CompanyService;
 import tw.com.zf_occupational_safety_platform.service.CourseService;
-import tw.com.zf_occupational_safety_platform.service.JobTypeCourseCategoryService;
+import tw.com.zf_occupational_safety_platform.service.JobTypeCourseService;
 
 /**
  * 企業 及 企業課程 管理層
@@ -28,7 +28,7 @@ public class CompanyRegisterManager {
 
 	private final CompanyService companyService;
 	private final CompanyJobTypeService companyJobTypeService;
-	private final JobTypeCourseCategoryService jobTypeCourseCategoryService;
+	private final JobTypeCourseService jobTypeCourseService;
 	private final CourseService courseService;
 	private final CompanyCourseService companyCourseService;
 
@@ -42,15 +42,14 @@ public class CompanyRegisterManager {
 		companyJobTypeService.assignType2Company(company.getCompanyId(), addCompanyDTO.getJobTypeIds());
 
 		// 3.查詢適用 企業作業類別 x 課程類別
-		List<JobTypeCourseCategory> typeCategorys = jobTypeCourseCategoryService
-				.findByTypeIds(addCompanyDTO.getJobTypeIds());
+		List<JobTypeCourse> jobCourses = jobTypeCourseService.findByTypeIds(addCompanyDTO.getJobTypeIds());
 
 		// 4.拿到去重 且 必要的 課程類別
-		Set<Long> courseCategoryIds = typeCategorys.stream()
+		Set<Long> courseCategoryIds = jobCourses.stream()
 				// 1. 先過濾：只保留 isMandatory 為 YES 的資料
 				.filter(tc -> CommonStatusEnum.YES.equals(tc.getIsMandatory()))
 				// 2. 再轉換：只提取課程類別 ID
-				.map(JobTypeCourseCategory::getCourseCategoryId)
+				.map(JobTypeCourse::getCourseId)
 				// 3. 收集成 Set（自動去重）
 				.collect(Collectors.toSet());
 

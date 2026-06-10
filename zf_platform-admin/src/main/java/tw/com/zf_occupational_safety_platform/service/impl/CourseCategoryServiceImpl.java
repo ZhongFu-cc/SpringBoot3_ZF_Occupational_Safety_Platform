@@ -46,8 +46,8 @@ public class CourseCategoryServiceImpl extends ServiceImpl<CourseCategoryMapper,
 	public IPage<CourseCategory> findPageByCategoryIdAndQuery(Collection<Long> categoryIds,
 			Page<CourseCategory> pageInfo, String queryText) {
 
-		if (categoryIds != null && !categoryIds.isEmpty()) {
-			new Page<CourseCategory>(pageInfo.getCurrent(), pageInfo.getSize());
+		if (categoryIds == null || categoryIds.isEmpty()) {
+			return new Page<CourseCategory>(pageInfo.getCurrent(), pageInfo.getSize());
 		}
 
 		return baseMapper.selectByCategoryIdsAndQuery(categoryIds, pageInfo, queryText);

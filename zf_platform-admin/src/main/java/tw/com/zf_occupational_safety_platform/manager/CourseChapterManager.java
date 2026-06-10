@@ -11,10 +11,12 @@ import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.FormStatusEnum;
 import tw.com.zf_occupational_safety_platform.helper.S3Helper;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddChapterVideoDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseChapterDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddFormDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCourseChapterDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CourseChapterVO;
+import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterVideo;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Form;
 import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
@@ -69,7 +71,8 @@ public class CourseChapterManager {
 			// 創建表單,並把表單 和 章節整合
 			Form form = formService.create(addFormDTO);
 			addCourseChapterDTO.setFormId(form.getFormId());
-		}
+			
+		} 
 
 		CourseChapter courseChapter = courseChapterService.create(addCourseChapterDTO);
 

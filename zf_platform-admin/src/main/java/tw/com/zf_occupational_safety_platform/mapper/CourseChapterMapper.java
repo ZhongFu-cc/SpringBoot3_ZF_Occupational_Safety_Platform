@@ -2,6 +2,9 @@ package tw.com.zf_occupational_safety_platform.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Update;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -16,6 +19,13 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
  * @since 2026-05-21
  */
 public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
+
+	@Update("""
+			    UPDATE course_chapter
+			    SET video_url = NULL
+			    WHERE course_chapter_id = #{courseChapterId}
+			""")
+	int clearVideoUrl(@Param("courseChapterId") Long courseChapterId);
 
 	/**
 	 * 根據課程ID查詢

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.service.CompanyJobTypeService;
-import tw.com.zf_occupational_safety_platform.service.JobTypeCourseCategoryService;
+import tw.com.zf_occupational_safety_platform.service.JobTypeCourseService;
 import tw.com.zf_occupational_safety_platform.service.JobTypeService;
 
 /**
@@ -16,7 +16,7 @@ public class JobTypeManager {
 
 	private final CompanyJobTypeService companyJobTypeService;
 	private final JobTypeService jobTypeService;
-	private final JobTypeCourseCategoryService jobTypeCourseCategoryService;
+	private final JobTypeCourseService jobTypeCourseCategoryService;
 
 	public void removeJobType(Long jobTypeId) {
 

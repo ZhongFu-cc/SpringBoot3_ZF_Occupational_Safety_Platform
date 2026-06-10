@@ -40,7 +40,7 @@ public interface ResponseAnswerMapper extends BaseMapper<ResponseAnswer> {
 	 */
 	default List<ResponseAnswer> listByResponseIds(Collection<Long> formResponseIds) {
 
-		if (formResponseIds.isEmpty()) {
+		if (formResponseIds == null ||formResponseIds.isEmpty()) {
 			return Collections.emptyList();
 		}
 
@@ -68,7 +68,7 @@ public interface ResponseAnswerMapper extends BaseMapper<ResponseAnswer> {
 	 * @param formResponseIds
 	 */
 	default void deleteByResponseIds(Collection<Long> formResponseIds) {
-		if (formResponseIds.isEmpty()) {
+		if (formResponseIds == null || formResponseIds.isEmpty()) {
 			return;
 		}
 

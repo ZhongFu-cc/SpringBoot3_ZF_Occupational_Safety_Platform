@@ -58,7 +58,7 @@ public class ChapterProgressServiceImpl extends ServiceImpl<ChapterProgressMappe
 	public void batchCreateByCourseChapter(Long courseEnrollmentId, Long sysUserId,
 			Collection<CourseChapter> courseChapters) {
 
-		if (courseChapters != null && courseChapters.isEmpty()) {
+		if (courseChapters == null || courseChapters.isEmpty()) {
 			return;
 		}
 

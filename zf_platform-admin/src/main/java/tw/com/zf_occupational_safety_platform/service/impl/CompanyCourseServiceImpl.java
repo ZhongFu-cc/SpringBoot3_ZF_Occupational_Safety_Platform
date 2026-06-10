@@ -46,7 +46,7 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 	@Override
 	public IPage<CompanyCourse> findPageBycourseIds(Page<CompanyCourse> pageInfo, Collection<Long> courseIds,
 			Long companyId) {
-		if (courseIds != null && courseIds.isEmpty()) {
+		if (courseIds == null || courseIds.isEmpty()) {
 			Page<CompanyCourse> page = new Page<>(pageInfo.getCurrent(), pageInfo.getSize());
 			return page;
 		}
