@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,11 +74,11 @@ public class FormResponseController {
 	}
 
 	@PostMapping("answering-quiz")
-	@Operation(summary = "單元測試作答")
+	@Operation(summary = "總測驗作答")
 	@Parameters({
-			@Parameter(name = "Authorization-member", description = "請求頭token,token-value開頭必須為Bearer ", required = false, in = ParameterIn.HEADER) })
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = false, in = ParameterIn.HEADER) })
 	@SaCheckLogin
-	public R<AnswerResultVO> answeringQuiz(@RequestBody @Valid QuizResponseDTO quizResponseDTO) {
+	public R<List<AnswerResultVO>> answeringQuiz(@RequestBody @Valid QuizResponseDTO quizResponseDTO) {
 
 		// 1.初始化memberId
 		Long memberId = null;
@@ -90,9 +91,9 @@ public class FormResponseController {
 		quizResponseDTO.setMemberId(memberId);
 
 		// 4.調用表單回覆新增
-		AnswerResultVO answerResultVO = formResponseManager.quizResponse(quizResponseDTO,userInfo);
+		 List<AnswerResultVO> quizResponses = formResponseManager.quizResponse(quizResponseDTO,userInfo);
 
-		return R.ok(answerResultVO);
+		return R.ok(quizResponses);
 	}
 
 	@PostMapping

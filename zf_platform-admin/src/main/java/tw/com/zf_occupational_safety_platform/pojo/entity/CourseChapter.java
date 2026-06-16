@@ -55,7 +55,7 @@ public class CourseChapter implements Serializable {
 	@TableField("chapter_order")
 	private Integer chapterOrder;
 
-	@Schema(description = "單元內容類型: directory(純目錄/大單元), video(影片內容), quiz(隨堂/課後測驗)")
+	@Schema(description = "單元內容類型: directory(純目錄/大單元), video(影片內容), quiz(總測驗)")
 	@TableField("content_type")
 	private ChapterContentTypeEnum contentType;
 

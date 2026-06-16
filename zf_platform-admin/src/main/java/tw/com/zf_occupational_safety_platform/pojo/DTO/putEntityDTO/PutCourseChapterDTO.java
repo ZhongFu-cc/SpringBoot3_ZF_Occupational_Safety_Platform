@@ -32,7 +32,7 @@ public class PutCourseChapterDTO {
 	private Integer chapterOrder;
 
 	@NotNull
-	@Schema(description = "單元內容類型: directory(純目錄/大單元), video(影片內容), quiz(隨堂/課後測驗)")
+	@Schema(description = "單元內容類型: directory(純目錄/大單元), video(影片內容), quiz(總測驗)")
 	private ChapterContentTypeEnum contentType;
 
 }

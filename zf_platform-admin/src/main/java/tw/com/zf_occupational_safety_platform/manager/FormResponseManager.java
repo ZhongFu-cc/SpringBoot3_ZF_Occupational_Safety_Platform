@@ -32,6 +32,7 @@ import tw.com.zf_occupational_safety_platform.pojo.BO.ResponseAnswerMatrixBO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.FormFieldOptionDTO.Choice;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.QuizResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddFormResponseDTO;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddResponseAnswerDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutFormResponseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutResponseAnswerDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.AnswerResultVO;
@@ -154,11 +155,11 @@ public class FormResponseManager {
 	}
 
 	/**
-	 * 單元測試 的 測驗回覆
+	 * 總測驗 的 測驗回覆
 	 * 
 	 * @param quizResponseDTO
 	 */
-	public AnswerResultVO quizResponse(QuizResponseDTO quizResponseDTO, SysUserVO operator) {
+	public List<AnswerResultVO> quizResponse(QuizResponseDTO quizResponseDTO, SysUserVO operator) {
 		// 1.表單回覆進來,先查詢表單基本資訊
 		Form form = formService.searchForm(quizResponseDTO.getFormId());
 
@@ -194,80 +195,101 @@ public class FormResponseManager {
 		FormResponse formResponse = formResponseService.submit(quizResponseDTO);
 		Map<Long, FormField> mapByFieldId = formFieldService.findMapByFieldId(quizResponseDTO.getFormId());
 
-		// 轉換
-		ResponseAnswer responseAnswer = responseAnswerConvert.addDTOToEntity(quizResponseDTO.getResponseAnswer());
-		// 塞入本次表單回覆ID
-		responseAnswer.setFormResponseId(formResponse.getFormResponseId());
-		// 創建作答結果VO
-		AnswerResultVO answerResultVO = new AnswerResultVO();
+		// 初始化作答回覆 和 作答的結果
+		List<ResponseAnswer> responseAnswerList = new ArrayList<>(quizResponseDTO.getResponseAnswer().size());
+		List<AnswerResultVO> answerResultVOList = new ArrayList<>(quizResponseDTO.getResponseAnswer().size());
 
-		// 批改：找到對應題目，比對正確答案
-		FormField field = mapByFieldId.get(responseAnswer.getFormFieldId());
-		if (field != null) {
-			FormFieldVO fieldVO = formFieldConvert.entityToVO(field);
-			fieldVO.getOptions()
-					.getChoices()
-					.stream()
-					.filter(Choice::isCorrectAnswer)
-					.findFirst()
-					.ifPresent(correct -> {
-						// 填入作答結果
-						answerResultVO.setCorrectAnswer(correct.getLabel());
-						answerResultVO.setYourAnswer(responseAnswer.getAnswerValue());
+		// 6.遍歷這次的作答
+		for (AddResponseAnswerDTO addResponseAnswerDTO : quizResponseDTO.getResponseAnswer()) {
 
-						boolean isCorrect = correct.getId().equals(responseAnswer.getChoiceId());
-						// 提取回答次數 , +1後重設置
-						Integer quizAttempts = chapterProgress.getQuizAttempts();
-						quizAttempts = quizAttempts == null ? 0 : quizAttempts;
-						quizAttempts += 1;
-						chapterProgress.setQuizAttempts(quizAttempts);
+			ResponseAnswer responseAnswer = responseAnswerConvert.addDTOToEntity(addResponseAnswerDTO);
+			// 塞入本次表單回覆ID
+			responseAnswer.setFormResponseId(formResponse.getFormResponseId());
+			// 創建作答結果VO
+			AnswerResultVO answerResultVO = new AnswerResultVO();
 
-						// 當回答正確
-						if (isCorrect) {
-							responseAnswer.setIsCorrectAnwser(CommonStatusEnum.YES);
-							answerResultVO.setIsCorrect(CommonStatusEnum.YES);
-							// 設定章節測驗通過 , 100分 , 完成 , 設置完成時間
-							chapterProgress.setIsQuizPassed(CommonStatusEnum.YES);
-							chapterProgress.setQuizScore(100);
-							chapterProgress.setStatus(CourseStatusEnum.COMPLETED);
-							chapterProgress.setCompletedAt(LocalDateTime.now());
+			// 批改：找到對應題目，比對正確答案
+			FormField field = mapByFieldId.get(responseAnswer.getFormFieldId());
+			if (field != null) {
+				FormFieldVO fieldVO = formFieldConvert.entityToVO(field);
+				fieldVO.getOptions()
+						.getChoices()
+						.stream()
+						.filter(Choice::isCorrectAnswer)
+						.findFirst()
+						.ifPresent(correct -> {
+							// 填入作答結果
+							answerResultVO.setQuestion(fieldVO.getLabel());
+							answerResultVO.setCorrectAnswer(correct.getLabel());
+							answerResultVO.setYourAnswer(responseAnswer.getAnswerValue());
 
-							// 章節通過，同步更新課程報名的整體學習狀況
-							CourseEnrollment courseEnrollment = courseEnrollmentService
-									.get(chapterProgress.getCourseEnrollmentId());
-							// 同時更新 課程完成的整體狀態
-							Integer totalChapters = courseEnrollment.getTotalChapters();
-							Integer completedChapters = courseEnrollment.getCompletedChapters();
-							completedChapters += 1;
-							// 當完成課程章節數 大於等於 總共課程章節數
-							if (completedChapters >= totalChapters) {
-								courseEnrollment.setCompletedChapters(totalChapters);
-								courseEnrollment.setIsChaptersDone(CommonStatusEnum.YES);
+							boolean isCorrect = correct.getId().equals(responseAnswer.getChoiceId());
+							// 提取回答次數 , +1後重設置
+							Integer quizAttempts = chapterProgress.getQuizAttempts();
+							quizAttempts = quizAttempts == null ? 0 : quizAttempts;
+							quizAttempts += 1;
+							chapterProgress.setQuizAttempts(quizAttempts);
+
+							// 當回答正確
+							if (isCorrect) {
+								responseAnswer.setIsCorrectAnwser(CommonStatusEnum.YES);
+								answerResultVO.setIsCorrect(CommonStatusEnum.YES);
 							} else {
-								// 當完成課程章節數 大於等於 總共課程章節數
-								courseEnrollment.setCompletedChapters(completedChapters);
+								// 當回答錯誤
+								responseAnswer.setIsCorrectAnwser(CommonStatusEnum.NO);
+								answerResultVO.setIsCorrect(CommonStatusEnum.NO);
 							}
-							courseEnrollmentService.updateById(courseEnrollment);
 
-						} else {
-							// 當回答錯誤
-							responseAnswer.setIsCorrectAnwser(CommonStatusEnum.NO);
-							answerResultVO.setIsCorrect(CommonStatusEnum.NO);
-							// 設定章節測驗失敗 , 0分 , 進行中
-							chapterProgress.setQuizScore(0);
-							chapterProgress.setStatus(CourseStatusEnum.IN_PROGRESS);
+						});
 
-						}
+			}
 
-					});
+			// 為兩個列表添加Item
+			answerResultVOList.add(answerResultVO);
+			responseAnswerList.add(responseAnswer);
 
 		}
 
 		// 儲存作答結果
-		responseAnswerService.save(responseAnswer);
+		responseAnswerService.saveBatch(responseAnswerList);
+
+		// 當測驗全通過
+		long count = answerResultVOList.stream().filter(e -> e.getIsCorrect().getBooleanValue()).count();
+		if (count == 10) {
+			// 設定章節測驗通過 , 100分 , 完成 , 設置完成時間
+			chapterProgress.setIsQuizPassed(CommonStatusEnum.YES);
+			chapterProgress.setQuizScore(100);
+			chapterProgress.setStatus(CourseStatusEnum.COMPLETED);
+			chapterProgress.setCompletedAt(LocalDateTime.now());
+
+			// 章節通過，同步更新課程報名的整體學習狀況
+			CourseEnrollment courseEnrollment = courseEnrollmentService.get(chapterProgress.getCourseEnrollmentId());
+			// 同時更新 課程完成的整體狀態
+			Integer totalChapters = courseEnrollment.getTotalChapters();
+			Integer completedChapters = courseEnrollment.getCompletedChapters();
+			completedChapters += 1;
+			// 當完成課程章節數 大於等於 總共課程章節數
+			if (completedChapters >= totalChapters) {
+				courseEnrollment.setCompletedChapters(totalChapters);
+				courseEnrollment.setIsChaptersDone(CommonStatusEnum.YES);
+			} else {
+				// 當完成課程章節數 大於等於 總共課程章節數
+				courseEnrollment.setCompletedChapters(completedChapters);
+			}
+			courseEnrollmentService.updateById(courseEnrollment);
+
+		} else {
+			// 設定章節測驗失敗 , 0分 , 進行中
+			
+			chapterProgress.setQuizScore(0);
+			chapterProgress.setStatus(CourseStatusEnum.IN_PROGRESS);
+		}
+
+		// 更新課程章節進度
+		chapterProgressService.updateById(chapterProgress);
 
 		// 返回作答結果
-		return answerResultVO;
+		return answerResultVOList;
 
 	}
 

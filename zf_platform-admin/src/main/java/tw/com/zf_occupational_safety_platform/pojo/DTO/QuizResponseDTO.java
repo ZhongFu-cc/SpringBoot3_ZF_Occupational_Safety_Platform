@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.pojo.DTO;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -23,6 +25,6 @@ public class QuizResponseDTO {
 	@Schema(description = "回覆值")
 	@NotNull
 	@Valid
-	private AddResponseAnswerDTO responseAnswer;
+	private List<AddResponseAnswerDTO> responseAnswer;
 
 }

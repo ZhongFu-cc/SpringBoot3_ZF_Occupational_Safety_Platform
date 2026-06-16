@@ -7,9 +7,12 @@ import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 @Data
 public class AnswerResultVO {
 
+	@Schema(description = "題目")
+	private String question;
+	
 	@Schema(description = "是否回答正確")
 	private CommonStatusEnum isCorrect;
-
+	
 	@Schema(description = "正確答案")
 	private String correctAnswer;
 

@@ -11,8 +11,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ChapterContentTypeEnum {
 
-	DIRECTORY("directory", "目錄", "Directory"), VIDEO("video", "影片", "Video"), QUIZ("quiz", "單元測驗", "Quiz"),
-	SURVEY("survey", "課程總測驗", "Survey");
+	DIRECTORY("directory", "目錄", "Directory"), VIDEO("video", "影片", "Video"), QUIZ("quiz", "總測驗", "Quiz");
+//	SURVEY("survey", "課程總測驗", "Survey");
 
 	@EnumValue
 	@JsonValue // JSON 輸出用

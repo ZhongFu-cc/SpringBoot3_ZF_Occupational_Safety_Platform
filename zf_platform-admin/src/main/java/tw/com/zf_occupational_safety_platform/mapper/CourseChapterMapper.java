@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Update;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 
 /**
@@ -19,6 +20,17 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
  * @since 2026-05-21
  */
 public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
+
+	/**
+	 * 查詢總測驗章節的數量
+	 * 
+	 * @return
+	 */
+	default long countByQuizChapter() {
+		LambdaQueryWrapper<CourseChapter> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(CourseChapter::getContentType, ChapterContentTypeEnum.QUIZ);
+		return this.selectCount(queryWrapper);
+	}
 
 	@Update("""
 			    UPDATE course_chapter
