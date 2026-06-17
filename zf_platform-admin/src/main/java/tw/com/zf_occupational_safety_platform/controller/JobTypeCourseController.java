@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,6 +65,20 @@ public class JobTypeCourseController {
 	//	}
 
 	/**
+	 * 查詢 作業類別 關聯的 課程列表對象
+	 * 
+	 * @return
+	 */
+	@GetMapping()
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢 作業類別 關聯的 課程列表對象")
+	public R<List<JobCourseVO>> findJobCourseList(@RequestParam @Schema(type = "string") Long jobTypeId) {
+		List<JobCourseVO> voList = jobCourseManager.findJobCourseListByJobType(jobTypeId);
+		return R.ok(voList);
+	}
+
+	/**
 	 * 查詢 作業類別 關聯的 課程分頁對象
 	 * 
 	 * @param page
@@ -73,7 +89,7 @@ public class JobTypeCourseController {
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 作業類別 關聯的 課程分頁對象")
-	public R<IPage<JobCourseVO>> findJobTypePage(@RequestParam @Schema(type = "string") Long jobTypeId,
+	public R<IPage<JobCourseVO>> findJobCoursePage(@RequestParam @Schema(type = "string") Long jobTypeId,
 			@RequestParam Integer page, @RequestParam Integer size, @RequestParam(required = false) String queryText) {
 
 		Page<JobTypeCourse> pageInfo = new Page<>(page, size);
@@ -84,23 +100,23 @@ public class JobTypeCourseController {
 	/**
 	 * 新增 作業類別 x 課程 關聯
 	 * 
-	 * @param addTypeCategoryDTO
+	 * @param addJobCourseDTO
 	 * @return
 	 */
-	@Operation(summary = "新增 作業類別 x 課程類別 關聯")
+	@Operation(summary = "新增 作業類別 x 課程 關聯")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@PostMapping
-	public R<Void> addAssociation(@RequestBody @Valid AddJobCourseDTO addTypeCategoryDTO) {
-		jobTypeCourseService.add(addTypeCategoryDTO);
+	public R<Void> addAssociation(@RequestBody @Valid AddJobCourseDTO addJobCourseDTO) {
+		jobTypeCourseService.add(addJobCourseDTO);
 		return R.ok();
 	}
 
 	/**
 	 * 更新 作業類別 x 課程 關聯的 必要欄位
 	 * 
-	 * @param putTypeCategoryDTO
+	 * @param putJobCourseDTO
 	 * @return
 	 */
 	@Operation(summary = "更新 作業類別 x 課程 關聯的 必要欄位")
@@ -108,18 +124,18 @@ public class JobTypeCourseController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
 	@PutMapping
-	public R<Void> updateMandatory(@RequestBody @Valid PutJobCourseDTO putTypeCategoryDTO) {
-		jobTypeCourseService.update(putTypeCategoryDTO);
+	public R<Void> updateMandatory(@RequestBody @Valid PutJobCourseDTO putJobCourseDTO) {
+		jobTypeCourseService.update(putJobCourseDTO);
 		return R.ok();
 	}
 
 	/**
-	 * 根據ID 刪除 作業類別 x 課程類別 關聯
+	 * 根據ID 刪除 作業類別 x 課程 關聯
 	 * 
 	 * @param id
 	 * @return
 	 */
-	@Operation(summary = "根據ID 刪除 作業類別 x 課程類別 關聯 ")
+	@Operation(summary = "根據ID 刪除 作業類別 x 課程 關聯 ")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
 	@SaCheckRole("super-admin")

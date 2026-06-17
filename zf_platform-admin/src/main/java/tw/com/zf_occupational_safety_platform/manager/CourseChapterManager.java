@@ -10,6 +10,7 @@ import tw.com.zf_occupational_safety_platform.convert.CourseChapterConvert;
 import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.FormStatusEnum;
+import tw.com.zf_occupational_safety_platform.exception.CourseException;
 import tw.com.zf_occupational_safety_platform.helper.S3Helper;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddChapterVideoDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseChapterDTO;
@@ -61,6 +62,11 @@ public class CourseChapterManager {
 
 		// 如果是 測驗型的,就創建 測驗表單
 		if (ChapterContentTypeEnum.QUIZ.equals(addCourseChapterDTO.getContentType())) {
+
+			if (courseChapterService.existQuizChapter()) {
+				throw new CourseException("此課程已有總測驗章節");
+			}
+
 			AddFormDTO addFormDTO = new AddFormDTO();
 			addFormDTO.setTitle(addCourseChapterDTO.getTitle());
 			addFormDTO.setStatus(FormStatusEnum.PUBLISHED);
@@ -71,8 +77,10 @@ public class CourseChapterManager {
 			// 創建表單,並把表單 和 章節整合
 			Form form = formService.create(addFormDTO);
 			addCourseChapterDTO.setFormId(form.getFormId());
-			
-		} 
+			// Quiz總測驗一定為頂層章節
+			addCourseChapterDTO.setParentId(0L);
+
+		}
 
 		CourseChapter courseChapter = courseChapterService.create(addCourseChapterDTO);
 
@@ -96,6 +104,11 @@ public class CourseChapterManager {
 			// 如果要調整為Quiz，且沒有formId則建立表單
 			if (ChapterContentTypeEnum.QUIZ.equals(putCourseChapterDTO.getContentType())
 					&& currentCourseChapter.getFormId() == null) {
+
+				if (courseChapterService.existQuizChapter()) {
+					throw new CourseException("此課程已有總測驗章節");
+				}
+
 				AddFormDTO addFormDTO = new AddFormDTO();
 				addFormDTO.setTitle(putCourseChapterDTO.getTitle());
 				addFormDTO.setStatus(FormStatusEnum.PUBLISHED);
@@ -106,6 +119,8 @@ public class CourseChapterManager {
 				// 創建表單,並把表單 和 章節整合
 				Form form = formService.create(addFormDTO);
 				putCourseChapterDTO.setFormId(form.getFormId());
+				// Quiz總測驗一定為頂層章節
+				putCourseChapterDTO.setParentId(0L);
 
 			}
 

@@ -21,6 +21,10 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
 public interface CompanyCourseService extends IService<CompanyCourse> {
 
 	CompanyCourse get(Long companyCourseId);
+	
+	List<CompanyCourse> findByCompany(Long companyId);
+	
+	List<CompanyCourse> findByIds(Collection<Long> companyCourseIds);
 
 	List<CompanyCourse> findByIdsAndCompany(Collection<Long> companyCourseIds, Long companyId);
 

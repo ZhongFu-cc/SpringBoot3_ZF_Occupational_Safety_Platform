@@ -6,8 +6,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.FormConvert;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.FormFieldOptionDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormFieldVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Form;
@@ -23,6 +26,8 @@ import tw.com.zf_occupational_safety_platform.service.ResponseAnswerService;
 @Component
 @RequiredArgsConstructor
 public class FormManager {
+
+	private final ObjectMapper objectMapper;
 
 	private final FormConvert formConvert;
 	private final FormService formService;
@@ -53,31 +58,64 @@ public class FormManager {
 	}
 
 	/**
-	 * 獲得隨機數量 單元測試 表單
+	 * 獲得指定數量 總測試 考卷<br>
+	 * 順序 及 選項打亂
 	 * 
 	 * @param formId
 	 * @param count
 	 * @return
 	 */
 	public FormVO getRandomQuizForm(Long formId, int count) {
-		// 1.查詢要填寫的表單
-		Form form = formService.searchForm(formId);
 
-		// 2.轉換資料
+		Form form = formService.searchForm(formId);
 		FormVO formVO = formConvert.entityToVO(form);
 
-		// 3.根據 formId 查詢表單 及其 欄位
 		List<FormFieldVO> formFieldVOList = formFieldService.searchFormStructureByForm(formId);
 
-		// 4.打亂列表
 		Collections.shuffle(formFieldVOList);
 
-		// 5.從打亂過的列表，再抽取限制數量的題目，最後放回表單
 		List<FormFieldVO> randomQuestions = formFieldVOList.stream()
 				.limit(Math.min(count, formFieldVOList.size()))
+				.map(this::shuffleChoicesSafely)
 				.toList();
+
 		formVO.setFormFields(randomQuestions);
 		return formVO;
+	}
+
+	/**
+	 * 深層複製
+	 * 
+	 * @param source
+	 * @return
+	 */
+	private FormFieldVO deepCopy(FormFieldVO source) {
+		try {
+			return objectMapper.readValue(objectMapper.writeValueAsBytes(source), FormFieldVO.class);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * 深層複製並打亂
+	 * 
+	 * @param field
+	 * @return
+	 */
+	private FormFieldVO shuffleChoicesSafely(FormFieldVO field) {
+
+		FormFieldVO copy = deepCopy(field);
+
+		if (copy.getOptions() == null || copy.getOptions().getChoices() == null) {
+			return copy;
+		}
+
+		List<FormFieldOptionDTO.Choice> choices = new ArrayList<>(copy.getOptions().getChoices());
+		Collections.shuffle(choices);
+		copy.getOptions().setChoices(choices);
+
+		return copy;
 	}
 
 	public void deleteForm(Long formId) {

@@ -3,9 +3,9 @@ package tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO;
 import java.util.Collection;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import tw.com.zf_occupational_safety_platform.enums.CompanyStatusEnum;
 
@@ -20,7 +20,7 @@ public class AddCompanyDTO {
     private CompanyStatusEnum status;
     
     @NotNull
-    @Min(1)
+    @Size(min=1)
     @Schema(description = "選擇的作業類別Ids")
     private Collection<Long> jobTypeIds;
     

@@ -2,8 +2,6 @@ package tw.com.zf_occupational_safety_platform.manager;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -30,6 +28,25 @@ public class JobCourseManager {
 	private final CourseService courseService;
 	private final JobTypeCourseService jobTypeCourseService;
 	private final CourseConvert courseConvert;
+
+	public List<JobCourseVO> findJobCourseListByJobType(Long jobTypeId) {
+		// 1.查詢符合模糊查詢 的 課程對象，並拿到map映射
+		Map<Long, Course> mapByCourseId = courseService.findCourseIdMapByQuery(null);
+		// 2.拿到關聯的對象
+		List<JobTypeCourse> jobTypeCourses = jobTypeCourseService.findByTypeId(jobTypeId);
+
+		// 3.課程資料與關聯資料做整合
+		List<JobCourseVO> voList = jobTypeCourses.stream().map(jobCourse -> {
+			Course course = mapByCourseId.get(jobCourse.getCourseId());
+			JobCourseVO jobCourseVO = courseConvert.entityToJobCourseVO(course);
+			jobCourseVO.setJobCourseId(jobCourse.getJobCourseId());
+			jobCourseVO.setJobTypeId(jobTypeId);
+			jobCourseVO.setIsMandatory(jobCourse.getIsMandatory());
+			return jobCourseVO;
+		}).toList();
+
+		return voList;
+	}
 
 	/**
 	 * 根據 jobType 查詢關聯的課程類別

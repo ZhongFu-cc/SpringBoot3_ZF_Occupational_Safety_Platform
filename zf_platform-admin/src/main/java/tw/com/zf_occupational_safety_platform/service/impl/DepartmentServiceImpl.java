@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -31,6 +33,11 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	@Override
 	public Department get(Long departmentId) {
 		return baseMapper.selectById(departmentId);
+	}
+	
+	@Override
+	public List<Department> findByCompany(Long companyId) {
+		return baseMapper.selectByCompanyId(companyId);
 	}
 	
 	@Override
@@ -66,6 +73,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 	public void remove(Long departmentId) {
 		baseMapper.deleteById(departmentId);
 	}
+
+
 
 
 

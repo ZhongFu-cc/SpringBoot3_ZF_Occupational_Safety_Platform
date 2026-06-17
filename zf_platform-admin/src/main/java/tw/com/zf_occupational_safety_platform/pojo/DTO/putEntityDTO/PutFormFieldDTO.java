@@ -43,21 +43,24 @@ public class PutFormFieldDTO implements HasFieldOptions {
 	private String imageUrl;
 
 	@Schema(description = "圖片說明文字")
-	@TableField("image_caption")
 	private String imageCaption;
 
 	@Schema(description = "是否必填 , 0為false(不是必填) , 1為true(必填)")
 	@NotNull
 	private CommonStatusEnum isRequired;
+	
+	@Schema(description = "是否標記正確答案 , 0=否, 1=是")
+	@NotNull
+	private CommonStatusEnum isMarkCorrectAnwser;
 
 	@Schema(description = "顯示順序 , 數字越小排的越前面")
 	private Integer fieldOrder;
 
-	@Schema(description = "選項資料")
+	@Schema(description = "選項資料，沒有可填null")
 	@Valid
 	private FormFieldOptionDTO options;
 
-	@Schema(description = "驗證規則")
+	@Schema(description = "驗證規則，沒有可填null")
 	@Valid
 	private FormFieldValidationRuleDTO validationRules;
 	

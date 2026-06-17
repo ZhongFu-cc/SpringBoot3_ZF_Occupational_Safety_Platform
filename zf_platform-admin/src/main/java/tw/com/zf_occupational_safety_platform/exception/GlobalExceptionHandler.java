@@ -19,6 +19,7 @@ import cn.dev33.satoken.exception.SaTokenException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import tw.com.zf_occupational_safety_platform.system.exception.SysChunkFileException;
+import tw.com.zf_occupational_safety_platform.system.exception.SysUserException;
 import tw.com.zf_occupational_safety_platform.utils.R;
 
 @Slf4j
@@ -190,6 +191,21 @@ public class GlobalExceptionHandler {
 		return R.fail(401, message);
 	}
 
+	/**
+	 * 處理自定義-SysUser 系統用戶相關的問題
+	 * 
+	 * @param exception
+	 * @return
+	 */
+	@ResponseStatus(HttpStatus.CONFLICT)
+	@ResponseBody
+	@ExceptionHandler(value = SysUserException.class)
+	public R<Map<String, Object>> sysUserException(SysUserException exception) {
+		String message = exception.getMessage();
+		return R.fail(409, message);
+	}
+
+	
 	/**
 	 * 處理自定義-SysChunkFile 大檔案分片上傳相關的問題
 	 * 
