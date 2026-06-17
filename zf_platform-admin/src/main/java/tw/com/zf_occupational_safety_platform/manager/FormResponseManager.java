@@ -279,9 +279,8 @@ public class FormResponseManager {
 			courseEnrollmentService.updateById(courseEnrollment);
 
 		} else {
-			// 設定章節測驗失敗 , 0分 , 進行中
-			
-			chapterProgress.setQuizScore(0);
+			// 設定章節測驗失敗 , 設定分數 , 進行中
+			chapterProgress.setQuizScore(Math.toIntExact(count * 10));
 			chapterProgress.setStatus(CourseStatusEnum.IN_PROGRESS);
 		}
 

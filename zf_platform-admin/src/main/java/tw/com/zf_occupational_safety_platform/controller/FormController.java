@@ -72,21 +72,9 @@ public class FormController {
 	@GetMapping("{id}/random-quiz")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@Operation(summary = "從表單題目中,抽取一題作為 單元測驗 ，formFields中只有一個元素(題目)")
+	@Operation(summary = "從表單題目中,抽取十題作為 總測驗 ，formFields中有十個元素(題目")
 	@SaCheckLogin
 	public R<FormVO> getRandomQuizForm(@PathVariable("id") Long formId) {
-		// 要抽取的題目數量
-		int questionCount = 1;
-		FormVO formVO = formManager.getRandomQuizForm(formId, questionCount);
-		return R.ok(formVO);
-	}
-
-	@GetMapping("{id}/random-survey")
-	@Parameters({
-			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	@Operation(summary = "從表單題目中,抽取十題作為 總測驗，formFields中有十個元素(題目)")
-	@SaCheckLogin
-	public R<FormVO> getRandomSurveyQuizForm(@PathVariable("id") Long formId) {
 		// 要抽取的題目數量
 		int questionCount = 10;
 		FormVO formVO = formManager.getRandomQuizForm(formId, questionCount);

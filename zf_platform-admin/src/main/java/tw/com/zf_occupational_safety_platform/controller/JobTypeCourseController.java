@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,6 +65,20 @@ public class JobTypeCourseController {
 	//	}
 
 	/**
+	 * 查詢 作業類別 關聯的 課程列表對象
+	 * 
+	 * @return
+	 */
+	@GetMapping()
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢 作業類別 關聯的 課程列表對象")
+	public R<List<JobCourseVO>> findJobCourseList(@RequestParam @Schema(type = "string") Long jobTypeId) {
+		List<JobCourseVO> voList = jobCourseManager.findJobCourseListByJobType(jobTypeId);
+		return R.ok(voList);
+	}
+
+	/**
 	 * 查詢 作業類別 關聯的 課程分頁對象
 	 * 
 	 * @param page
@@ -73,7 +89,7 @@ public class JobTypeCourseController {
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 作業類別 關聯的 課程分頁對象")
-	public R<IPage<JobCourseVO>> findJobTypePage(@RequestParam @Schema(type = "string") Long jobTypeId,
+	public R<IPage<JobCourseVO>> findJobCoursePage(@RequestParam @Schema(type = "string") Long jobTypeId,
 			@RequestParam Integer page, @RequestParam Integer size, @RequestParam(required = false) String queryText) {
 
 		Page<JobTypeCourse> pageInfo = new Page<>(page, size);

@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -74,6 +76,22 @@ public class CompanyCourseController {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		CompanyCourseVO vo = companyCourseManager.getCompanyCourseVO(id, sysUserVO);
 		return R.ok(vo);
+	}
+
+	/**
+	 * 查詢 企業課程 列表對象
+	 * 
+	 * @return
+	 */
+	@GetMapping
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢 企業課程 列表對象")
+	@SaCheckRole("company_manager")
+	public R<List<CompanyCourseVO>> findCompanyList() {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		List<CompanyCourseVO> voList = companyCourseManager.findCompanyCourseVOList(sysUserVO);
+		return R.ok(voList);
 	}
 
 	/**

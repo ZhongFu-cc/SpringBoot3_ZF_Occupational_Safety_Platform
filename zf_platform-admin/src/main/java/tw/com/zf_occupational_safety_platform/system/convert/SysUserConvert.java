@@ -2,6 +2,7 @@ package tw.com.zf_occupational_safety_platform.system.convert;
 
 import org.mapstruct.Mapper;
 
+import tw.com.zf_occupational_safety_platform.pojo.excel.EmployeeExcel;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
@@ -16,5 +17,7 @@ public interface SysUserConvert {
 	
 	//最後返回為SysUserVo對象, 方法名為entityToVO, 參數為SysUser對象
 	SysUserVO entityToVO(SysUser sysUser);
+	
+	SysUser employeeExcelToEntity(EmployeeExcel employeeExcel);
 	
 }

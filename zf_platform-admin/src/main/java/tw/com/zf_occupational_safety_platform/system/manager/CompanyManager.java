@@ -1,24 +1,37 @@
 package tw.com.zf_occupational_safety_platform.system.manager;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.read.listener.ReadListener;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.MissingRequestParameterException;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
+import tw.com.zf_occupational_safety_platform.pojo.entity.Department;
 import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
+import tw.com.zf_occupational_safety_platform.pojo.excel.EmployeeExcel;
 import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 import tw.com.zf_occupational_safety_platform.service.DepartmentCourseService;
+import tw.com.zf_occupational_safety_platform.service.DepartmentService;
 import tw.com.zf_occupational_safety_platform.system.convert.SysUserConvert;
+import tw.com.zf_occupational_safety_platform.system.exception.SysUserException;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
@@ -32,6 +45,7 @@ import tw.com.zf_occupational_safety_platform.system.service.SysUserService;
  * 負責企業管理者操作的 管理層
  * 
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class CompanyManager {
@@ -43,6 +57,7 @@ public class CompanyManager {
 	private final SysUserConvert sysUserConvert;
 	private final SysUserRoleService sysUserRoleService;
 	private final SysRoleService sysRoleService;
+	private final DepartmentService departmentService;
 	private final DepartmentCourseService departmentCourseService;
 	private final CompanyCourseService companyCourseService;
 	private final CourseEnrollmentService courseEnrollmentService;
@@ -94,7 +109,100 @@ public class CompanyManager {
 		return sysUserService.findByCompany(pageInfo, sysUserVO.getParentId(), sysUserVO.getCompanyId(), queryText);
 	}
 
-	// 匯入 員工資料-待完成
+	/**
+	 * 匯入Excel 批量新增 員工資料
+	 * 
+	 * @param file
+	 * @throws IOException
+	 */
+	public void importExcel(MultipartFile file, SysUserVO operator) throws IOException {
+
+		Long companyId = operator.getCompanyId();
+		String companyName = operator.getCompanyName();
+
+		List<Department> departments = departmentService.findByCompany(companyId);
+		Map<String, Long> departmentMap = departments.stream()
+				.collect(Collectors.toMap(Department::getName, Department::getDepartmentId));
+
+		// ========== Phase 1: validate ==========
+		validateExcel(file, departmentMap);
+
+		// ========== Phase 2: import ==========
+		importExcelData(file, companyId, companyName, departmentMap);
+
+	}
+
+	/**
+	 * 第一次遍歷，驗證Excel內的部門皆為合規值
+	 * 
+	 * @param file          excel 檔案
+	 * @param departmentMap 部門名:部門ID Map
+	 * @throws IOException
+	 */
+	private void validateExcel(MultipartFile file, Map<String, Long> departmentMap) throws IOException {
+
+		AtomicBoolean hasError = new AtomicBoolean(false);
+
+		EasyExcel.read(file.getInputStream(), EmployeeExcel.class, new ReadListener<EmployeeExcel>() {
+
+			@Override
+			public void invoke(EmployeeExcel row, AnalysisContext context) {
+				Long deptId = departmentMap.get(row.getDepartment());
+				if (deptId == null) {
+					int rowNum = context.readRowHolder().getRowIndex() + 1;
+					throw new SysUserException("不合規的部門 at row " + rowNum + ": " + row.getDepartment());
+				}
+			}
+
+			@Override
+			public void doAfterAllAnalysed(AnalysisContext context) {
+				// pass
+			}
+
+		}).sheet().doRead();
+	}
+
+	/**
+	 * 
+	 * 
+	 * @param file          excel 檔案
+	 * @param companyId     公司ID
+	 * @param companyName   公司名
+	 * @param departmentMap 部門名:部門ID Map
+	 * @throws IOException
+	 */
+	private void importExcelData(MultipartFile file, Long companyId, String companyName,
+			Map<String, Long> departmentMap) throws IOException {
+
+		EasyExcel.read(file.getInputStream(), EmployeeExcel.class, new ReadListener<EmployeeExcel>() {
+
+			private static final int BATCH_SIZE = 500;
+			private final List<SysUser> batch = new ArrayList<>();
+
+			@Override
+			public void invoke(EmployeeExcel row, AnalysisContext context) {
+
+				SysUser user = sysUserConvert.employeeExcelToEntity(row);
+				user.setCompanyId(companyId);
+				user.setCompanyName(companyName);
+				user.setDepartmentId(departmentMap.get(row.getDepartment()));
+				batch.add(user);
+
+				if (batch.size() >= BATCH_SIZE) {
+					sysUserService.saveBatch(batch);
+					batch.clear();
+				}
+			}
+
+			@Override
+			public void doAfterAllAnalysed(AnalysisContext context) {
+				if (!batch.isEmpty()) {
+					sysUserService.saveBatch(batch);
+				}
+			}
+
+		}).sheet().doRead();
+	}
 
 	/**
 	 * 創建 企業員工用戶

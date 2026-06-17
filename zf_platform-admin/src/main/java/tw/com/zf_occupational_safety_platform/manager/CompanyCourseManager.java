@@ -59,6 +59,30 @@ public class CompanyCourseManager {
 	}
 
 	/**
+	 * 拿到企業內所有企業課程
+	 * 
+	 * @param operator
+	 * @return
+	 */
+	public List<CompanyCourseVO> findCompanyCourseVOList(SysUserVO operator) {
+		// 拿到 課程ID:課程 映射
+		Map<Long, Course> mapByCourseId = courseService.findCourseIdMapByQuery(null);
+		List<CompanyCourse> companyCourses = companyCourseService.findByCompany(operator.getCompanyId());
+
+		List<CompanyCourseVO> vos = companyCourses.stream().map(companyCourse -> {
+			Course course = mapByCourseId.get(companyCourse.getCourseId());
+			CompanyCourseVO vo = courseConvert.entityToCompanyCourseVO(course);
+			vo.setCompanyCourseId(companyCourse.getCompanyCourseId());
+			vo.setCompanyId(companyCourse.getCompanyId());
+			return vo;
+
+		}).toList();
+
+		return vos;
+
+	}
+
+	/**
 	 * 查詢 企業課程 分頁對象
 	 * 
 	 * @param pageInfo
@@ -112,11 +136,9 @@ public class CompanyCourseManager {
 	 */
 	public void removeCourseFromCompany(Long companyCourseId, SysUserVO operator) {
 		CompanyCourse companyCourse = companyCourseService.get(companyCourseId);
-
-		if (!companyCourse.getCompanyCourseId().equals(operator.getCompanyId())) {
+		if (!companyCourse.getCompanyId().equals(operator.getCompanyId())) {
 			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
-
 		companyCourseService.remove(companyCourseId);
 
 	}
