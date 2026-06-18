@@ -107,12 +107,12 @@ public class CompanyCourseController {
 	@Operation(summary = "查詢 企業課程 分頁對象")
 	@SaCheckRole("company_manager")
 	public R<IPage<CompanyCourseVO>> findCompanyCoursePage(@RequestParam Integer page, @RequestParam Integer size,
-			@RequestParam(required = false) Long courseCategoryId,
-			@RequestParam(required = false) String queryText) {
+			@RequestParam(required = false) Long courseCategoryId, @RequestParam(required = false) String queryText) {
 
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		Page<CompanyCourse> pageInfo = new Page<>(page, size);
-		IPage<CompanyCourseVO> voPage = companyCourseManager.findCompanyCourseVOPage(pageInfo,courseCategoryId, queryText, sysUserVO);
+		IPage<CompanyCourseVO> voPage = companyCourseManager.findCompanyCourseVOPage(pageInfo, courseCategoryId,
+				queryText, sysUserVO);
 
 		return R.ok(voPage);
 	}

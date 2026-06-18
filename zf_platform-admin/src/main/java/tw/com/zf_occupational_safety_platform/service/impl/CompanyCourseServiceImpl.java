@@ -78,7 +78,8 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 	@Override
 	public void batchAdd(Long companyId, Collection<Long> courseIds) {
 
-		if (courseIds != null && !courseIds.isEmpty()) {
+		// 沒有課程需要新增
+		if (courseIds == null || courseIds.isEmpty()) {
 			return;
 		}
 
