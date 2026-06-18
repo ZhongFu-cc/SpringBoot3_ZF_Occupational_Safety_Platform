@@ -1,5 +1,8 @@
 package tw.com.zf_occupational_safety_platform.system.mapper;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
@@ -143,5 +146,11 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 			WHERE batch_id = #{batchId}
 			""")
 	int insertFromStaging(@Param("batchId") String batchId);
+
+	default List<SysUser> selectByDepartmentIds(Collection<Long> departmentIds) {
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(SysUser::getDepartmentId, departmentIds);
+		return this.selectList(queryWrapper);
+	};
 
 }

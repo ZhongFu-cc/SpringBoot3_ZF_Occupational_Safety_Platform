@@ -1,5 +1,6 @@
 package tw.com.zf_occupational_safety_platform.system.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -68,6 +69,14 @@ public interface SysUserService extends IService<SysUser> {
 	 * @return
 	 */
 	List<SysUser> list();
+
+	/**
+	 * 查詢符合部門 的 所有用戶
+	 * 
+	 * @param departmentIds
+	 * @return
+	 */
+	List<SysUser> findByDepartments(Collection<Long> departmentIds);
 
 	/**
 	 * 分頁查詢 - 直接子用戶

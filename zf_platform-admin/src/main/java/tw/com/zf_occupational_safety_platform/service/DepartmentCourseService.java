@@ -2,6 +2,7 @@ package tw.com.zf_occupational_safety_platform.service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -18,6 +19,15 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
 public interface DepartmentCourseService extends IService<DepartmentCourse> {
 
 	List<DepartmentCourse> findByDepartmentId(Long departmentId);
+	
+	/**
+	 * 查詢條件中的部門<br>
+	 * 並成為以 departmentId為key , companyCourseIds為 value的映射對象
+	 * 
+	 * @param departmentIds
+	 * @return
+	 */
+	Map<Long,List<Long>> mapByDepartmentId(List<Long> departmentIds);
 	
 	void assignCourse2Department(Long departmentId , Collection<Long> courseIds);
 	

@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.system.service.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -60,6 +62,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	@Override
 	public List<SysUser> list() {
 		return baseMapper.selectList(null);
+	}
+
+	@Override
+	public List<SysUser> findByDepartments(Collection<Long> departmentIds) {
+		if (departmentIds == null || departmentIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByDepartmentIds(departmentIds);
 	}
 
 	@Override
