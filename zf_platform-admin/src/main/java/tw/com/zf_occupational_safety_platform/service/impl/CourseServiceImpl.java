@@ -39,10 +39,10 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 	public Course get(Long courseCategoryId) {
 		return baseMapper.selectById(courseCategoryId);
 	}
-	
+
 	@Override
 	public List<Course> findByIds(Collection<Long> courseIds) {
-		if(courseIds == null || courseIds.isEmpty()) {
+		if (courseIds == null || courseIds.isEmpty()) {
 			return Collections.emptyList();
 		}
 		return baseMapper.selectBatchIds(courseIds);
@@ -68,6 +68,12 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 	}
 
 	@Override
+	public Map<Long, Course> findCourseIdMapByQuery(Long courseCategoryId, String queryText) {
+		List<Course> courses = baseMapper.selectByCategoryIdAndQuery(courseCategoryId, queryText);
+		return courses.stream().collect(Collectors.toMap(Course::getCourseId, Function.identity()));
+	}
+
+	@Override
 	public IPage<Course> findPageByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText) {
 		return baseMapper.selectByQuery(pageInfo, courseCategoryId, queryText);
 	}
@@ -89,7 +95,5 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
 	public void remove(Long courseCategoryId) {
 		baseMapper.deleteById(courseCategoryId);
 	}
-
-
 
 }

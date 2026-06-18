@@ -90,11 +90,11 @@ public class CompanyCourseManager {
 	 * @param operator
 	 * @return
 	 */
-	public IPage<CompanyCourseVO> findCompanyCourseVOPage(Page<CompanyCourse> pageInfo,Long courseCategoryId, String queryText,
-			SysUserVO operator) {
+	public IPage<CompanyCourseVO> findCompanyCourseVOPage(Page<CompanyCourse> pageInfo, Long courseCategoryId,
+			String queryText, SysUserVO operator) {
 
 		// 先模糊查詢符合的類別，並提取ID
-		Map<Long, Course> courseIdMapByQuery = courseService.findCourseIdMapByQuery(queryText);
+		Map<Long, Course> courseIdMapByQuery = courseService.findCourseIdMapByQuery(courseCategoryId, queryText);
 		List<Long> courseIds = courseIdMapByQuery.keySet().stream().toList();
 
 		IPage<CompanyCourse> companyCoursePage = companyCourseService.findPageBycourseIds(pageInfo, courseIds,

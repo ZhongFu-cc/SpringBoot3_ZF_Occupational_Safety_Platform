@@ -38,9 +38,16 @@ public interface CourseMapper extends BaseMapper<Course> {
 		queryWrapper.and(StringUtils.isNotBlank(queryText), wrap -> {
 			wrap.like(Course::getTitle, queryText);
 		});
-
 		return this.selectList(queryWrapper);
+	}
 
+	default List<Course> selectByCategoryIdAndQuery(Long courseCategoryId, String queryText) {
+		LambdaQueryWrapper<Course> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(courseCategoryId != null, Course::getCourseCategoryId, courseCategoryId)
+				.and(StringUtils.isNotBlank(queryText), wrap -> {
+					wrap.like(Course::getTitle, queryText);
+				});
+		return this.selectList(queryWrapper);
 	}
 
 	/**
