@@ -21,14 +21,16 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
  */
 public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
 
+
 	/**
-	 * 查詢總測驗章節的數量
-	 * 
+	 * 查詢課程內 總測驗章節的數量
+	 * @param courseId
 	 * @return
 	 */
-	default long countByQuizChapter() {
+	default long countByQuizChapter(Long courseId) {
 		LambdaQueryWrapper<CourseChapter> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(CourseChapter::getContentType, ChapterContentTypeEnum.QUIZ);
+		queryWrapper.eq(CourseChapter::getCourseId, courseId)
+				.eq(CourseChapter::getContentType, ChapterContentTypeEnum.QUIZ);
 		return this.selectCount(queryWrapper);
 	}
 

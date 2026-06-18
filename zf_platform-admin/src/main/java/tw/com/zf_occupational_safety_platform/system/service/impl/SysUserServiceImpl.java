@@ -36,6 +36,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	private final SysUserConvert sysUserConvert;
 
 	@Override
+	public boolean validAccountExist(SysUser sysUser) {
+		// 已存在為true , 不存在為false
+		return baseMapper.selectByAccount(sysUser.getAccount()) != null;
+	}
+
+	@Override
+	public boolean validEmailExist(SysUser sysUser) {
+		// 已存在為true , 不存在為false
+		return baseMapper.selectByEmail(sysUser.getEmail()) != null;
+	}
+
+	@Override
 	public SysUser get(Long id) {
 		return baseMapper.selectById(id);
 	}
@@ -65,6 +77,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		SysUser sysUser = sysUserConvert.addDTOToEntity(addSysUserDTO);
 		baseMapper.insert(sysUser);
 		return sysUser;
+
+	}
+
+	@Override
+	public void insertFromStaging(String batchId) {
+		// TODO Auto-generated method stub
 
 	}
 

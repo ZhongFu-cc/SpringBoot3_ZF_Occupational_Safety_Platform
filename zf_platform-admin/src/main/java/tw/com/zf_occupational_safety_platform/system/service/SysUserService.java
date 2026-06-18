@@ -22,6 +22,22 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 public interface SysUserService extends IService<SysUser> {
 
 	/**
+	 * 校驗帳號是否存在
+	 * 
+	 * @param sysUser
+	 * @return
+	 */
+	boolean validAccountExist(SysUser sysUser);
+
+	/**
+	 * 校驗E-Mail 是否存在
+	 * 
+	 * @param sysUser
+	 * @return
+	 */
+	boolean validEmailExist(SysUser sysUser);
+
+	/**
 	 * 該部門的總人數
 	 * 
 	 * @param departmentId
@@ -81,6 +97,13 @@ public interface SysUserService extends IService<SysUser> {
 	 * @param addSysUserDTO
 	 */
 	SysUser create(AddSysUserDTO addSysUserDTO);
+
+	/**
+	 * 從臨時表進行新增
+	 * 
+	 * @param batchId
+	 */
+	void insertFromStaging(String batchId);
 
 	/**
 	 * 更新使用者

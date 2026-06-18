@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.excel.EasyExcel;
@@ -25,15 +26,18 @@ import tw.com.zf_occupational_safety_platform.exception.PermissionException;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Department;
 import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
+import tw.com.zf_occupational_safety_platform.pojo.entity.StagingSysUser;
 import tw.com.zf_occupational_safety_platform.pojo.excel.EmployeeExcel;
 import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 import tw.com.zf_occupational_safety_platform.service.DepartmentCourseService;
 import tw.com.zf_occupational_safety_platform.service.DepartmentService;
+import tw.com.zf_occupational_safety_platform.service.StagingSysUserService;
 import tw.com.zf_occupational_safety_platform.system.convert.SysUserConvert;
 import tw.com.zf_occupational_safety_platform.system.exception.SysUserException;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
+import tw.com.zf_occupational_safety_platform.system.pojo.DTO.StagingCheckResultDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysRole;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
@@ -54,6 +58,7 @@ public class CompanyManager {
 	private static final String ROLE_KEY = "employee";
 
 	private final SysUserService sysUserService;
+	private final StagingSysUserService stagingSysUserService;
 	private final SysUserConvert sysUserConvert;
 	private final SysUserRoleService sysUserRoleService;
 	private final SysRoleService sysRoleService;
@@ -111,85 +116,66 @@ public class CompanyManager {
 
 	/**
 	 * 匯入Excel 批量新增 員工資料
+	 * * @param file
 	 * 
-	 * @param file
 	 * @throws IOException
 	 */
+	@Transactional
 	public void importExcel(MultipartFile file, SysUserVO operator) throws IOException {
 
 		Long companyId = operator.getCompanyId();
-		String companyName = operator.getCompanyName();
+		String batchId = UUID.randomUUID().toString();
 
 		List<Department> departments = departmentService.findByCompany(companyId);
 		Map<String, Long> departmentMap = departments.stream()
 				.collect(Collectors.toMap(Department::getName, Department::getDepartmentId));
 
-		// ========== Phase 1: validate ==========
-		validateExcel(file, departmentMap);
+		// 只讀一次 Excel：同時完成部門校驗，並直接寫入擴充後的臨時表
+		save2StagingWithValidate(file, batchId, operator, departmentMap);
 
-		// ========== Phase 2: import ==========
-		importExcelData(file, companyId, companyName, departmentMap);
+		// 資料庫校驗：利用索引在 DB 內快速查找重複
+		validateStaging(batchId, companyId);
 
+		// SQL內轉存：由 DB 內部執行 INSERT INTO ... SELECT
+		sysUserService.insertFromStaging(batchId);
+
+		// Phase 5: cleanup
+		stagingSysUserService.removeByBatchId(batchId);
 	}
 
 	/**
-	 * 第一次遍歷，驗證Excel內的部門皆為合規值
-	 * 
-	 * @param file          excel 檔案
-	 * @param departmentMap 部門名:部門ID Map
-	 * @throws IOException
+	 * 讀取 Excel、驗證部門並寫入臨時表
 	 */
-	private void validateExcel(MultipartFile file, Map<String, Long> departmentMap) throws IOException {
-
-		AtomicBoolean hasError = new AtomicBoolean(false);
-
-		EasyExcel.read(file.getInputStream(), EmployeeExcel.class, new ReadListener<EmployeeExcel>() {
-
-			@Override
-			public void invoke(EmployeeExcel row, AnalysisContext context) {
-				Long deptId = departmentMap.get(row.getDepartment());
-				if (deptId == null) {
-					int rowNum = context.readRowHolder().getRowIndex() + 1;
-					throw new SysUserException("不合規的部門 at row " + rowNum + ": " + row.getDepartment());
-				}
-			}
-
-			@Override
-			public void doAfterAllAnalysed(AnalysisContext context) {
-				// pass
-			}
-
-		}).sheet().doRead();
-	}
-
-	/**
-	 * 
-	 * 
-	 * @param file          excel 檔案
-	 * @param companyId     公司ID
-	 * @param companyName   公司名
-	 * @param departmentMap 部門名:部門ID Map
-	 * @throws IOException
-	 */
-	private void importExcelData(MultipartFile file, Long companyId, String companyName,
+	private void save2StagingWithValidate(MultipartFile file, String batchId, SysUserVO operator,
 			Map<String, Long> departmentMap) throws IOException {
 
-		EasyExcel.read(file.getInputStream(), EmployeeExcel.class, new ReadListener<EmployeeExcel>() {
+		// 批次大小 1000 - 2000 
+		List<StagingSysUser> batch = new ArrayList<>(1000);
 
-			private static final int BATCH_SIZE = 500;
-			private final List<SysUser> batch = new ArrayList<>();
+		EasyExcel.read(file.getInputStream(), EmployeeExcel.class, new ReadListener<EmployeeExcel>() {
 
 			@Override
 			public void invoke(EmployeeExcel row, AnalysisContext context) {
+				int rowNum = context.readRowHolder().getRowIndex() + 1;
+				Long deptId = departmentMap.get(row.getDepartment());
 
-				SysUser user = sysUserConvert.employeeExcelToEntity(row);
-				user.setCompanyId(companyId);
-				user.setCompanyName(companyName);
-				user.setDepartmentId(departmentMap.get(row.getDepartment()));
-				batch.add(user);
+				// 在寫入臨時表前先做部門校驗
+				if (deptId == null) {
+					throw new SysUserException("Invalid department at row " + rowNum + ": " + row.getDepartment());
+				}
 
-				if (batch.size() >= BATCH_SIZE) {
-					sysUserService.saveBatch(batch);
+				// 封裝至臨時表（臨時表需包含正式表所需欄位）
+				StagingSysUser s = sysUserConvert.employeeExcelToStaging(row);
+				s.setBatchId(batchId);
+				s.setParentId(operator.getSysUserId());
+				s.setDepartmentId(deptId);
+				s.setCompanyId(operator.getCompanyId());
+				s.setCompanyName(operator.getCompanyName());
+
+				batch.add(s);
+
+				if (batch.size() >= 1000) {
+					stagingSysUserService.saveBatch(batch);
 					batch.clear();
 				}
 			}
@@ -197,11 +183,39 @@ public class CompanyManager {
 			@Override
 			public void doAfterAllAnalysed(AnalysisContext context) {
 				if (!batch.isEmpty()) {
-					sysUserService.saveBatch(batch);
+					stagingSysUserService.saveBatch(batch);
 				}
 			}
-
 		}).sheet().doRead();
+	}
+
+	/**
+	 * 判斷臨時表中 有無重複的account or email<br>
+	 * 判斷已有用戶中 有無重複的account or email
+	 * * @param batchId
+	 * 
+	 * @param companyId
+	 */
+	private void validateStaging(String batchId, Long companyId) {
+
+		// 一口氣完成所有校驗，全表需 1 次網路請求，且有 LIMIT 1 短路特性
+		StagingCheckResultDTO result = stagingSysUserService.executeStagingValidation(batchId);
+
+		if (result != null) {
+			// 清空臨時表，表示這次匯入失敗
+			stagingSysUserService.removeByBatchId(batchId);
+
+			switch (result.getDupType()) {
+			case "EXCEL_ACCOUNT":
+				throw new SysUserException("Duplicate account in Excel: " + result.getAccount());
+			case "EXCEL_EMAIL":
+				throw new SysUserException("Duplicate email in Excel: " + result.getEmail());
+			case "DB_DUP":
+				throw new SysUserException("Duplicate with DB: " + result.getAccount() + " / " + result.getEmail());
+			default:
+				throw new SysUserException("Unknown validation error.");
+			}
+		}
 	}
 
 	/**
@@ -220,6 +234,15 @@ public class CompanyManager {
 		sysUser.setParentId(sysUserVO.getSysUserId());
 		// 不管前端companyId傳什麼，都以當前操作者的companyId為準
 		sysUser.setCompanyId(sysUserVO.getCompanyId());
+
+		boolean accountExist = sysUserService.validAccountExist(sysUser);
+		if (accountExist) {
+			throw new SysUserException("系統內已有重複帳號，請更換帳號使用");
+		}
+		boolean emailExist = sysUserService.validEmailExist(sysUser);
+		if (emailExist) {
+			throw new SysUserException("系統內已有重複E-Mail，請更換E-Mail使用");
+		}
 
 		sysUserService.save(sysUser);
 

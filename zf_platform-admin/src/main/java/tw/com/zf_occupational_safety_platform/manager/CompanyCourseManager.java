@@ -90,7 +90,7 @@ public class CompanyCourseManager {
 	 * @param operator
 	 * @return
 	 */
-	public IPage<CompanyCourseVO> findCompanyCourseVOPage(Page<CompanyCourse> pageInfo, String queryText,
+	public IPage<CompanyCourseVO> findCompanyCourseVOPage(Page<CompanyCourse> pageInfo,Long courseCategoryId, String queryText,
 			SysUserVO operator) {
 
 		// 先模糊查詢符合的類別，並提取ID

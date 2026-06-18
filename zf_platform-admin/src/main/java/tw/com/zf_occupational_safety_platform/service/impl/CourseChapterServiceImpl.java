@@ -33,8 +33,8 @@ public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, C
 	private final CourseChapterConvert courseChapterConvert;
 
 	@Override
-	public boolean existQuizChapter() {
-		if (baseMapper.countByQuizChapter() > 0) {
+	public boolean existQuizChapter(Long courseId) {
+		if (baseMapper.countByQuizChapter(courseId) > 0) {
 			return true;
 		}
 		return false;

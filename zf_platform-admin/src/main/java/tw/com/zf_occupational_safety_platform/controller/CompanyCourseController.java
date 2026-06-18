@@ -72,7 +72,7 @@ public class CompanyCourseController {
 	@Operation(summary = "根據ID 查詢 企業課程")
 	@GetMapping("{id}")
 	@SaCheckRole("company_manager")
-	public R<CompanyCourseVO> getCompany(@PathVariable("id") @Schema(type = "string") Long id) {
+	public R<CompanyCourseVO> getCompanyCourse(@PathVariable("id") @Schema(type = "string") Long id) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		CompanyCourseVO vo = companyCourseManager.getCompanyCourseVO(id, sysUserVO);
 		return R.ok(vo);
@@ -88,7 +88,7 @@ public class CompanyCourseController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 企業課程 列表對象")
 	@SaCheckRole("company_manager")
-	public R<List<CompanyCourseVO>> findCompanyList() {
+	public R<List<CompanyCourseVO>> findCompanyCourseList() {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		List<CompanyCourseVO> voList = companyCourseManager.findCompanyCourseVOList(sysUserVO);
 		return R.ok(voList);
@@ -106,12 +106,13 @@ public class CompanyCourseController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 企業課程 分頁對象")
 	@SaCheckRole("company_manager")
-	public R<IPage<CompanyCourseVO>> findCompanyPage(@RequestParam Integer page, @RequestParam Integer size,
+	public R<IPage<CompanyCourseVO>> findCompanyCoursePage(@RequestParam Integer page, @RequestParam Integer size,
+			@RequestParam(required = false) Long courseCategoryId,
 			@RequestParam(required = false) String queryText) {
 
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		Page<CompanyCourse> pageInfo = new Page<>(page, size);
-		IPage<CompanyCourseVO> voPage = companyCourseManager.findCompanyCourseVOPage(pageInfo, queryText, sysUserVO);
+		IPage<CompanyCourseVO> voPage = companyCourseManager.findCompanyCourseVOPage(pageInfo,courseCategoryId, queryText, sysUserVO);
 
 		return R.ok(voPage);
 	}

@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.system.controller;
 
+import java.io.IOException;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -109,6 +112,24 @@ public class SysCompanyController {
 
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		companyManager.createEmployee(addUserDTO, sysUserVO);
+		return R.ok();
+	}
+
+	/**
+	 * Excel 匯入 批量新增使用者 (企業員工)
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	@Operation(summary = "新增使用者 (企業員工)")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("company_manager")
+	@PostMapping("import-excel")
+	public R<Void> importExcelUser(@RequestBody MultipartFile file) throws IOException {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		companyManager.importExcel(file, sysUserVO);
 		return R.ok();
 	}
 
