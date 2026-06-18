@@ -67,7 +67,15 @@ public class CompanyManager {
 	private final CompanyCourseService companyCourseService;
 	private final CourseEnrollmentService courseEnrollmentService;
 
-	// 指派 學習任務
+	/**
+	 * 根據 課程分派規則，為所有<br>
+	 * 未持有課程(含課程認證過期的)企業員工<br>
+	 * 分配學習任務
+	 * 
+	 */
+	public void assignCourse2Employee() {
+		// 查詢部門 x 企業課程關聯
+	}
 
 	// 查看 部門內員工課程達成率
 

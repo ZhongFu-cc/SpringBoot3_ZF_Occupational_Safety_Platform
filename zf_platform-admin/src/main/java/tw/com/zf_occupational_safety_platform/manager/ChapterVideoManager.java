@@ -108,8 +108,10 @@ public class ChapterVideoManager {
 
 					//  4-3-2. 插入 DB
 					ChapterVideo chapterVideo = new ChapterVideo();
+					chapterVideo.setCourseChapterId(uploadChapterVideoDTO.getCourseChapterId());
 					chapterVideo.setFileName(fileName);
 					chapterVideo.setPath(filePath);
+					
 					chapterVideoService.save(chapterVideo);
 
 					// 更新chapter 的 video_url
