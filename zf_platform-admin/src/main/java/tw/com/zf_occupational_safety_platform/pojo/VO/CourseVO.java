@@ -5,22 +5,16 @@ import lombok.Data;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 
 @Data
-public class CompanyCourseVO {
+public class CourseVO {
 
 	@Schema(description = "主鍵ID")
-	private Long companyCourseId;
-
-	@Schema(description = "公司 ID")
-	private Long companyId;
-
-	@Schema(description = "課程ID")
 	private Long courseId;
 
 	@Schema(description = "課程類別ID")
 	private Long courseCategoryId;
 	
-	@Schema(description = "課程類別名稱")
-	private String courseCategoryName;
+    @Schema(description = "類別名稱 (例如: 基礎職安、高分貝作業環境、高溫環境)")
+    private String courseCategoryName;
 
 	@Schema(description = "課程名稱")
 	private String title;
@@ -36,5 +30,6 @@ public class CompanyCourseVO {
 
 	@Schema(description = "是否啟用;0=否,1=是")
 	private CommonStatusEnum isActive;
-
+	
+	
 }
