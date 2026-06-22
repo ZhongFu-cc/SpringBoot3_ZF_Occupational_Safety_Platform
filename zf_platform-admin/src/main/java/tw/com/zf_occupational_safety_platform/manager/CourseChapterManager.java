@@ -63,7 +63,7 @@ public class CourseChapterManager {
 		// 如果是 測驗型的,就創建 測驗表單
 		if (ChapterContentTypeEnum.QUIZ.equals(addCourseChapterDTO.getContentType())) {
 
-			if (courseChapterService.existQuizChapter()) {
+			if (courseChapterService.existQuizChapter(addCourseChapterDTO.getCourseId())) {
 				throw new CourseException("此課程已有總測驗章節");
 			}
 
@@ -105,7 +105,7 @@ public class CourseChapterManager {
 			if (ChapterContentTypeEnum.QUIZ.equals(putCourseChapterDTO.getContentType())
 					&& currentCourseChapter.getFormId() == null) {
 
-				if (courseChapterService.existQuizChapter()) {
+				if (courseChapterService.existQuizChapter(putCourseChapterDTO.getCourseId())) {
 					throw new CourseException("此課程已有總測驗章節");
 				}
 

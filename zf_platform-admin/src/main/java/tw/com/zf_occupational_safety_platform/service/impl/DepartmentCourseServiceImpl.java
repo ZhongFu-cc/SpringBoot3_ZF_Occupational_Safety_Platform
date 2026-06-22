@@ -1,8 +1,10 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,9 +40,23 @@ public class DepartmentCourseServiceImpl extends ServiceImpl<DepartmentCourseMap
 	}
 
 	@Override
+	public Map<Long, List<Long>> mapByDepartmentId(List<Long> departmentIds) {
+		if (departmentIds == null || departmentIds.isEmpty()) {
+			return Collections.emptyMap();
+		}
+		List<DepartmentCourse> departmentCourses = baseMapper.selectByDepartmentIds(departmentIds);
+
+		return departmentCourses.stream()
+				.collect(Collectors.groupingBy(DepartmentCourse::getDepartmentId, // 以 departmentId 作為 Map 的 Key
+						Collectors.mapping(DepartmentCourse::getCompanyCourseId, // 提取 companyCourseId
+								Collectors.toList() // 收集成 List<Long> 作為 Map 的 Value
+						)));
+	}
+
+	@Override
 	public void assignCourse2Department(Long departmentId, Collection<Long> courseIds) {
-		if (courseIds == null) {
-			throw new JobTypeException("courseIds不可為null");
+		if (courseIds == null || courseIds.isEmpty()) {
+			throw new JobTypeException("courseIds不可為null 或者 空");
 		}
 
 		// 1.先查詢目前公司持有的 course

@@ -1,5 +1,6 @@
 package tw.com.zf_occupational_safety_platform.system.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -20,6 +21,22 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
  * @since 2024-05-10
  */
 public interface SysUserService extends IService<SysUser> {
+
+	/**
+	 * 校驗帳號是否存在
+	 * 
+	 * @param sysUser
+	 * @return
+	 */
+	boolean validAccountExist(SysUser sysUser);
+
+	/**
+	 * 校驗E-Mail 是否存在
+	 * 
+	 * @param sysUser
+	 * @return
+	 */
+	boolean validEmailExist(SysUser sysUser);
 
 	/**
 	 * 該部門的總人數
@@ -54,6 +71,14 @@ public interface SysUserService extends IService<SysUser> {
 	List<SysUser> list();
 
 	/**
+	 * 查詢符合部門 的 所有用戶
+	 * 
+	 * @param departmentIds
+	 * @return
+	 */
+	List<SysUser> findByDepartments(Collection<Long> departmentIds);
+
+	/**
 	 * 分頁查詢 - 直接子用戶
 	 * 
 	 * @param pageInfo  分頁資訊
@@ -81,6 +106,13 @@ public interface SysUserService extends IService<SysUser> {
 	 * @param addSysUserDTO
 	 */
 	SysUser create(AddSysUserDTO addSysUserDTO);
+
+	/**
+	 * 從臨時表進行新增
+	 * 
+	 * @param batchId
+	 */
+	void insertFromStaging(String batchId);
 
 	/**
 	 * 更新使用者

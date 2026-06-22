@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -63,7 +62,7 @@ public class CourseController {
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@GetMapping("{id}")
-	public R<Course> getCourse(@PathVariable("id") @Schema(type="string") Long id) {
+	public R<Course> getCourse(@PathVariable("id") @Schema(type = "string") Long id) {
 		Course course = courseService.get(id);
 		return R.ok(course);
 	}
@@ -86,8 +85,8 @@ public class CourseController {
 			@RequestParam(required = false) @Schema(description = "查詢輸入") String queryText) {
 
 		Page<Course> pageInfo = new Page<>(page, size);
-		IPage<Course> coursePage = courseService.findPageByQuery(pageInfo, courseCategoryId, queryText);
-		return R.ok(coursePage);
+		IPage<Course> courseVOPage = courseService.findPageByQuery(pageInfo, courseCategoryId, queryText);
+		return R.ok(courseVOPage);
 	}
 
 	/**
@@ -105,8 +104,7 @@ public class CourseController {
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("super-admin")
-	public R<Void> saveCourse(
-			@RequestPart(value = "imgFile", required = false) MultipartFile imgFile,
+	public R<Void> saveCourse(@RequestPart(value = "imgFile", required = false) MultipartFile imgFile,
 			@RequestPart("data") @Schema(name = "data", implementation = AddCourseDTO.class) String jsonData)
 			throws JsonMappingException, JsonProcessingException {
 
@@ -157,7 +155,7 @@ public class CourseController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER), })
 	@SaCheckRole("super-admin")
 	@DeleteMapping("{id}")
-	public R<Void> removeCourse(@PathVariable @Schema(type="string") Long id) {
+	public R<Void> removeCourse(@PathVariable @Schema(type = "string") Long id) {
 		courseService.remove(id);
 		return R.ok();
 	}

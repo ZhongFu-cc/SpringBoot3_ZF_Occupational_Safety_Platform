@@ -23,15 +23,17 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
 public interface CourseService extends IService<Course> {
 
 	Course get(Long courseId);
-	
+
 	List<Course> findByIds(Collection<Long> courseIds);
 
 	List<Course> findByCategoryIds(Collection<Long> courseCategoryIds);
-	
+
 	List<Course> findByQuery(String queryText);
-	
-	Map<Long,Course> findCourseIdMapByQuery(String queryText);
-	
+
+	Map<Long, Course> findCourseIdMapByQuery(String queryText);
+
+	Map<Long, Course> findCourseIdMapByQuery(Long courseCategoryId,String queryText);
+
 	IPage<Course> findPageByQuery(Page<Course> pageInfo, Long courseCategoryId, String queryText);
 
 	Course create(AddCourseDTO addCourseDTO);

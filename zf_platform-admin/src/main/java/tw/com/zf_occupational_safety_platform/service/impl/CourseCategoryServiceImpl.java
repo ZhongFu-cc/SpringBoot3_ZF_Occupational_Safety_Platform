@@ -14,6 +14,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -35,6 +39,13 @@ public class CourseCategoryServiceImpl extends ServiceImpl<CourseCategoryMapper,
 	@Override
 	public CourseCategory get(Long courseCategoryId) {
 		return baseMapper.selectById(courseCategoryId);
+	}
+
+	@Override
+	public Map<Long, CourseCategory> mapById() {
+		List<CourseCategory> courseCategorys = baseMapper.selectList(null);
+		return courseCategorys.stream()
+				.collect(Collectors.toMap(CourseCategory::getCourseCategoryId, Function.identity()));
 	}
 
 	@Override

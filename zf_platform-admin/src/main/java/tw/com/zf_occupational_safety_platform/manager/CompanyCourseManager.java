@@ -16,9 +16,11 @@ import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCompanyCo
 import tw.com.zf_occupational_safety_platform.pojo.VO.CompanyCourseVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
 import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
 import tw.com.zf_occupational_safety_platform.service.CompanyJobTypeService;
 import tw.com.zf_occupational_safety_platform.service.CompanyService;
+import tw.com.zf_occupational_safety_platform.service.CourseCategoryService;
 import tw.com.zf_occupational_safety_platform.service.CourseService;
 import tw.com.zf_occupational_safety_platform.service.JobTypeCourseService;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
@@ -36,6 +38,7 @@ public class CompanyCourseManager {
 	private final CourseService courseService;
 	private final CompanyCourseService companyCourseService;
 	private final CourseConvert courseConvert;
+	private final CourseCategoryService courseCategoryService;
 
 	/**
 	 * 獲得 單一 企業課程
@@ -51,9 +54,12 @@ public class CompanyCourseManager {
 		}
 
 		Course course = courseService.get(companyCourse.getCourseId());
+		CourseCategory courseCategory = courseCategoryService.get(course.getCourseCategoryId());
+
 		CompanyCourseVO companyCourseVO = courseConvert.entityToCompanyCourseVO(course);
 		companyCourseVO.setCompanyCourseId(companyCourseId);
 		companyCourseVO.setCompanyId(companyCourse.getCompanyId());
+		companyCourseVO.setCourseCategoryName(courseCategory.getName());
 
 		return companyCourseVO;
 	}
@@ -67,13 +73,18 @@ public class CompanyCourseManager {
 	public List<CompanyCourseVO> findCompanyCourseVOList(SysUserVO operator) {
 		// 拿到 課程ID:課程 映射
 		Map<Long, Course> mapByCourseId = courseService.findCourseIdMapByQuery(null);
+		// 拿到 課程類別ID:課程類別 映射
+		Map<Long, CourseCategory> courseCategoryMapById = courseCategoryService.mapById();
+
 		List<CompanyCourse> companyCourses = companyCourseService.findByCompany(operator.getCompanyId());
 
 		List<CompanyCourseVO> vos = companyCourses.stream().map(companyCourse -> {
 			Course course = mapByCourseId.get(companyCourse.getCourseId());
+			CourseCategory courseCategory = courseCategoryMapById.get(course.getCourseCategoryId());
 			CompanyCourseVO vo = courseConvert.entityToCompanyCourseVO(course);
 			vo.setCompanyCourseId(companyCourse.getCompanyCourseId());
 			vo.setCompanyId(companyCourse.getCompanyId());
+			vo.setCourseCategoryName(courseCategory.getName());
 			return vo;
 
 		}).toList();
@@ -90,11 +101,14 @@ public class CompanyCourseManager {
 	 * @param operator
 	 * @return
 	 */
-	public IPage<CompanyCourseVO> findCompanyCourseVOPage(Page<CompanyCourse> pageInfo, String queryText,
-			SysUserVO operator) {
+	public IPage<CompanyCourseVO> findCompanyCourseVOPage(Page<CompanyCourse> pageInfo, Long courseCategoryId,
+			String queryText, SysUserVO operator) {
+
+		// 拿到 課程類別ID:課程類別 映射
+		Map<Long, CourseCategory> courseCategoryMapById = courseCategoryService.mapById();
 
 		// 先模糊查詢符合的類別，並提取ID
-		Map<Long, Course> courseIdMapByQuery = courseService.findCourseIdMapByQuery(queryText);
+		Map<Long, Course> courseIdMapByQuery = courseService.findCourseIdMapByQuery(courseCategoryId, queryText);
 		List<Long> courseIds = courseIdMapByQuery.keySet().stream().toList();
 
 		IPage<CompanyCourse> companyCoursePage = companyCourseService.findPageBycourseIds(pageInfo, courseIds,
@@ -102,9 +116,11 @@ public class CompanyCourseManager {
 
 		List<CompanyCourseVO> vos = companyCoursePage.getRecords().stream().map(companyCourse -> {
 			Course course = courseIdMapByQuery.get(companyCourse.getCourseId());
+			CourseCategory courseCategory = courseCategoryMapById.get(course.getCourseCategoryId());
 			CompanyCourseVO vo = courseConvert.entityToCompanyCourseVO(course);
 			vo.setCompanyCourseId(companyCourse.getCompanyCourseId());
 			vo.setCompanyId(companyCourse.getCompanyId());
+			vo.setCourseCategoryName(courseCategory.getName());
 			return vo;
 
 		}).toList();

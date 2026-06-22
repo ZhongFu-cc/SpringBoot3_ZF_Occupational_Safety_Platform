@@ -2,6 +2,7 @@ package tw.com.zf_occupational_safety_platform.system.convert;
 
 import org.mapstruct.Mapper;
 
+import tw.com.zf_occupational_safety_platform.pojo.entity.StagingSysUser;
 import tw.com.zf_occupational_safety_platform.pojo.excel.EmployeeExcel;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
@@ -19,5 +20,7 @@ public interface SysUserConvert {
 	SysUserVO entityToVO(SysUser sysUser);
 	
 	SysUser employeeExcelToEntity(EmployeeExcel employeeExcel);
+	
+	StagingSysUser employeeExcelToStaging(EmployeeExcel employeeExcel);
 	
 }

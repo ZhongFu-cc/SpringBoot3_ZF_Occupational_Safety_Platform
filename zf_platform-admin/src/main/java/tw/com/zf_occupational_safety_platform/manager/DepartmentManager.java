@@ -1,6 +1,9 @@
 package tw.com.zf_occupational_safety_platform.manager;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,9 +21,11 @@ import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutDepartmen
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Department;
 import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
+import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 import tw.com.zf_occupational_safety_platform.service.DepartmentCourseService;
 import tw.com.zf_occupational_safety_platform.service.DepartmentService;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
+import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 import tw.com.zf_occupational_safety_platform.system.service.SysUserService;
 
 /**
@@ -34,6 +39,7 @@ public class DepartmentManager {
 	private final DepartmentService departmentService;
 	private final DepartmentCourseService departmentCourseService;
 	private final CompanyCourseService companyCourseService;
+	private final CourseEnrollmentService courseEnrollmentService;
 
 	/**
 	 * 拿到操作者，所能操作的部門 單一對象
@@ -141,6 +147,58 @@ public class DepartmentManager {
 				.map(CompanyCourse::getCompanyCourseId)
 				.collect(Collectors.toSet());
 		departmentCourseService.assignCourse2Department(addDepartmentCourse.departmentId(), companyCourseIds);
+
+	}
+
+	/**
+	 * 為企業所有部門員工，報名應上的課程
+	 * 
+	 * @param operator
+	 */
+	public void oneClickEnrollment(SysUserVO operator) {
+		// 1.查詢所有部門
+		List<Department> departments = departmentService.findByCompany(operator.getCompanyId());
+		List<Long> deptIds = departments.stream().map(Department::getDepartmentId).toList();
+
+		// 2.查詢部門內所有的用戶(企業員工)
+		List<SysUser> employees = sysUserService.findByDepartments(deptIds);
+
+		// 3.查詢部門要上的課，得到以 departmentId為key , companyCourseIds為 value的映射對象
+		Map<Long, List<Long>> departmentCompanyCourseMap = departmentCourseService.mapByDepartmentId(deptIds);
+
+		// 4. 將 companyCourseId 轉換為實際的 courseId
+		// 4.1 收集所有去重的 companyCourseId
+		List<Long> allCompanyCourseIds = departmentCompanyCourseMap.values()
+				.stream()
+				.flatMap(List::stream)
+				.distinct()
+				.toList();
+
+		// 初始化一個 以 departmentId為key , courseIds為value的 Map
+		Map<Long, List<Long>> departmentCourseMap = new HashMap<>();
+
+		if (!allCompanyCourseIds.isEmpty()) {
+			// 4.2 查詢 CompanyCourse
+			List<CompanyCourse> companyCourses = companyCourseService.findByIds(allCompanyCourseIds);
+
+			// 4.3 建立 companyCourseId -> courseId 的映射關係
+			Map<Long, Long> companyCourseToCourseMap = companyCourses.stream()
+					.collect(Collectors.toMap(CompanyCourse::getCompanyCourseId, CompanyCourse::getCourseId));
+
+			// 4.4 組裝成 departmentId 為 key, courseIds 為 value 的 map 對象
+			departmentCourseMap = departmentCompanyCourseMap.entrySet()
+					.stream()
+					.collect(Collectors.toMap(Map.Entry::getKey,
+							entry -> entry.getValue()
+									.stream()
+									.map(companyCourseToCourseMap::get) // 轉換為 courseId
+									.filter(Objects::nonNull) // 排除可能因資料不一致導致的 null 值
+									.distinct() // 如果有多個 companyCourse 對應同個 courseId 可去重
+									.toList()));
+		}
+
+		// 接下來就可以使用 departmentCourseMap (Map<Long, List<Long>>) 來為員工進行報名了
+		// ...
 
 	}
 

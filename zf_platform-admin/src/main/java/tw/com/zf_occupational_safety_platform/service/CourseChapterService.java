@@ -27,9 +27,9 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	void clearVideoUrl(Long courseChapterId);
 
 	/**
-	 * 總測驗章節是否存在
+	 * 課程 總測驗章節是否存在
 	 */
-	boolean existQuizChapter();
+	boolean existQuizChapter(Long courseId);
 	
 	/** -------------------------------------------- */
 

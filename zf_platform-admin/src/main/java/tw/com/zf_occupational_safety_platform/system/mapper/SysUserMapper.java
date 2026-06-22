@@ -1,6 +1,11 @@
 package tw.com.zf_occupational_safety_platform.system.mapper;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -18,6 +23,18 @@ import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
  * @since 2024-05-10
  */
 public interface SysUserMapper extends BaseMapper<SysUser> {
+
+	default SysUser selectByAccount(String account) {
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysUser::getAccount, account);
+		return this.selectOne(queryWrapper);
+	}
+
+	default SysUser selectByEmail(String email) {
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(SysUser::getEmail, email);
+		return this.selectOne(queryWrapper);
+	}
 
 	default long countByDepartmentId(Long departmentId) {
 		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
@@ -92,5 +109,48 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 
 		return this.selectPage(pageInfo, queryWrapper);
 	}
+
+	/**
+	 * 從臨時表新增進sys_user表
+	 * 
+	 * @param batchId
+	 * @return
+	 */
+	@Insert("""
+			INSERT INTO sys_user (
+				sys_user_id,
+				parent_id,
+				department_id,
+			    company_id,
+			    account,
+			    password,
+			    email,
+			    real_name,
+			    company_name,
+			    phone,
+			    create_time
+			)
+			SELECT
+				staging_sys_user_id,
+				parent_id,
+				department_id,
+			    company_id,
+			    account,
+			    password,
+			    email,
+			    real_name,
+			    company_name,
+			    phone,
+			    NOW()
+			FROM staging_sys_user
+			WHERE batch_id = #{batchId}
+			""")
+	int insertFromStaging(@Param("batchId") String batchId);
+
+	default List<SysUser> selectByDepartmentIds(Collection<Long> departmentIds) {
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(SysUser::getDepartmentId, departmentIds);
+		return this.selectList(queryWrapper);
+	};
 
 }

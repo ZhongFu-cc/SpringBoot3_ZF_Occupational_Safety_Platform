@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.system.service.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -36,6 +38,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	private final SysUserConvert sysUserConvert;
 
 	@Override
+	public boolean validAccountExist(SysUser sysUser) {
+		// 已存在為true , 不存在為false
+		return baseMapper.selectByAccount(sysUser.getAccount()) != null;
+	}
+
+	@Override
+	public boolean validEmailExist(SysUser sysUser) {
+		// 已存在為true , 不存在為false
+		return baseMapper.selectByEmail(sysUser.getEmail()) != null;
+	}
+
+	@Override
 	public SysUser get(Long id) {
 		return baseMapper.selectById(id);
 	}
@@ -48,6 +62,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	@Override
 	public List<SysUser> list() {
 		return baseMapper.selectList(null);
+	}
+
+	@Override
+	public List<SysUser> findByDepartments(Collection<Long> departmentIds) {
+		if (departmentIds == null || departmentIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByDepartmentIds(departmentIds);
 	}
 
 	@Override
@@ -65,6 +87,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 		SysUser sysUser = sysUserConvert.addDTOToEntity(addSysUserDTO);
 		baseMapper.insert(sysUser);
 		return sysUser;
+
+	}
+
+	@Override
+	public void insertFromStaging(String batchId) {
+		// TODO Auto-generated method stub
 
 	}
 

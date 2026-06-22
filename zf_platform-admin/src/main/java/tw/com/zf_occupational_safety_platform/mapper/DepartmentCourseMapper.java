@@ -26,6 +26,12 @@ public interface DepartmentCourseMapper extends BaseMapper<DepartmentCourse> {
 		return this.selectList(queryWrapper);
 	}
 
+	default List<DepartmentCourse> selectByDepartmentIds(Collection<Long> departmentIds) {
+		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(DepartmentCourse::getDepartmentId, departmentIds);
+		return this.selectList(queryWrapper);
+	}
+
 	// 從部門移除課程類型
 	default void removeCourseFromDepartment(Long departmentId, Collection<Long> companyCourseId) {
 		if (companyCourseId == null || companyCourseId.isEmpty()) {

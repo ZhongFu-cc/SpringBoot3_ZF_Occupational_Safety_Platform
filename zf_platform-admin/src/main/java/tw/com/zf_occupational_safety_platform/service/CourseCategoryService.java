@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service;
 
 import java.util.Collection;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -21,6 +22,13 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
 public interface CourseCategoryService extends IService<CourseCategory> {
 
 	CourseCategory get(Long courseCategoryId);
+
+	/**
+	 * 根據主鍵 與 課程類別對象做映射
+	 * 
+	 * @return
+	 */
+	Map<Long, CourseCategory> mapById();
 
 	IPage<CourseCategory> findPageByQuery(Page<CourseCategory> pageInfo, String queryText);
 

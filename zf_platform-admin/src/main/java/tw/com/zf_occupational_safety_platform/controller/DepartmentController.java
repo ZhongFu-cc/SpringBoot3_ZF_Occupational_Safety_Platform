@@ -163,4 +163,21 @@ public class DepartmentController {
 		return R.ok();
 	}
 
+	/**
+	 * 幫所有部門 報名課程(一鍵報名)<br>
+	 * 為 「未報名課程」 的 企業員工 以及 「上完課但證書過期」 的 企業員工 報名所屬部門的課程
+	 * 
+	 * @return
+	 */
+	@Operation(summary = "幫所有部門 報名課程(一鍵報名)", description = "為 「未報名課程」 的 企業員工 以及 「上完課但證書過期」 的 企業員工 報名所屬部門的課程")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("company_manager")
+	@PostMapping("one-click-enrollment")
+	public R<Void> oneClickEnrollment() {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		departmentManager.oneClickEnrollment(sysUserVO);
+		return R.ok();
+	}
+
 }

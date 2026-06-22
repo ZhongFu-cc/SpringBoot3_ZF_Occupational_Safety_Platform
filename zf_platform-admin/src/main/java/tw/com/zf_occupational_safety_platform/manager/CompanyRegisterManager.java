@@ -38,13 +38,17 @@ public class CompanyRegisterManager {
 	public void createCompany(AddCompanyDTO addCompanyDTO) {
 		// 1.創建企業
 		Company company = companyService.create(addCompanyDTO);
+
 		// 2.為企業 分配 作業類別 
 		companyJobTypeService.assignType2Company(company.getCompanyId(), addCompanyDTO.getJobTypeIds());
 
 		// 3.查詢適用 企業作業類別 x 課程
 		List<JobTypeCourse> jobCourses = jobTypeCourseService.findByTypeIds(addCompanyDTO.getJobTypeIds());
+		for (JobTypeCourse jobTypeCourse : jobCourses) {
+			System.out.println("jobTypeCourseId: " + jobTypeCourse.getJobCourseId());
+		}
 
-		// 4.拿到去重 且 必要的 課程類別
+		// 4.拿到去重 且 必要的 課程
 		Set<Long> courseIds = jobCourses.stream()
 				// 1. 先過濾：只保留 isMandatory 為 YES 的資料
 				.filter(tc -> CommonStatusEnum.YES.equals(tc.getIsMandatory()))
@@ -57,7 +61,6 @@ public class CompanyRegisterManager {
 		if (courseIds.isEmpty()) {
 			return;
 		}
-
 
 		// 6.將這些課程放入 公司的課程庫
 		companyCourseService.batchAdd(company.getCompanyId(), courseIds);
