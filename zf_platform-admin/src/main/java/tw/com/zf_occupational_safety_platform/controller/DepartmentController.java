@@ -146,6 +146,9 @@ public class DepartmentController {
 		return R.ok();
 	}
 
+	
+	
+	
 	/**
 	 * 分配/移除 部門課程
 	 * 

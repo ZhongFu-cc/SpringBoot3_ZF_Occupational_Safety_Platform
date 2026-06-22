@@ -52,6 +52,14 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 	}
 
 	@Override
+	public List<CompanyCourse> findByCompanyIdAndCourseIds(Long companyId, Collection<Long> courseIds) {
+		if (courseIds == null || courseIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByCourseIdsAndCompanyId(courseIds, companyId);
+	}
+
+	@Override
 	public IPage<CompanyCourse> findPageBycourseIds(Page<CompanyCourse> pageInfo, Collection<Long> courseIds) {
 		// TODO Auto-generated method stub
 		return null;

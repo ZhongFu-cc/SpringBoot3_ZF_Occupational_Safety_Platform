@@ -33,6 +33,12 @@ public interface CompanyCourseMapper extends BaseMapper<CompanyCourse> {
 		return this.selectList(queryWrapper);
 	}
 
+	default List<CompanyCourse> selectByCourseIdsAndCompanyId(Collection<Long> courseIds, Long companyId) {
+		LambdaQueryWrapper<CompanyCourse> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(CompanyCourse::getCompanyId, companyId).in(CompanyCourse::getCourseId, courseIds);
+		return this.selectList(queryWrapper);
+	}
+
 	default IPage<CompanyCourse> selectByCourseIdsAndCompanyId(Page<CompanyCourse> pageInfo, Collection<Long> courseIds,
 			Long companyId) {
 		LambdaQueryWrapper<CompanyCourse> queryWrapper = new LambdaQueryWrapper<>();

@@ -198,6 +198,7 @@ public class DepartmentManager {
 		}
 
 		// 接下來就可以使用 departmentCourseMap (Map<Long, List<Long>>) 來為員工進行報名了
+
 		// ...
 
 	}

@@ -109,6 +109,7 @@ public class CourseManager {
 			String s3Key = s3Helper.upload(COVER_IMAGE_BASE_PATH, imgFile.getOriginalFilename(), imgFile);
 			targetCourse.setCoverImage(coverImagePath);
 		}
+		
 
 		courseService.saveOrUpdate(targetCourse);
 

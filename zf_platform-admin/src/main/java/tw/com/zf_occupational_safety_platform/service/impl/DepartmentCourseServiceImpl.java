@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,20 @@ public class DepartmentCourseServiceImpl extends ServiceImpl<DepartmentCourseMap
 	@Override
 	public List<DepartmentCourse> findByDepartmentId(Long departmentId) {
 		return baseMapper.selectByDepartmentId(departmentId);
+	}
+
+	@Override
+	public IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo, Collection<Long> companyCourseIds) {
+		if (companyCourseIds == null || companyCourseIds.isEmpty()) {
+			return new Page<DepartmentCourse>(pageInfo.getCurrent(), pageInfo.getSize());
+		}
+		return baseMapper.selectByCompanyCourseIds(pageInfo, companyCourseIds);
 	}
 
 	@Override

@@ -1,11 +1,18 @@
 package tw.com.zf_occupational_safety_platform.manager;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.convert.CourseEnrollmentConvert;
+import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseEnrollmentVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
@@ -26,8 +33,58 @@ public class CourseEnrollmentManager {
 	private final CourseService courseService;
 	private final CourseChapterService courseChapterService;
 	private final CourseEnrollmentService courseEnrollmentService;
+	private final CourseEnrollmentConvert courseEnrollmentConvert;
 	private final ChapterProgressService chapterProgressService;
 	private final ChapterWatchLogService chapterWatchLogService;
+
+	public CourseEnrollmentVO getByOwner(Long courseEnrollmentId) {
+
+		Map<Long, Course> mapByCourseId = courseService.findCourseIdMapByQuery(null);
+
+		CourseEnrollment courseEnrollment = courseEnrollmentService.get(courseEnrollmentId);
+		CourseEnrollmentVO vo = courseEnrollmentConvert.entityToVO(courseEnrollment);
+		Course course = mapByCourseId.get(courseEnrollment.getCourseId());
+
+		vo.setCourseCategoryId(course.getCourseCategoryId());
+		vo.setCourseName(course.getTitle());
+		vo.setCourseCoverImage(course.getCoverImage());
+		vo.setCourseDescription(course.getDescription());
+
+		return vo;
+	}
+
+	/**
+	 * 查詢 已報名課程 分頁對象
+	 * 
+	 * @param pageInfo         分頁對象
+	 * @param courseStatusEnum 課程學習狀態
+	 * @param operator         操作者
+	 * @return
+	 */
+	public IPage<CourseEnrollmentVO> findPageByOwner(Page<CourseEnrollment> pageInfo, CourseStatusEnum courseStatusEnum,
+			SysUserVO operator) {
+		IPage<CourseEnrollment> courseEnrollmentPage = courseEnrollmentService.findPageByOwner(pageInfo,
+				courseStatusEnum, operator.getSysUserId());
+
+		Map<Long, Course> mapByCourseId = courseService.findCourseIdMapByQuery(null);
+
+		List<CourseEnrollmentVO> vos = courseEnrollmentPage.getRecords().stream().map(courseEnrollment -> {
+			Course course = mapByCourseId.get(courseEnrollment.getCourseId());
+
+			CourseEnrollmentVO vo = courseEnrollmentConvert.entityToVO(courseEnrollment);
+			vo.setCourseCategoryId(course.getCourseCategoryId());
+			vo.setCourseName(course.getTitle());
+			vo.setCourseCoverImage(course.getCoverImage());
+			vo.setCourseDescription(course.getDescription());
+			return vo;
+		}).toList();
+
+		Page<CourseEnrollmentVO> voPage = new Page<CourseEnrollmentVO>(courseEnrollmentPage.getCurrent(),
+				courseEnrollmentPage.getSize(), courseEnrollmentPage.getTotal());
+		voPage.setRecords(vos);
+		return voPage;
+
+	}
 
 	/**
 	 * 報名 課程

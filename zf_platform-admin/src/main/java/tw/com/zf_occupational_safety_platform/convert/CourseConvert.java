@@ -6,6 +6,7 @@ import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCourseDTO
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutCourseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CompanyCourseVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CourseVO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.DepartmentCourseVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.JobCourseVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
 
@@ -21,6 +22,5 @@ public interface CourseConvert {
 	CompanyCourseVO entityToCompanyCourseVO(Course course);
 	
 	JobCourseVO entityToJobCourseVO(Course course);
-	
 	
 }
