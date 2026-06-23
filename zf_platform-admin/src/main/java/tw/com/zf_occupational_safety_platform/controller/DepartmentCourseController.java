@@ -57,7 +57,8 @@ public class DepartmentCourseController {
 	@Operation(summary = "查詢 部門課程 分頁對象")
 	@SaCheckRole("company_manager")
 	public R<IPage<DepartmentCourseVO>> findDepartmentCoursePage(@RequestParam Integer page, @RequestParam Integer size,
-			@RequestParam(required = true) Long departmentId, @RequestParam(required = false) String queryText) {
+			@RequestParam(required = true) @Schema(type = "string") Long departmentId,
+			@RequestParam(required = false) String queryText) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		Page<DepartmentCourse> pageInfo = new Page<>(page, size);
 		IPage<DepartmentCourseVO> departmentPage = departmentCourseManager.findDepartmentCoursePage(pageInfo,

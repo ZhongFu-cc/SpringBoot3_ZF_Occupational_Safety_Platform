@@ -33,10 +33,11 @@ public interface DepartmentCourseMapper extends BaseMapper<DepartmentCourse> {
 		return this.selectList(queryWrapper);
 	}
 
-	default IPage<DepartmentCourse> selectByCompanyCourseIds(Page<DepartmentCourse> pageInfo,Collection<Long> companyCourseIds) {
+	default IPage<DepartmentCourse> selectByCompanyCourseIds(Page<DepartmentCourse> pageInfo,
+			Collection<Long> companyCourseIds) {
 		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(DepartmentCourse::getCompanyCourseId, companyCourseIds);
-		return this.selectPage(pageInfo,queryWrapper);
+		queryWrapper.in(DepartmentCourse::getCompanyCourseId, companyCourseIds);
+		return this.selectPage(pageInfo, queryWrapper);
 	}
 
 	// 從部門移除課程類型
