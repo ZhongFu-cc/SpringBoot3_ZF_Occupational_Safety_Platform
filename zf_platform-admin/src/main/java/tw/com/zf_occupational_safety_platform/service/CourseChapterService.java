@@ -1,5 +1,6 @@
 package tw.com.zf_occupational_safety_platform.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -42,6 +43,8 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	 * @return
 	 */
 	List<CourseChapter> findNonDirectoryByCourseId(Long courseId);
+	
+	List<CourseChapter> findNonDirectoryByCourseIds(Collection<Long> allCourseIds);
 
 	List<CourseChapterVO> findTreeByCourseId(Long courseId);
 
@@ -50,5 +53,7 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	void update(PutCourseChapterDTO putCourseChapterDTO);
 
 	void remove(Long courseChapterId);
+
+
 
 }

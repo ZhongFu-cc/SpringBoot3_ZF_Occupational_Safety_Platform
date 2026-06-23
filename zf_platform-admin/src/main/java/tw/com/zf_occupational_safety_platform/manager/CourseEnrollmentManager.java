@@ -87,7 +87,7 @@ public class CourseEnrollmentManager {
 	}
 
 	/**
-	 * 報名 課程
+	 * 用戶(企業員工) 報名 課程
 	 * 
 	 * @param courseId 課程ID
 	 * @param operator 報名者(操作者)
