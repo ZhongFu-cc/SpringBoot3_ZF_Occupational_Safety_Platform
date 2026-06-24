@@ -35,7 +35,7 @@ public class AddSysUserDTO {
 	@Schema(description = "電話號碼")
 	private String phone;
 
-	@NotBlank
+//	@NotBlank
 	@Schema(description = "公司名稱")
 	private String companyName;
 

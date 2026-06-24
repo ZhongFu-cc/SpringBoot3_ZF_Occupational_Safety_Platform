@@ -242,6 +242,7 @@ public class CompanyManager {
 		sysUser.setParentId(sysUserVO.getSysUserId());
 		// 不管前端companyId傳什麼，都以當前操作者的companyId為準
 		sysUser.setCompanyId(sysUserVO.getCompanyId());
+		sysUser.setCompanyName(sysUserVO.getCompanyName());
 
 		boolean accountExist = sysUserService.validAccountExist(sysUser);
 		if (accountExist) {
