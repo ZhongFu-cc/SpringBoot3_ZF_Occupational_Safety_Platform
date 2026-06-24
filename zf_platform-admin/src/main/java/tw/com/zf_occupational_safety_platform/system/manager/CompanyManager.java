@@ -264,6 +264,12 @@ public class CompanyManager {
 		// 創建完後，查看目前部門有無分配課程，如果有則自動幫他報名
 		List<DepartmentCourse> departmentCourses = departmentCourseService
 				.findByDepartmentId(sysUser.getDepartmentId());
+		
+		// 如果沒有部門課程，直接return
+		if (departmentCourses.isEmpty()) {
+			return;
+		}
+
 		List<Long> companyCourseIds = departmentCourses.stream().map(DepartmentCourse::getCompanyCourseId).toList();
 		List<CompanyCourse> companyCourses = companyCourseService.findByIds(companyCourseIds);
 		// 如果沒有企業課程，直接return
