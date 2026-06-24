@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.DepartmentCourseConvert;
+import tw.com.zf_occupational_safety_platform.exception.DepartmentException;
 import tw.com.zf_occupational_safety_platform.exception.JobTypeException;
 import tw.com.zf_occupational_safety_platform.mapper.DepartmentCourseMapper;
 import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
@@ -35,6 +36,13 @@ public class DepartmentCourseServiceImpl extends ServiceImpl<DepartmentCourseMap
 		implements DepartmentCourseService {
 
 	private final DepartmentCourseConvert departmentCourseConvert;
+
+	@Override
+	public boolean isExist(Long departmentId, Long companyCourseId) {
+		DepartmentCourse departmentCourse = baseMapper.selectByDepartmentIdAndCompanyCourseId(departmentId,
+				companyCourseId);
+		return departmentCourse != null ? true : false;
+	}
 
 	@Override
 	public List<DepartmentCourse> findByDepartmentId(Long departmentId) {
@@ -67,6 +75,21 @@ public class DepartmentCourseServiceImpl extends ServiceImpl<DepartmentCourseMap
 						Collectors.mapping(DepartmentCourse::getCompanyCourseId, // 提取 companyCourseId
 								Collectors.toList() // 收集成 List<Long> 作為 Map 的 Value
 						)));
+	}
+
+	@Override
+	public void addCourse2Department(Long departmentId, Long companyCourseId) {
+		boolean exist = this.isExist(departmentId, companyCourseId);
+		if (exist) {
+			throw new DepartmentException("部門已分配此課程，不可重複分配");
+		}
+
+		DepartmentCourse departmentCourse = new DepartmentCourse();
+		departmentCourse.setDepartmentCourseId(departmentId);
+		departmentCourse.setCompanyCourseId(companyCourseId);
+
+		baseMapper.insert(departmentCourse);
+
 	}
 
 	@Override

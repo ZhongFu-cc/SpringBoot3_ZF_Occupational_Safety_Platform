@@ -119,6 +119,11 @@ public class ChapterProgressManager {
 			Integer completedChapters = courseEnrollment.getCompletedChapters();
 			completedChapters += 1;
 
+			// 只要當前 報名課程的狀態 不是 「已完成」，就統一改成進行中
+			if (!courseEnrollment.getStatus().equals(CourseStatusEnum.COMPLETED)) {
+				courseEnrollment.setStatus(CourseStatusEnum.IN_PROGRESS);
+			}
+
 			// 當完成課程章節數 大於等於 總共課程章節數
 			if (completedChapters >= totalChapters) {
 				courseEnrollment.setCompletedChapters(totalChapters);

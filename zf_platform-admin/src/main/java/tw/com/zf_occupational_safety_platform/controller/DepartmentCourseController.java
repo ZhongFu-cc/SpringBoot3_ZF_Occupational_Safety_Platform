@@ -1,9 +1,13 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,10 +22,14 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.manager.DepartmentCourseManager;
+import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddDepartmentDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.DepartmentCourseVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
+import tw.com.zf_occupational_safety_platform.service.DepartmentCourseService;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.utils.R;
@@ -43,6 +51,13 @@ public class DepartmentCourseController {
 
 	private final AuthManager authManager;
 	private final DepartmentCourseManager departmentCourseManager;
+
+	/**
+	 * 臨時AddDTO, 部門x課程 關聯 <br>
+	 */
+	public record AddDepartmentCourse(@NotNull @Schema(description = "部門 ID", type = "string") Long departmentId,
+			@NotNull @Schema(description = "企業課程 ID", type = "string") Long companyCourseId) {
+	}
 
 	/**
 	 * 查詢 部門課程 分頁對象
@@ -67,7 +82,24 @@ public class DepartmentCourseController {
 	}
 
 	/**
-	 * 根據ID 刪除 部門
+	 * 新增 部門課程
+	 * 
+	 * @param addDepartmentDTO
+	 * @return
+	 */
+	@Operation(summary = "新增 部門課程")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("company_manager")
+	@PostMapping
+	public R<Void> saveDepartment(@RequestBody @Valid AddDepartmentCourse addDepartmentCourse) {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		departmentCourseManager.addCourse2Department(addDepartmentCourse, sysUserVO);
+		return R.ok();
+	}
+
+	/**
+	 * 根據ID 刪除 部門課程
 	 * 
 	 * @param id
 	 * @return

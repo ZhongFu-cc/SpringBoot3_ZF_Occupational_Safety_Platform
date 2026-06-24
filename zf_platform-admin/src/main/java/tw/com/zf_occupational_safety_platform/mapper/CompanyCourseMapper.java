@@ -21,6 +21,12 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
  */
 public interface CompanyCourseMapper extends BaseMapper<CompanyCourse> {
 
+	default CompanyCourse selectByCompanyIdAndCourseId(Long companyId, Long courseId) {
+		LambdaQueryWrapper<CompanyCourse> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(CompanyCourse::getCompanyId, companyId).eq(CompanyCourse::getCourseId, courseId);
+		return this.selectOne(queryWrapper);
+	}
+
 	default List<CompanyCourse> selectByCompanyId(Long companyId) {
 		LambdaQueryWrapper<CompanyCourse> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(CompanyCourse::getCompanyId, companyId);

@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.controller.CompanyCourseController.AddCompanyCourse;
 import tw.com.zf_occupational_safety_platform.convert.CourseConvert;
+import tw.com.zf_occupational_safety_platform.exception.CourseException;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCompanyCourseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CompanyCourseVO;
@@ -138,6 +139,11 @@ public class CompanyCourseManager {
 	 * @param operator
 	 */
 	public void addCourse2Company(AddCompanyCourse addCompanyCourse, SysUserVO operator) {
+		boolean isExist = companyCourseService.isExist(operator.getCompanyId(), addCompanyCourse.courseId());
+		if (isExist) {
+			throw new CourseException("企業持有此課程，不可重複添加");
+		}
+
 		AddCompanyCourseDTO addCompanyCourseDTO = new AddCompanyCourseDTO();
 		addCompanyCourseDTO.setCompanyId(operator.getCompanyId());
 		addCompanyCourseDTO.setCourseId(addCompanyCourse.courseId());

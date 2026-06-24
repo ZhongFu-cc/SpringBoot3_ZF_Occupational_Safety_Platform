@@ -39,6 +39,12 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 	}
 
 	@Override
+	public boolean isExist(Long companyId, Long courseId) {
+		CompanyCourse companyCourse = baseMapper.selectByCompanyIdAndCourseId(companyId, courseId);
+		return companyCourse != null ? true : false;
+	}
+
+	@Override
 	public List<CompanyCourse> findByCompany(Long companyId) {
 		return baseMapper.selectByCompanyId(companyId);
 	}

@@ -158,7 +158,7 @@ public class DepartmentManager {
 
 		// 根據公司ID 和 課程ID去查詢是否屬於企業的課程
 		List<CompanyCourse> companyCourses = companyCourseService
-				.findByIdsAndCompany(addDepartmentCourse.companyCourseId(), operator.getCompanyId());
+				.findByIdsAndCompany(addDepartmentCourse.companyCourseIds(), operator.getCompanyId());
 		if (companyCourses.isEmpty()) {
 			return;
 		}

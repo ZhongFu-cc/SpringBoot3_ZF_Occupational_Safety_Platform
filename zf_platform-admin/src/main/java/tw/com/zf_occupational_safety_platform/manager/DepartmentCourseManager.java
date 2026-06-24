@@ -10,9 +10,12 @@ import org.springframework.stereotype.Component;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.controller.DepartmentCourseController.AddDepartmentCourse;
 import tw.com.zf_occupational_safety_platform.convert.CourseConvert;
 import tw.com.zf_occupational_safety_platform.convert.DepartmentCourseConvert;
+import tw.com.zf_occupational_safety_platform.exception.DepartmentException;
 import tw.com.zf_occupational_safety_platform.pojo.VO.DepartmentCourseVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
@@ -81,6 +84,18 @@ public class DepartmentCourseManager {
 				departmentCourses.getSize(), departmentCourses.getTotal());
 		voPage.setRecords(vos);
 		return voPage;
+
+	}
+
+	/**
+	 * 為部門新增課程，新增前會校驗是否存在，不存在則拋出異常
+	 * 
+	 * @param addDepartmentCourse
+	 * @param sysUserVO
+	 */
+	public void addCourse2Department(AddDepartmentCourse addDepartmentCourse, SysUserVO sysUserVO) {
+		departmentCourseService.addCourse2Department(addDepartmentCourse.departmentId(),
+				addDepartmentCourse.companyCourseId());
 
 	}
 

@@ -22,6 +22,8 @@ public interface CompanyCourseService extends IService<CompanyCourse> {
 
 	CompanyCourse get(Long companyCourseId);
 
+	boolean isExist(Long companyId,Long courseId);
+	
 	List<CompanyCourse> findByCompany(Long companyId);
 
 	List<CompanyCourse> findByIds(Collection<Long> companyCourseIds);

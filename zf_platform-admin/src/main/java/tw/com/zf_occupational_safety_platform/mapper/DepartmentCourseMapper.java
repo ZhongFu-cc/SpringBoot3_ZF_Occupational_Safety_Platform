@@ -20,6 +20,13 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
  */
 public interface DepartmentCourseMapper extends BaseMapper<DepartmentCourse> {
 
+	default DepartmentCourse selectByDepartmentIdAndCompanyCourseId(Long departmentId, Long companyCourseId) {
+		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(DepartmentCourse::getDepartmentId, departmentId)
+				.eq(DepartmentCourse::getCompanyCourseId, companyCourseId);
+		return this.selectOne(queryWrapper);
+	}
+
 	// 根據部門ID查詢
 	default List<DepartmentCourse> selectByDepartmentId(Long departmentId) {
 		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
