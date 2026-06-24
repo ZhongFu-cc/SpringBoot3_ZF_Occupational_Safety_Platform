@@ -35,6 +35,54 @@ public class DepartmentCourseManager {
 	private final CourseService courseService;
 
 	/**
+	 * 查詢部門持有課程 - 列表對象
+	 * 
+	 * @param departmentId
+	 * @param queryText
+	 * @param sysUserVO
+	 * @return
+	 */
+	public List<DepartmentCourseVO> findDepartmentCourseList(Long departmentId, String queryText, SysUserVO sysUserVO) {
+
+		List<Course> courses = courseService.findByQuery(queryText);
+		List<Long> courseIds = courses.stream().map(Course::getCourseId).toList();
+
+		// 課程ID 與 資訊映射
+		Map<Long, Course> mapByCourseId = courseService.findCourseIdMapByQuery(queryText);
+
+		// 查出符合條件的企業課程
+		List<CompanyCourse> companyCourses = companyCourseService.findByCompanyIdAndCourseIds(sysUserVO.getCompanyId(),
+				courseIds);
+
+		// 建立 companyCourseId -> courseId 的映射關係
+		Map<Long, Long> companyCourseToCourseMap = companyCourses.stream()
+				.collect(Collectors.toMap(CompanyCourse::getCompanyCourseId, CompanyCourse::getCourseId));
+
+		// 抽取 符合條件的企業課程 ID
+		Set<Long> companyCourseIds = companyCourses.stream()
+				.map(CompanyCourse::getCompanyCourseId)
+				.collect(Collectors.toSet());
+
+		List<DepartmentCourse> departmentCourses = departmentCourseService.findByCompanyCourses(companyCourseIds);
+
+		List<DepartmentCourseVO> vos = departmentCourses.stream().map(departmentCourse -> {
+			Long courseId = companyCourseToCourseMap.get(departmentCourse.getCompanyCourseId());
+			Course course = mapByCourseId.get(courseId);
+
+			DepartmentCourseVO vo = departmentCourseConvert.entityToDepartmentCourseVO(departmentCourse);
+			vo.setCourseCategoryId(course.getCourseCategoryId());
+			vo.setCourseName(course.getTitle());
+			vo.setCourseCoverImage(course.getCoverImage());
+			vo.setCourseDescription(course.getDescription());
+			vo.setCourseTotalMinutes(course.getTotalMinutes());
+
+			return vo;
+		}).toList();
+
+		return vos;
+	}
+
+	/**
 	 * 查詢部門持有課程 - 分頁對象
 	 * 
 	 * @param pageInfo     分頁資訊

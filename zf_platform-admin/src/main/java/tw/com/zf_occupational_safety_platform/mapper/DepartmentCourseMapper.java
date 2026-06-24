@@ -40,6 +40,12 @@ public interface DepartmentCourseMapper extends BaseMapper<DepartmentCourse> {
 		return this.selectList(queryWrapper);
 	}
 
+	default List<DepartmentCourse> selectByCompanyCourseIds(Collection<Long> companyCourseIds) {
+		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(DepartmentCourse::getCompanyCourseId, companyCourseIds);
+		return this.selectList(queryWrapper);
+	}
+
 	default IPage<DepartmentCourse> selectByCompanyCourseIds(Page<DepartmentCourse> pageInfo,
 			Collection<Long> companyCourseIds) {
 		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();

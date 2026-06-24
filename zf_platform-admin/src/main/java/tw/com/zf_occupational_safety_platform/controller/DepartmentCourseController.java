@@ -66,6 +66,27 @@ public class DepartmentCourseController {
 	 * @param size
 	 * @return
 	 */
+	@GetMapping
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢 部門課程 列表對象")
+	@SaCheckRole("company_manager")
+	public R<List<DepartmentCourseVO>> findDepartmentCourseList(
+			@RequestParam(required = true) @Schema(type = "string") Long departmentId,
+			@RequestParam(required = false) String queryText) {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		List<DepartmentCourseVO> vos = departmentCourseManager.findDepartmentCourseList(departmentId, queryText,
+				sysUserVO);
+		return R.ok(vos);
+	}
+
+	/**
+	 * 查詢 部門課程 分頁對象
+	 * 
+	 * @param page
+	 * @param size
+	 * @return
+	 */
 	@GetMapping("pagination")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
