@@ -93,7 +93,7 @@ public class DepartmentCourseServiceImpl extends ServiceImpl<DepartmentCourseMap
 		}
 
 		DepartmentCourse departmentCourse = new DepartmentCourse();
-		departmentCourse.setDepartmentCourseId(departmentId);
+		departmentCourse.setDepartmentId(departmentId);
 		departmentCourse.setCompanyCourseId(companyCourseId);
 
 		baseMapper.insert(departmentCourse);
