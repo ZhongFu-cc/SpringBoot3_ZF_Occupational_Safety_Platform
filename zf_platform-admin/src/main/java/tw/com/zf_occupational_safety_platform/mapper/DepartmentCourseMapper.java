@@ -36,7 +36,7 @@ public interface DepartmentCourseMapper extends BaseMapper<DepartmentCourse> {
 
 	default List<DepartmentCourse> selectByDepartmentIds(Collection<Long> departmentIds) {
 		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(DepartmentCourse::getDepartmentId, departmentIds);
+		queryWrapper.in(DepartmentCourse::getDepartmentId, departmentIds);
 		return this.selectList(queryWrapper);
 	}
 

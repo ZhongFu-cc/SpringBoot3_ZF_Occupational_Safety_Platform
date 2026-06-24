@@ -122,7 +122,7 @@ public class SysCompanyController {
 	 * @return
 	 * @throws IOException
 	 */
-	@Operation(summary = "新增使用者 (企業員工)")
+	@Operation(summary = "Excel 匯入 批量新增使用者 (企業員工)")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("company_manager")
