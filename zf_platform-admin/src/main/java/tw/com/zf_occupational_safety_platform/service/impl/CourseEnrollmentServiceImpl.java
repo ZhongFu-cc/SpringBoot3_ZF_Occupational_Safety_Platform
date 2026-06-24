@@ -56,8 +56,8 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 		if (courseIds == null || courseIds.isEmpty()) {
 			return Collections.emptyList();
 		}
-
-		return null;
+		
+		return baseMapper.selectBySysUserIdsAndCourseIds(userIds,courseIds);
 	}
 
 	@Override
