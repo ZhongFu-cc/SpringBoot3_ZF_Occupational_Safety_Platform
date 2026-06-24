@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -62,6 +64,21 @@ public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, C
 				.filter(chapter -> !ChapterContentTypeEnum.DIRECTORY.equals(chapter.getContentType()))
 				.toList();
 
+	}
+
+	@Override
+	public List<CourseChapter> findNonDirectoryByCourseIds(Collection<Long> allCourseIds) {
+		if (allCourseIds == null || allCourseIds.isEmpty()) {
+			Collections.emptyList();
+		}
+
+		// 查詢課程的所有單元
+		List<CourseChapter> courseChapters = baseMapper.selectByCourseId(allCourseIds);
+
+		// 過濾不是DIRECTORY類型的chapter
+		return courseChapters.stream()
+				.filter(chapter -> !ChapterContentTypeEnum.DIRECTORY.equals(chapter.getContentType()))
+				.toList();
 	}
 
 	@Override

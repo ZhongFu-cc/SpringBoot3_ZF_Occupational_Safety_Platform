@@ -5,8 +5,9 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyJobType;
 import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
 
 /**
@@ -19,6 +20,13 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
  */
 public interface DepartmentCourseMapper extends BaseMapper<DepartmentCourse> {
 
+	default DepartmentCourse selectByDepartmentIdAndCompanyCourseId(Long departmentId, Long companyCourseId) {
+		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(DepartmentCourse::getDepartmentId, departmentId)
+				.eq(DepartmentCourse::getCompanyCourseId, companyCourseId);
+		return this.selectOne(queryWrapper);
+	}
+
 	// 根據部門ID查詢
 	default List<DepartmentCourse> selectByDepartmentId(Long departmentId) {
 		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
@@ -30,6 +38,13 @@ public interface DepartmentCourseMapper extends BaseMapper<DepartmentCourse> {
 		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(DepartmentCourse::getDepartmentId, departmentIds);
 		return this.selectList(queryWrapper);
+	}
+
+	default IPage<DepartmentCourse> selectByCompanyCourseIds(Page<DepartmentCourse> pageInfo,
+			Collection<Long> companyCourseIds) {
+		LambdaQueryWrapper<DepartmentCourse> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(DepartmentCourse::getCompanyCourseId, companyCourseIds);
+		return this.selectPage(pageInfo, queryWrapper);
 	}
 
 	// 從部門移除課程類型

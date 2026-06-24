@@ -38,8 +38,6 @@ public class NormalUploadController {
 	@PostMapping("img")
 	public R<Map<String, Object>> uploadContentImg(MultipartFile file) {
 
-		System.out.println("獲得檔案");
-
 		HashMap<String, Object> hashMap = new HashMap<>();
 
 		hashMap.put("url", "https://miro.medium.com/v2/resize:fit:582/1*4j2A9niz0eq-mRaCPUffpg.png");

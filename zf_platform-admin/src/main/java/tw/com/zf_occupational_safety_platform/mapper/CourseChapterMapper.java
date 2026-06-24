@@ -1,5 +1,6 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
@@ -21,9 +22,9 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
  */
 public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
 
-
 	/**
 	 * 查詢課程內 總測驗章節的數量
+	 * 
 	 * @param courseId
 	 * @return
 	 */
@@ -50,6 +51,19 @@ public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
 	default List<CourseChapter> selectByCourseId(Long courseId) {
 		LambdaQueryWrapper<CourseChapter> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(CourseChapter::getCourseId, courseId);
+		return this.selectList(queryWrapper);
+
+	}
+
+	/**
+	 * 根據課程IDs查詢
+	 * 
+	 * @param courseIds
+	 * @return
+	 */
+	default List<CourseChapter> selectByCourseId(Collection<Long> courseIds) {
+		LambdaQueryWrapper<CourseChapter> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(CourseChapter::getCourseId, courseIds);
 		return this.selectList(queryWrapper);
 
 	}

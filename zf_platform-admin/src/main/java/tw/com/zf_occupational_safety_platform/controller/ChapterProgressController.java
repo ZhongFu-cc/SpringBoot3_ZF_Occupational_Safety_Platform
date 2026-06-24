@@ -55,11 +55,6 @@ public class ChapterProgressController {
 			@NotNull @Schema(description = "課程章節進度 ID", type = "string") Long chapterProgressId) {
 	}
 
-	@GetMapping
-	public void test() {
-		System.out.println("系統時間" + Instant.now().getEpochSecond());
-
-	}
 
 	/**
 	 * 根據 報名ID 與 課程單元ID 查詢章節學習進度

@@ -2,7 +2,9 @@ package tw.com.zf_occupational_safety_platform.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
+import tw.com.zf_occupational_safety_platform.exception.CourseException;
 import tw.com.zf_occupational_safety_platform.mapper.CourseEnrollmentMapper;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
@@ -45,10 +48,35 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 	}
 
 	@Override
+	public List<CourseEnrollment> findByUsersAndCourses(Collection<Long> userIds, Collection<Long> courseIds) {
+		if (userIds == null || userIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		if (courseIds == null || courseIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return null;
+	}
+
+	@Override
 	public CourseEnrollment create(Long sysUserId, Long courseId) {
 
-		LocalDateTime now = LocalDateTime.now();
+		// 判斷課程是否有報名過
+		List<CourseEnrollment> courseEnrollments = baseMapper.selectBySysUserIdAndCourseId(sysUserId, courseId);
+		// 如果要報名的課程有資料並處於 未開始、進行中、已完成 任何一種狀態時，拋出錯誤
+		long count = courseEnrollments.stream()
+				.filter(e -> Set
+						.of(CourseStatusEnum.NOT_STARTED, CourseStatusEnum.IN_PROGRESS, CourseStatusEnum.COMPLETED)
+						.contains(e.getStatus()))
+				.count();
 
+		if (count > 1) {
+			throw new CourseException("已有報名此課程，無法重複報名");
+		}
+
+		LocalDateTime now = LocalDateTime.now();
 		CourseEnrollment courseEnrollment = new CourseEnrollment();
 		courseEnrollment.setSysUserId(sysUserId);
 		courseEnrollment.setCourseId(courseId);
@@ -64,9 +92,9 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 	}
 
 	@Override
-	public void batchCreate(Long sysUserId, Collection<Long> courseIds) {
+	public List<CourseEnrollment> batchCreate(Long sysUserId, Collection<Long> courseIds) {
 		if (courseIds == null || courseIds.isEmpty()) {
-			return;
+			return Collections.emptyList();
 		}
 		LocalDateTime now = LocalDateTime.now();
 
@@ -83,6 +111,8 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 		}).toList();
 
 		this.saveBatch(courseEnrollments);
+
+		return courseEnrollments;
 
 	}
 

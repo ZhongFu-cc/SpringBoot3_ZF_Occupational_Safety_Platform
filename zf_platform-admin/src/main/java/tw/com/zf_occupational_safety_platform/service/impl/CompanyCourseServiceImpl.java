@@ -39,6 +39,12 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 	}
 
 	@Override
+	public boolean isExist(Long companyId, Long courseId) {
+		CompanyCourse companyCourse = baseMapper.selectByCompanyIdAndCourseId(companyId, courseId);
+		return companyCourse != null ? true : false;
+	}
+
+	@Override
 	public List<CompanyCourse> findByCompany(Long companyId) {
 		return baseMapper.selectByCompanyId(companyId);
 	}
@@ -49,6 +55,14 @@ public class CompanyCourseServiceImpl extends ServiceImpl<CompanyCourseMapper, C
 			Collections.emptyList();
 		}
 		return baseMapper.selectBatchIds(companyCourseIds);
+	}
+
+	@Override
+	public List<CompanyCourse> findByCompanyIdAndCourseIds(Long companyId, Collection<Long> courseIds) {
+		if (courseIds == null || courseIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByCourseIdsAndCompanyId(courseIds, companyId);
 	}
 
 	@Override

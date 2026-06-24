@@ -56,7 +56,7 @@ public class DepartmentController {
 	 * 臨時AddDTO, 部門x課程 關聯 <br>
 	 */
 	public record AddDepartmentCourse(@NotNull @Schema(description = "部門 ID", type = "string") Long departmentId,
-			@NotNull @Schema(description = "企業課程 ID", type = "string") List<Long> companyCourseId) {
+			@NotNull @Schema(description = "企業課程 IDs", type = "string") List<Long> companyCourseIds) {
 	}
 
 	/**

@@ -25,6 +25,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.manager.CourseEnrollmentManager;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseEnrollmentVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
@@ -47,7 +48,6 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 public class CourseEnrollmentController {
 
 	private final AuthManager authManager;
-	private final CourseEnrollmentService courseEnrollmentService;
 	private final CourseEnrollmentManager courseEnrollmentManager;
 
 	/**
@@ -67,9 +67,9 @@ public class CourseEnrollmentController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@GetMapping("{id}")
 	@SaCheckLogin
-	public R<CourseEnrollment> getCourseEnrollment(@PathVariable("id") @Schema(type = "string") Long id) {
-		CourseEnrollment courseEnrollment = courseEnrollmentService.get(id);
-		return R.ok(courseEnrollment);
+	public R<CourseEnrollmentVO> getCourseEnrollment(@PathVariable("id") @Schema(type = "string") Long id) {
+		CourseEnrollmentVO vo = courseEnrollmentManager.getByOwner(id);
+		return R.ok(vo);
 	}
 
 	/**
@@ -84,18 +84,25 @@ public class CourseEnrollmentController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢 報名課程分頁對象")
 	@SaCheckLogin
-	public R<IPage<CourseEnrollment>> findCourseEnrollmentPageByOwner(@RequestParam Integer page,
+	public R<IPage<CourseEnrollmentVO>> findCourseEnrollmentPageByOwner(@RequestParam Integer page,
 			@RequestParam Integer size,
 			@RequestParam(required = false) @Schema(description = "可選值:not_started、in_progress、completed、expired、cancelled") String status) {
 
-		CourseStatusEnum courseStatusEnum = CourseStatusEnum.fromValue(status);
+		// 可傳可不傳 , 不傳的情況下手動調整為null , 避免轉換失敗
+		CourseStatusEnum courseStatusEnum;
+		if (status == null) {
+			courseStatusEnum = null;
+		} else {
+			courseStatusEnum = CourseStatusEnum.fromValue(status);
+		}
 
 		SysUserVO sysUserVO = authManager.getUserInfo();
 
 		Page<CourseEnrollment> pageInfo = new Page<>(page, size);
-		IPage<CourseEnrollment> courseEnrollmentPage = courseEnrollmentService.findPageByOwner(pageInfo,
-				courseStatusEnum, sysUserVO.getSysUserId());
-		return R.ok(courseEnrollmentPage);
+		IPage<CourseEnrollmentVO> voPage = courseEnrollmentManager.findPageByOwner(pageInfo, courseStatusEnum,
+				sysUserVO);
+
+		return R.ok(voPage);
 	}
 
 	/**
