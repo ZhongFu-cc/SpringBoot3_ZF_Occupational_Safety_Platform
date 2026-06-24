@@ -32,6 +32,8 @@ public interface DepartmentCourseService extends IService<DepartmentCourse> {
 
 	List<DepartmentCourse> findByDepartmentId(Long departmentId);
 
+	List<DepartmentCourse> findByCompanyCourses(Collection<Long> companyCourseIds);
+
 	IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo);
 
 	IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo, Collection<Long> companyCourseIds);

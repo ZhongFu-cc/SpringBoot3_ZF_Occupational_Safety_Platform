@@ -50,6 +50,14 @@ public class DepartmentCourseServiceImpl extends ServiceImpl<DepartmentCourseMap
 	}
 
 	@Override
+	public List<DepartmentCourse> findByCompanyCourses(Collection<Long> companyCourseIds) {
+		if (companyCourseIds == null || companyCourseIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByCompanyCourseIds(companyCourseIds);
+	}
+
+	@Override
 	public IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo) {
 		// TODO Auto-generated method stub
 		return null;
