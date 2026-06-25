@@ -33,7 +33,7 @@ public class HeartbeatExpiredListener extends KeyExpirationEventMessageListener 
 
 		String expiredKey = message.toString();
 
-		System.out.println("Hearbeat 過期: " + expiredKey);
+		System.out.println("redis key 過期: " + expiredKey);
 
 		log.info("expired key={}", expiredKey);
 

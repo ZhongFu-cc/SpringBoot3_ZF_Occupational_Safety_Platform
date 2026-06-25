@@ -304,7 +304,7 @@ public class SysChunkFileServiceImpl extends ServiceImpl<SysChunkFileMapper, Sys
 			finalUrl = s3Helper.completeMultipartUpload(s3Key, uploadId, parts);
 
 			// 4. 更新資料庫
-			sysChunkFile.setFilePath(s3Key); // S3 Key 就是路徑
+			sysChunkFile.setFilePath(finalUrl); // finalUrl 是帶bucketName的路徑
 			sysChunkFile.setUploadedChunks(totalChunks);
 			sysChunkFile.setStatus(1);
 			//S3 合併後要獲取 FileSize 

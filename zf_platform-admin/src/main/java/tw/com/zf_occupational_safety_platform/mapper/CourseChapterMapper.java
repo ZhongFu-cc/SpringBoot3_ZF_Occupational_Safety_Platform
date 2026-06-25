@@ -43,14 +43,16 @@ public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
 	int clearVideoUrl(@Param("courseChapterId") Long courseChapterId);
 
 	/**
-	 * 根據課程ID查詢
+	 * 根據課程ID查詢，並以ChapterOrder排序
 	 * 
 	 * @param courseId
 	 * @return
 	 */
 	default List<CourseChapter> selectByCourseId(Long courseId) {
 		LambdaQueryWrapper<CourseChapter> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(CourseChapter::getCourseId, courseId);
+		queryWrapper.eq(CourseChapter::getCourseId, courseId)
+				.orderByAsc(CourseChapter::getChapterOrder)
+				.orderByAsc(CourseChapter::getCourseChapterId);
 		return this.selectList(queryWrapper);
 
 	}
