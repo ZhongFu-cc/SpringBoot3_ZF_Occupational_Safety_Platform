@@ -37,6 +37,11 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 	}
 
 	@Override
+	public List<CourseEnrollment> findBySysUser(Long sysUserId) {
+		return baseMapper.selectBySysUserId(sysUserId);
+	}
+
+	@Override
 	public IPage<CourseEnrollment> findPageByQuery(Page<CourseEnrollment> pageInfo, CourseStatusEnum status) {
 		return baseMapper.selectByQuery(pageInfo, status);
 	}
@@ -56,8 +61,8 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 		if (courseIds == null || courseIds.isEmpty()) {
 			return Collections.emptyList();
 		}
-		
-		return baseMapper.selectBySysUserIdsAndCourseIds(userIds,courseIds);
+
+		return baseMapper.selectBySysUserIdsAndCourseIds(userIds, courseIds);
 	}
 
 	@Override

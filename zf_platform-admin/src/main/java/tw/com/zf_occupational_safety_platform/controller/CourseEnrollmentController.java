@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.io.IOException;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +22,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -136,6 +139,17 @@ public class CourseEnrollmentController {
 	public R<Void> cancelEnrollment(@PathVariable @Schema(type = "string") Long id) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		courseEnrollmentManager.cancelEnrollment(id, sysUserVO);
+		return R.ok();
+	}
+
+	@Operation(summary = "下載 個人 學習歷程")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@PostMapping("download-study-history")
+	@SaCheckLogin
+	public R<Void> downloadStudyHistory(HttpServletResponse response) throws IOException {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		courseEnrollmentManager.downloadStudyHistory(response, sysUserVO);
 		return R.ok();
 	}
 

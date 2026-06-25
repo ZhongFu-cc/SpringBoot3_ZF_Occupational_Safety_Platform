@@ -107,7 +107,7 @@ public class CourseManager {
 
 			// 上傳新的檔案並獲得S3 key
 			String s3Key = s3Helper.upload(COVER_IMAGE_BASE_PATH, imgFile.getOriginalFilename(), imgFile);
-			targetCourse.setCoverImage(coverImagePath);
+			targetCourse.setCoverImage(s3Key);
 		}
 		
 

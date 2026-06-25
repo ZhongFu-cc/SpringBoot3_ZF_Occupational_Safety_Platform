@@ -21,6 +21,12 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
  */
 public interface CourseEnrollmentMapper extends BaseMapper<CourseEnrollment> {
 
+	default List<CourseEnrollment> selectBySysUserId(Long sysUserId) {
+		LambdaQueryWrapper<CourseEnrollment> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(CourseEnrollment::getSysUserId, sysUserId);
+		return this.selectList(queryWrapper);
+	}
+
 	default List<CourseEnrollment> selectBySysUserIdAndCourseId(Long sysUserId, Long courseId) {
 		LambdaQueryWrapper<CourseEnrollment> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.eq(CourseEnrollment::getSysUserId, sysUserId).eq(CourseEnrollment::getCourseId, courseId);
