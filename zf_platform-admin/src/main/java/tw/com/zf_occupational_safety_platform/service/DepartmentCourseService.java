@@ -32,11 +32,12 @@ public interface DepartmentCourseService extends IService<DepartmentCourse> {
 
 	List<DepartmentCourse> findByDepartmentId(Long departmentId);
 
-	List<DepartmentCourse> findByCompanyCourses(Collection<Long> companyCourseIds);
+	List<DepartmentCourse> findByCompanyCourses(Long departmentId, Collection<Long> companyCourseIds);
 
 	IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo);
 
-	IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo, Collection<Long> companyCourseIds);
+	IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo, Long departmentId,
+			Collection<Long> companyCourseIds);
 
 	void addCourse2Department(Long departmentId, Long companyCourseId);
 

@@ -63,7 +63,8 @@ public class DepartmentCourseManager {
 				.map(CompanyCourse::getCompanyCourseId)
 				.collect(Collectors.toSet());
 
-		List<DepartmentCourse> departmentCourses = departmentCourseService.findByCompanyCourses(companyCourseIds);
+		List<DepartmentCourse> departmentCourses = departmentCourseService.findByCompanyCourses(departmentId,
+				companyCourseIds);
 
 		List<DepartmentCourseVO> vos = departmentCourses.stream().map(departmentCourse -> {
 			Long courseId = companyCourseToCourseMap.get(departmentCourse.getCompanyCourseId());
@@ -112,7 +113,8 @@ public class DepartmentCourseManager {
 				.map(CompanyCourse::getCompanyCourseId)
 				.collect(Collectors.toSet());
 
-		IPage<DepartmentCourse> departmentCourses = departmentCourseService.findPage(pageInfo, companyCourseIds);
+		IPage<DepartmentCourse> departmentCourses = departmentCourseService.findPage(pageInfo, departmentId,
+				companyCourseIds);
 
 		List<DepartmentCourseVO> vos = departmentCourses.getRecords().stream().map(departmentCourse -> {
 			Long courseId = companyCourseToCourseMap.get(departmentCourse.getCompanyCourseId());

@@ -97,6 +97,7 @@ public class DepartmentCourseController {
 			@RequestParam(required = false) String queryText) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		Page<DepartmentCourse> pageInfo = new Page<>(page, size);
+		System.out.println("查詢的部門ID:" + departmentId);
 		IPage<DepartmentCourseVO> departmentPage = departmentCourseManager.findDepartmentCoursePage(pageInfo,
 				departmentId, queryText, sysUserVO);
 		return R.ok(departmentPage);

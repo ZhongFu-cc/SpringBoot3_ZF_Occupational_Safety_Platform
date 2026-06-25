@@ -50,11 +50,11 @@ public class DepartmentCourseServiceImpl extends ServiceImpl<DepartmentCourseMap
 	}
 
 	@Override
-	public List<DepartmentCourse> findByCompanyCourses(Collection<Long> companyCourseIds) {
+	public List<DepartmentCourse> findByCompanyCourses(Long departmentId, Collection<Long> companyCourseIds) {
 		if (companyCourseIds == null || companyCourseIds.isEmpty()) {
 			return Collections.emptyList();
 		}
-		return baseMapper.selectByCompanyCourseIds(companyCourseIds);
+		return baseMapper.selectByDepartmentIdAndCompanyCourseIds(departmentId, companyCourseIds);
 	}
 
 	@Override
@@ -64,11 +64,12 @@ public class DepartmentCourseServiceImpl extends ServiceImpl<DepartmentCourseMap
 	}
 
 	@Override
-	public IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo, Collection<Long> companyCourseIds) {
+	public IPage<DepartmentCourse> findPage(Page<DepartmentCourse> pageInfo, Long departmentId,
+			Collection<Long> companyCourseIds) {
 		if (companyCourseIds == null || companyCourseIds.isEmpty()) {
 			return new Page<DepartmentCourse>(pageInfo.getCurrent(), pageInfo.getSize());
 		}
-		return baseMapper.selectByCompanyCourseIds(pageInfo, companyCourseIds);
+		return baseMapper.selectByDepartmentIdAndCompanyCourseIds(pageInfo, departmentId, companyCourseIds);
 	}
 
 	@Override
