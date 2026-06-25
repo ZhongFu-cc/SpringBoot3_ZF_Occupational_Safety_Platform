@@ -22,6 +22,8 @@ public interface CourseEnrollmentService extends IService<CourseEnrollment> {
 
 	CourseEnrollment get(Long courseEnrollmentId);
 
+	List<CourseEnrollment> findBySysUser(Long sysUserId);
+
 	IPage<CourseEnrollment> findPageByQuery(Page<CourseEnrollment> pageInfo, CourseStatusEnum status);
 
 	/**

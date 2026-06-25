@@ -1,23 +1,34 @@
 package tw.com.zf_occupational_safety_platform.manager;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.convert.CourseConvert;
 import tw.com.zf_occupational_safety_platform.convert.CourseEnrollmentConvert;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CourseEnrollmentVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
+import tw.com.zf_occupational_safety_platform.pojo.excel.EmployeeStudyHistoryExcel;
 import tw.com.zf_occupational_safety_platform.service.ChapterProgressService;
 import tw.com.zf_occupational_safety_platform.service.ChapterWatchLogService;
+import tw.com.zf_occupational_safety_platform.service.CourseCategoryService;
 import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 import tw.com.zf_occupational_safety_platform.service.CourseService;
@@ -31,6 +42,8 @@ import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 public class CourseEnrollmentManager {
 
 	private final CourseService courseService;
+	private final CourseConvert courseConvert;
+	private final CourseCategoryService courseCategoryService;
 	private final CourseChapterService courseChapterService;
 	private final CourseEnrollmentService courseEnrollmentService;
 	private final CourseEnrollmentConvert courseEnrollmentConvert;
@@ -140,6 +153,54 @@ public class CourseEnrollmentManager {
 
 		// 最後刪除報名本身
 		courseEnrollmentService.remove(courseEnrollmentId);
+	}
+
+	/**
+	 * 下載 個人 學習歷程
+	 * 
+	 * @param response
+	 * @param operator
+	 * @throws IOException
+	 */
+	public void downloadStudyHistory(HttpServletResponse response, SysUserVO operator) throws IOException {
+		// 1.設置Excel 檔案資訊
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setCharacterEncoding("utf-8");
+		// 这里URLEncoder.encode可以防止中文乱码 ， 和easyexcel没有关系
+		String fileName = URLEncoder.encode("學習歷程", "UTF-8").replaceAll("\\+", "%20");
+		response.setHeader("Content-disposition", "attachment;filename*=" + fileName + ".xlsx");
+
+		// 2.獲取用戶所有報名的課程
+		List<CourseEnrollment> courseEnrollments = courseEnrollmentService.findBySysUser(operator.getSysUserId());
+
+		// 3.抽取課程Id,查詢有上的課程
+		Set<Long> courseIds = courseEnrollments.stream().map(CourseEnrollment::getCourseId).collect(Collectors.toSet());
+		List<Course> courses = courseService.findByIds(courseIds);
+		// 製成 map 對象
+		Map<Long, Course> courseMap = courses.stream()
+				.collect(Collectors.toMap(Course::getCourseId, Function.identity()));
+
+		// 4.獲取課程類別的映射對象
+		Map<Long, CourseCategory> courseCategoryMap = courseCategoryService.mapById();
+
+		// 5.轉換
+		List<EmployeeStudyHistoryExcel> excelData = courseEnrollments.stream().map(courseEnrollment -> {
+			// 拿到課程
+			Course course = courseMap.get(courseEnrollment.getCourseId());
+			// 拿到課程類別
+			CourseCategory courseCategory = courseCategoryMap.get(course.getCourseCategoryId());
+			// pojo轉換
+			EmployeeStudyHistoryExcel excelRow = courseConvert.toEmployeeStudyHistoryExcel(course, courseEnrollment);
+			// 補上課程類別名稱、用戶名
+			excelRow.setCourseCategoryName(courseCategory.getName());
+			excelRow.setUserName(operator.getRealName());
+
+			return excelRow;
+		}).toList();
+
+		// 6.輸出成Excel
+		EasyExcel.write(response.getOutputStream(), EmployeeStudyHistoryExcel.class).sheet("學習歷程").doWrite(excelData);
+
 	}
 
 }
