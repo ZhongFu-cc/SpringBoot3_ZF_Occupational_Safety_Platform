@@ -108,32 +108,38 @@ public class ChapterProgressManager {
 		// 章節觀看次數 + 1 
 		chapterProgress.setWatchCount(chapterProgress.getWatchCount() + 1);
 
-		// 當今天訪問 非測驗型章節，直接代表他學習完了
-		if (chapterProgress.getIsQuizPassed().getBooleanValue()) {
-			LocalDateTime now = LocalDateTime.now();
-			chapterProgress.setCompletedAt(now);
-			chapterProgress.setStatus(CourseStatusEnum.COMPLETED);
+		// 如果此章節還未完成，變更章節學習狀態 及 課程狀態 
+		if (!CourseStatusEnum.COMPLETED.equals(chapterProgress.getStatus())) {
 
-			// 同時更新 課程完成的整體狀態
-			Integer totalChapters = courseEnrollment.getTotalChapters();
-			Integer completedChapters = courseEnrollment.getCompletedChapters();
-			completedChapters += 1;
+			// 當今天訪問 非測驗型章節，直接代表他學習完了
+			if (chapterProgress.getIsQuizPassed().getBooleanValue()) {
 
-			// 當完成課程章節數 大於等於 總共課程章節數
-			if (completedChapters >= totalChapters) {
-				courseEnrollment.setCompletedChapters(totalChapters);
-				courseEnrollment.setIsChaptersDone(CommonStatusEnum.YES);
-			} else {
+				LocalDateTime now = LocalDateTime.now();
+				chapterProgress.setCompletedAt(now);
+				chapterProgress.setStatus(CourseStatusEnum.COMPLETED);
+
+				// 同時更新 課程完成的整體狀態
+				Integer totalChapters = courseEnrollment.getTotalChapters();
+				Integer completedChapters = courseEnrollment.getCompletedChapters();
+				completedChapters += 1;
+
 				// 當完成課程章節數 大於等於 總共課程章節數
-				courseEnrollment.setCompletedChapters(completedChapters);
+				if (completedChapters >= totalChapters) {
+					courseEnrollment.setCompletedChapters(totalChapters);
+					courseEnrollment.setIsChaptersDone(CommonStatusEnum.YES);
+				} else {
+					// 當完成課程章節數 大於等於 總共課程章節數
+					courseEnrollment.setCompletedChapters(completedChapters);
+				}
+
+				courseEnrollmentService.updateById(courseEnrollment);
+
+			} else {
+				// 測驗型章節,則先處理進行中,等問卷回答完成,回調時在更新狀態
+				chapterProgress.setStatus(CourseStatusEnum.IN_PROGRESS);
 			}
-			courseEnrollmentService.updateById(courseEnrollment);
 
-		}else {
-			// 測驗型章節,則先處理進行中,等問卷回答完成,回調時在更新狀態
-			chapterProgress.setStatus(CourseStatusEnum.IN_PROGRESS);
 		}
-
 		// 章節學習進度更新
 		chapterProgressService.updateById(chapterProgress);
 

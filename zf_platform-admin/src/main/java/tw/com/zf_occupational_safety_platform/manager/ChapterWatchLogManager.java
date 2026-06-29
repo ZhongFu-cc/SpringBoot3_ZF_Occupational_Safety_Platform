@@ -185,6 +185,8 @@ public class ChapterWatchLogManager {
 
 		CourseEnrollment courseEnrollment = courseEnrollmentService.get(enrollmentId);
 
+		courseEnrollment.setCompletedChapters(null);
+
 		// 統計時間，並判斷有沒有達成課程完成時間
 		Integer totalDurationSec = chapterWatchLogService.calculateTotalDurationSec(enrollmentId);
 
