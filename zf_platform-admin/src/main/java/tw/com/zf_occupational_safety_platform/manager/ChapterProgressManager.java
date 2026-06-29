@@ -109,7 +109,7 @@ public class ChapterProgressManager {
 		chapterProgress.setWatchCount(chapterProgress.getWatchCount() + 1);
 
 		// 當今天訪問 非測驗型章節，直接代表他學習完了
-		if (!chapterProgress.getIsQuizPassed().getBooleanValue()) {
+		if (chapterProgress.getIsQuizPassed().getBooleanValue()) {
 			LocalDateTime now = LocalDateTime.now();
 			chapterProgress.setCompletedAt(now);
 			chapterProgress.setStatus(CourseStatusEnum.COMPLETED);
@@ -118,11 +118,6 @@ public class ChapterProgressManager {
 			Integer totalChapters = courseEnrollment.getTotalChapters();
 			Integer completedChapters = courseEnrollment.getCompletedChapters();
 			completedChapters += 1;
-
-			// 只要當前 報名課程的狀態 不是 「已完成」，就統一改成進行中
-			if (!courseEnrollment.getStatus().equals(CourseStatusEnum.COMPLETED)) {
-				courseEnrollment.setStatus(CourseStatusEnum.IN_PROGRESS);
-			}
 
 			// 當完成課程章節數 大於等於 總共課程章節數
 			if (completedChapters >= totalChapters) {
@@ -134,9 +129,7 @@ public class ChapterProgressManager {
 			}
 			courseEnrollmentService.updateById(courseEnrollment);
 
-		}
-
-		else {
+		}else {
 			// 測驗型章節,則先處理進行中,等問卷回答完成,回調時在更新狀態
 			chapterProgress.setStatus(CourseStatusEnum.IN_PROGRESS);
 		}
