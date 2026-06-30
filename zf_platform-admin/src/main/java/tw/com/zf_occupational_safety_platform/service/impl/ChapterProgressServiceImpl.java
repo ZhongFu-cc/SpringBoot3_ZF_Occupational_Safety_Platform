@@ -49,6 +49,11 @@ public class ChapterProgressServiceImpl extends ServiceImpl<ChapterProgressMappe
 	}
 
 	@Override
+	public List<ChapterProgress> findByEnrollment(Long enrollmentId) {
+		return baseMapper.selectByEnrollmentId(enrollmentId);
+	}
+
+	@Override
 	public IPage<ChapterProgress> findPageByQuery(Page<ChapterProgress> pageInfo, String queryText) {
 		// TODO Auto-generated method stub
 		return null;

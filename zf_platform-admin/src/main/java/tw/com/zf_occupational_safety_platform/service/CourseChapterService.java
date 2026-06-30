@@ -31,7 +31,7 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	 * 課程 總測驗章節是否存在
 	 */
 	boolean existQuizChapter(Long courseId);
-	
+
 	/** -------------------------------------------- */
 
 	CourseChapter get(Long courseChapterId);
@@ -43,9 +43,11 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	 * @return
 	 */
 	List<CourseChapter> findNonDirectoryByCourseId(Long courseId);
-	
+
 	List<CourseChapter> findNonDirectoryByCourseIds(Collection<Long> allCourseIds);
 
+	List<CourseChapterVO> findTreeSourceByCourseId(Long courseId);
+	
 	List<CourseChapterVO> findTreeByCourseId(Long courseId);
 
 	CourseChapter create(AddCourseChapterDTO addCourseChapterDTO);
@@ -53,7 +55,5 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	void update(PutCourseChapterDTO putCourseChapterDTO);
 
 	void remove(Long courseChapterId);
-
-
 
 }

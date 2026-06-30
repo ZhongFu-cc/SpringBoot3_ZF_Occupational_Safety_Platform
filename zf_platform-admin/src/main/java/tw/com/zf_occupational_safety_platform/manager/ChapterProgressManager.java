@@ -3,6 +3,7 @@ package tw.com.zf_occupational_safety_platform.manager;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.redisson.api.RBucket;
 import org.redisson.api.RMap;
@@ -11,16 +12,20 @@ import org.redisson.client.codec.LongCodec;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.ChapterWatchLogException;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseChapterVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
 import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterWatchLog;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.service.ChapterProgressService;
 import tw.com.zf_occupational_safety_platform.service.ChapterWatchLogService;
+import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
+import tw.com.zf_occupational_safety_platform.utils.TreeUtil;
 
 /**
  * 章節學習進度 - 管理層
@@ -31,6 +36,7 @@ public class ChapterProgressManager {
 
 	private final CourseEnrollmentService courseEnrollmentService;
 	private final ChapterProgressService chapterProgressService;
+	private final CourseChapterService courseChapterService;
 	private final ChapterWatchLogService chapterWatchLogService;
 	private final RedissonClient redissonClient;
 
@@ -196,6 +202,35 @@ public class ChapterProgressManager {
 		// 回傳觀看紀錄,讓前端拿到紀錄ID , 定期call API 維持心跳包
 		return chapterWatchLog;
 
+	}
+
+	/**
+	 * 根據 報名ID 查詢 課程單元樹(父子結構)
+	 * 
+	 * @param courseEnrollmentId
+	 * @return
+	 */
+	public List<CourseChapterVO> findTreeList(Long courseEnrollmentId) {
+
+		// 1.拿到報名資料
+		CourseEnrollment courseEnrollment = courseEnrollmentService.get(courseEnrollmentId);
+
+		// 2.拿到當初報名時的章節Ids
+		List<ChapterProgress> chapterProgresses = chapterProgressService.findByEnrollment(courseEnrollmentId);
+		List<Long> courseChapterIds = chapterProgresses.stream().map(ChapterProgress::getCourseChapterId).toList();
+
+		// 3.透過 課程ID 查到所有章節的資訊
+		List<CourseChapterVO> courseChapterVO = courseChapterService
+				.findTreeSourceByCourseId(courseEnrollment.getCourseId());
+
+		// 4.過濾資料
+		List<CourseChapterVO> filtered = courseChapterVO.stream()
+				.filter(vo -> ChapterContentTypeEnum.DIRECTORY.equals(vo.getContentType())
+						|| courseChapterIds.contains(vo.getCourseChapterId()))
+				.toList();
+
+		// 5.拿著過濾後的資料組成樹狀結構
+		return TreeUtil.buildTree(filtered);
 	};
 
 }

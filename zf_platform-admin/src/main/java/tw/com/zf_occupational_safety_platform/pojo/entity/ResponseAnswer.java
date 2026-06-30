@@ -53,8 +53,8 @@ public class ResponseAnswer implements Serializable {
 	private String answerValue;
 
 	@Schema(description = "是否標記正確答案 , 0=否, 1=是")
-	@TableField("is_correct_anwser")
-	private CommonStatusEnum isCorrectAnwser;
+	@TableField("is_correct_answer")
+	private CommonStatusEnum isCorrectAnswer;
 
 	@Schema(description = "創建者")
 	@TableField("create_by")

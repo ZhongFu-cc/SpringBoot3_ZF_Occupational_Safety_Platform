@@ -76,7 +76,7 @@ public class FormField implements Serializable {
 	
 	@Schema(description = "是否標記正確答案 , 0=否, 1=是")
 	@TableField("is_mark_correct_answer")
-	private CommonStatusEnum isMarkCorrectAnwser;
+	private CommonStatusEnum isMarkCorrectAnswer;
 
 	@Schema(description = "顯示順序 , 數字越小排的越前面")
 	@TableField("field_order")

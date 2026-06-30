@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,8 +9,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
-import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
-import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 
 /**
  * <p>
@@ -42,6 +41,14 @@ public interface ChapterProgressService extends IService<ChapterProgress> {
 	 * @return
 	 */
 	ChapterProgress getByEnrollmentAndChapter(Long enrollmentId, Long chapterId, Long userId);
+
+	/**
+	 * 根據報名ID 查詢所有章節進度
+	 * 
+	 * @param enrollmentId
+	 * @return
+	 */
+	List<ChapterProgress> findByEnrollment(Long enrollmentId);
 
 	IPage<ChapterProgress> findPageByQuery(Page<ChapterProgress> pageInfo, String queryText);
 

@@ -82,6 +82,19 @@ public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, C
 	}
 
 	@Override
+	public List<CourseChapterVO> findTreeSourceByCourseId(Long courseId) {
+		// 查詢課程的所有單元
+		List<CourseChapter> courseChapters = baseMapper.selectByCourseId(courseId);
+
+		// 轉換成vo對象List
+		return courseChapters.stream().map(courseChapter -> {
+			CourseChapterVO vo = courseChapterConvert.entityToVO(courseChapter);
+			return vo;
+		}).toList();
+		
+	}
+
+	@Override
 	public List<CourseChapterVO> findTreeByCourseId(Long courseId) {
 		// 查詢課程的所有單元
 		List<CourseChapter> courseChapters = baseMapper.selectByCourseId(courseId);

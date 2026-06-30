@@ -1,9 +1,11 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
-import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
 
 /**
  * <p>
@@ -47,6 +49,12 @@ public interface ChapterProgressMapper extends BaseMapper<ChapterProgress> {
 				.eq(ChapterProgress::getSysUserId, sysUserId);
 		return this.selectOne(queryWrapper);
 	};
+
+	default List<ChapterProgress> selectByEnrollmentId(Long courseEnrollmentId) {
+		LambdaQueryWrapper<ChapterProgress> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ChapterProgress::getCourseEnrollmentId, courseEnrollmentId);
+		return this.selectList(queryWrapper);
+	}
 
 	/**
 	 * 根據報名ID刪除

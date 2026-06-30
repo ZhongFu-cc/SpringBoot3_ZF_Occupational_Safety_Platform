@@ -232,11 +232,11 @@ public class FormResponseManager {
 
 							// 當回答正確
 							if (isCorrect) {
-								responseAnswer.setIsCorrectAnwser(CommonStatusEnum.YES);
+								responseAnswer.setIsCorrectAnswer(CommonStatusEnum.YES);
 								answerResultVO.setIsCorrect(CommonStatusEnum.YES);
 							} else {
 								// 當回答錯誤
-								responseAnswer.setIsCorrectAnwser(CommonStatusEnum.NO);
+								responseAnswer.setIsCorrectAnswer(CommonStatusEnum.NO);
 								answerResultVO.setIsCorrect(CommonStatusEnum.NO);
 							}
 
@@ -350,9 +350,9 @@ public class FormResponseManager {
 								.ifPresent(correct -> {
 									boolean isCorrect = correct.getId().equals(responseAnswerDTO.getChoiceId());
 									if (isCorrect) {
-										responseAnswer.setIsCorrectAnwser(CommonStatusEnum.YES);
+										responseAnswer.setIsCorrectAnswer(CommonStatusEnum.YES);
 									} else {
-										responseAnswer.setIsCorrectAnwser(CommonStatusEnum.NO);
+										responseAnswer.setIsCorrectAnswer(CommonStatusEnum.NO);
 									}
 								});
 

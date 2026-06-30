@@ -1,6 +1,6 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
-import java.time.Instant;
+import java.util.List;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckRole;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -22,9 +21,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.manager.ChapterProgressManager;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseChapterVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
 import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterWatchLog;
-import tw.com.zf_occupational_safety_platform.service.ChapterProgressService;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.utils.R;
@@ -45,7 +44,6 @@ import tw.com.zf_occupational_safety_platform.utils.R;
 public class ChapterProgressController {
 
 	private final AuthManager authManager;
-	private final ChapterProgressService chapterProgressService;
 	private final ChapterProgressManager chapterProgressManager;
 
 	/**
@@ -55,6 +53,16 @@ public class ChapterProgressController {
 			@NotNull @Schema(description = "課程章節進度 ID", type = "string") Long chapterProgressId) {
 	}
 
+	@Operation(summary = "根據 報名ID 查詢 課程單元樹(父子結構)")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@GetMapping()
+	@SaCheckLogin
+	public R<List<CourseChapterVO>> getCourseChapterTree(
+			@RequestParam("courseEnrollmentId") @Schema(type = "string") Long courseEnrollmentId) {
+		List<CourseChapterVO> treeList = chapterProgressManager.findTreeList(courseEnrollmentId);
+		return R.ok(treeList);
+	}
 
 	/**
 	 * 根據 報名ID 與 課程單元ID 查詢章節學習進度

@@ -51,7 +51,7 @@ public class PutFormFieldDTO implements HasFieldOptions {
 	
 	@Schema(description = "是否標記正確答案 , 0=否, 1=是")
 	@NotNull
-	private CommonStatusEnum isMarkCorrectAnwser;
+	private CommonStatusEnum isMarkCorrectAnswer;
 
 	@Schema(description = "顯示順序 , 數字越小排的越前面")
 	private Integer fieldOrder;
