@@ -37,6 +37,14 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	CourseChapter get(Long courseChapterId);
 
 	/**
+	 * 查詢包含自身及其底下子節點
+	 * 
+	 * @param courseChapterId
+	 * @return
+	 */
+	List<CourseChapter> findAllNode(Long courseChapterId);
+
+	/**
 	 * 獲得不是目錄型的 課程章節
 	 * 
 	 * @param courseId
@@ -47,7 +55,7 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	List<CourseChapter> findNonDirectoryByCourseIds(Collection<Long> allCourseIds);
 
 	List<CourseChapterVO> findTreeSourceByCourseId(Long courseId);
-	
+
 	List<CourseChapterVO> findTreeByCourseId(Long courseId);
 
 	CourseChapter create(AddCourseChapterDTO addCourseChapterDTO);

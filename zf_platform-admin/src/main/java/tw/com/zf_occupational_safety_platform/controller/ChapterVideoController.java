@@ -73,10 +73,9 @@ public class ChapterVideoController {
 	@Operation(summary = "查看是否已上傳過相同 課程影片，如果有則將此章節的影片地址轉換到已有影片位置")
 	@Parameters({
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
-	public R<CheckFileVO> slideCheck(@RequestParam @Schema(type = "string") Long chapterVideoId,
-			@RequestParam String sha256) {
-		CheckFileVO checkFile = chapterVideoManager.checkFile(chapterVideoId, sha256);
-		return R.ok(checkFile);
+	public R<Void> slideCheck(@RequestParam String sha256) {
+		chapterVideoManager.checkFile(sha256);
+		return R.ok();
 	}
 
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

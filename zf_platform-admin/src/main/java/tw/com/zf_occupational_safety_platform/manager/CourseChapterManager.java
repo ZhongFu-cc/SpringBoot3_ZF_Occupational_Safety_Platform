@@ -131,4 +131,18 @@ public class CourseChapterManager {
 
 	}
 
+	/**
+	 * 刪除課程章節
+	 * 
+	 * @param courseChapterId
+	 */
+	public void remove(Long courseChapterId) {
+
+		// 查詢刪除此章節受影響的所有章節
+		List<CourseChapter> courseChpaters = courseChapterService.findAllNode(courseChapterId);
+
+		// 最後刪除課程章節
+		courseChapterService.remove(courseChapterId);
+	}
+
 }

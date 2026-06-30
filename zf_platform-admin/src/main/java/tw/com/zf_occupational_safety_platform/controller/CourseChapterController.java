@@ -132,11 +132,10 @@ public class CourseChapterController {
 	@SaCheckRole("super-admin")
 	@DeleteMapping("{id}")
 	public R<Void> removeCourseChapter(@PathVariable @Schema(type = "string") Long id) {
-		courseChapterService.remove(id);
+		courseChapterManager.remove(id);
 		return R.ok();
 	}
 	
-	/** ------------------- 章節影片相關 -----------------------------  */
 
 	
 

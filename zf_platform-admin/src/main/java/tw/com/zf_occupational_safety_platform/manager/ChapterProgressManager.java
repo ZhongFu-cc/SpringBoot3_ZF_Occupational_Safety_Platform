@@ -229,8 +229,29 @@ public class ChapterProgressManager {
 						|| courseChapterIds.contains(vo.getCourseChapterId()))
 				.toList();
 
-		// 5.拿著過濾後的資料組成樹狀結構
-		return TreeUtil.buildTree(filtered);
+		// 5.拿著過濾後的資料組成樹狀結構,並在進行一次過濾空目錄，
+		List<CourseChapterVO> tree = TreeUtil.buildTree(filtered);
+		tree.removeIf(this::pruneDirectory);
+
+		return tree;
 	};
+
+	/**
+	 * 遞歸處理節點內的空目錄
+	 * 
+	 * @param node
+	 * @return
+	 */
+	private boolean pruneDirectory(CourseChapterVO node) {
+
+		if (node.getChildren() != null) {
+			node.getChildren().removeIf(this::pruneDirectory);
+		}
+
+		boolean isDirectory = node.getContentType() == ChapterContentTypeEnum.DIRECTORY;
+		boolean hasChildren = node.getChildren() != null && !node.getChildren().isEmpty();
+
+		return isDirectory && !hasChildren;
+	}
 
 }

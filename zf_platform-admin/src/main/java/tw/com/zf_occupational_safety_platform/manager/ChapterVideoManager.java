@@ -206,33 +206,34 @@ public class ChapterVideoManager {
 			throw new CourseException("沒有此課程章節影片");
 		}
 
-		// 2.刪除檔案
-		s3Helper.removeFileIfPresent(bucketName, chapterVideo.getPath());
+		// 2.從DB中抽取檔案儲存路徑，並刪除檔案
+		String s3Key = s3Helper.extractS3PathInDbUrl(bucketName, chapterVideo.getPath());
+		s3Helper.removeFileIfPresent(bucketName, s3Key);
 
-		// 3.刪除資料
+		// 3.刪除sysChunk紀錄
+		sysChunkFileService.deleteSysChunkFileByPath(chapterVideo.getPath());
+
+		// 4.刪除資料
 		chapterVideoService.remove(chapterVideoId);
 
-		// 4.移除chapter 內的 path
+		// 5.移除chapter 內的 path
 		courseChapterService.clearVideoUrl(chapterVideo.getCourseChapterId());
 
 	}
 
 	/**
 	 * 確認檔案是否有上傳過<br>
-	 * 如果有則將此章節的影片地址轉換到原本有的位置
+	 * 如果有則拋出錯誤
 	 * 
 	 * @param sha256
 	 * @return
 	 */
-	public CheckFileVO checkFile(Long chapterVideoId, String sha256) {
+	public void checkFile(String sha256) {
 		// 透過用戶檔案的sha256值，用來判斷是否傳送過，也是達到秒傳的功能
 		CheckFileVO checkFile = sysChunkFileService.checkFile(sha256);
 		if (checkFile.getExist()) {
-			ChapterVideo chapterVideo = chapterVideoService.get(chapterVideoId);
-			chapterVideo.setPath(checkFile.getPath());
-			chapterVideoService.updateById(chapterVideo);
+			throw new CourseException("請勿上傳課程中已有的影片");
 		}
-		return checkFile;
 	}
 
 }
