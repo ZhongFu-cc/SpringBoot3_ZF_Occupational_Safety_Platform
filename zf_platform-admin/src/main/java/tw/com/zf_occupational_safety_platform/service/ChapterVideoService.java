@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddChapterVideoDTO;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.putEntityDTO.PutChapterVideoDTO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterVideo;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.CheckFileVO;
 
 /**
  * <p>

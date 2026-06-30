@@ -21,6 +21,7 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterVideo;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 import tw.com.zf_occupational_safety_platform.service.ChapterVideoService;
 import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.CheckFileVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.ChunkResponseVO;
 import tw.com.zf_occupational_safety_platform.system.service.SysChunkFileService;
 
@@ -111,7 +112,7 @@ public class ChapterVideoManager {
 					chapterVideo.setCourseChapterId(uploadChapterVideoDTO.getCourseChapterId());
 					chapterVideo.setFileName(fileName);
 					chapterVideo.setPath(filePath);
-					
+
 					chapterVideoService.save(chapterVideo);
 
 					// 更新chapter 的 video_url
@@ -214,6 +215,24 @@ public class ChapterVideoManager {
 		// 4.移除chapter 內的 path
 		courseChapterService.clearVideoUrl(chapterVideo.getCourseChapterId());
 
+	}
+
+	/**
+	 * 確認檔案是否有上傳過<br>
+	 * 如果有則將此章節的影片地址轉換到原本有的位置
+	 * 
+	 * @param sha256
+	 * @return
+	 */
+	public CheckFileVO checkFile(Long chapterVideoId, String sha256) {
+		// 透過用戶檔案的sha256值，用來判斷是否傳送過，也是達到秒傳的功能
+		CheckFileVO checkFile = sysChunkFileService.checkFile(sha256);
+		if (checkFile.getExist()) {
+			ChapterVideo chapterVideo = chapterVideoService.get(chapterVideoId);
+			chapterVideo.setPath(checkFile.getPath());
+			chapterVideoService.updateById(chapterVideo);
+		}
+		return checkFile;
 	}
 
 }
