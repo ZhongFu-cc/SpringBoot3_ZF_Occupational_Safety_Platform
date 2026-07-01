@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -46,6 +47,14 @@ public class ChapterProgressServiceImpl extends ServiceImpl<ChapterProgressMappe
 	@Override
 	public ChapterProgress getByEnrollmentAndChapter(Long enrollmentId, Long chapterId, Long userId) {
 		return baseMapper.selectByEnrollmentAndChapter(enrollmentId, chapterId, userId);
+	}
+
+	@Override
+	public List<ChapterProgress> findByChapter(Collection<Long> chapterIds) {
+		if (chapterIds == null || chapterIds.isEmpty()) {
+			return Collections.emptyList();
+		}
+		return baseMapper.selectByChpaterId(chapterIds);
 	}
 
 	@Override
@@ -101,6 +110,14 @@ public class ChapterProgressServiceImpl extends ServiceImpl<ChapterProgressMappe
 	@Override
 	public void removeByEnrollmentId(Long courseEnrollmentId) {
 		baseMapper.deleteByEnrollmentId(courseEnrollmentId);
+	}
+
+	@Override
+	public void removeByChapterIds(Collection<Long> courseChapterIds) {
+		if (courseChapterIds == null || courseChapterIds.isEmpty()) {
+			return;
+		}
+		baseMapper.deleteByCourseChapterId(courseChapterIds);
 	}
 
 }

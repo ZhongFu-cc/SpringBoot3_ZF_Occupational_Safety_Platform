@@ -49,6 +49,8 @@ public interface ChapterProgressService extends IService<ChapterProgress> {
 	 * @return
 	 */
 	List<ChapterProgress> findByEnrollment(Long enrollmentId);
+	
+	List<ChapterProgress> findByChapter(Collection<Long> chapterIds);
 
 	IPage<ChapterProgress> findPageByQuery(Page<ChapterProgress> pageInfo, String queryText);
 
@@ -71,5 +73,12 @@ public interface ChapterProgressService extends IService<ChapterProgress> {
 	 * @param courseEnrollmentId
 	 */
 	void removeByEnrollmentId(Long courseEnrollmentId);
+
+	/**
+	 * 根據章節IDs 刪除
+	 * 
+	 * @param courseChapterIds
+	 */
+	void removeByChapterIds(Collection<Long> courseChapterIds);
 
 }

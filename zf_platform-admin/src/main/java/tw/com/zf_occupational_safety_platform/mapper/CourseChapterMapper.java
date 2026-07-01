@@ -43,6 +43,19 @@ public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
 	int clearVideoUrl(@Param("courseChapterId") Long courseChapterId);
 
 	/**
+	 * 查詢主鍵對象 , 及其child節點的對象
+	 * 
+	 * @param courseChapterId
+	 * @return
+	 */
+	default List<CourseChapter> selectAllNode(Long courseChapterId) {
+		LambdaQueryWrapper<CourseChapter> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(CourseChapter::getCourseChapterId, courseChapterId)
+				.in(CourseChapter::getParentId, courseChapterId);
+		return this.selectList(queryWrapper);
+	}
+
+	/**
 	 * 根據主鍵IDs查詢，並以ChapterOrder排序
 	 * 
 	 * @param courseChapterIds

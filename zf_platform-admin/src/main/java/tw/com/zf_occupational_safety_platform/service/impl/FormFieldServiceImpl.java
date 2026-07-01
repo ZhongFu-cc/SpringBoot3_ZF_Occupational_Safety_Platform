@@ -44,7 +44,6 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 	private final S3Helper s3Helper;
 	private final FormFieldConvert formFieldConvert;
 
-
 	@Override
 	public Map<Long, FormField> findMapByFieldId(Long formId) {
 		return baseMapper.listByFormId(formId)
@@ -56,7 +55,7 @@ public class FormFieldServiceImpl extends ServiceImpl<FormFieldMapper, FormField
 	public List<FormFieldVO> searchFormStructureByForm(Long formId) {
 		List<FormFieldVO> voList = baseMapper.listByFormId(formId).stream().map(formField -> {
 			return formFieldConvert.entityToVO(formField);
-		}).toList();
+		}).collect(Collectors.toList());
 
 		return voList;
 	}

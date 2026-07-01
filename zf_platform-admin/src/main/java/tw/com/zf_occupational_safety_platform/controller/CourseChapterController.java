@@ -132,11 +132,8 @@ public class CourseChapterController {
 	@SaCheckRole("super-admin")
 	@DeleteMapping("{id}")
 	public R<Void> removeCourseChapter(@PathVariable @Schema(type = "string") Long id) {
-		courseChapterManager.remove(id);
+		courseChapterManager.removeCourseChapter(id);
 		return R.ok();
 	}
-	
-
-	
 
 }

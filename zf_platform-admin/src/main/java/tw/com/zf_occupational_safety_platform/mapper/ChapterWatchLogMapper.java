@@ -1,5 +1,6 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Select;
@@ -50,4 +51,15 @@ public interface ChapterWatchLogMapper extends BaseMapper<ChapterWatchLog> {
 		this.delete(queryWrapper);
 
 	}
+
+	/**
+	 * 根據章節IDs 刪除
+	 * 
+	 * @param courseChapterIds
+	 */
+	default void deleteByCourseChapterIds(Collection<Long> courseChapterIds) {
+		LambdaQueryWrapper<ChapterWatchLog> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(ChapterWatchLog::getCourseChapterId, courseChapterIds);
+		this.delete(queryWrapper);
+	};
 }

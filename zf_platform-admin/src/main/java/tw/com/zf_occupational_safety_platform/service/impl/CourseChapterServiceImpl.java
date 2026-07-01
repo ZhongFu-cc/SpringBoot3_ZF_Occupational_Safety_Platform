@@ -53,12 +53,10 @@ public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, C
 	public CourseChapter get(Long courseChapterId) {
 		return baseMapper.selectById(courseChapterId);
 	}
-	
 
 	@Override
 	public List<CourseChapter> findAllNode(Long courseChapterId) {
-		// TODO Auto-generated method stub
-		return null;
+		return baseMapper.selectAllNode(courseChapterId);
 	}
 
 	@Override
@@ -98,7 +96,7 @@ public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, C
 			CourseChapterVO vo = courseChapterConvert.entityToVO(courseChapter);
 			return vo;
 		}).toList();
-		
+
 	}
 
 	@Override
@@ -134,6 +132,5 @@ public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, C
 	public void remove(Long courseChapterId) {
 		baseMapper.deleteById(courseChapterId);
 	}
-
 
 }

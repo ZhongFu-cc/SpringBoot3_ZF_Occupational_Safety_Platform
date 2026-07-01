@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -78,6 +79,14 @@ public class ChapterWatchLogServiceImpl extends ServiceImpl<ChapterWatchLogMappe
 	@Override
 	public void removeByEnrollmentId(Long enrollmentId) {
 		baseMapper.deleteByCourseEnrollmentId(enrollmentId);
+	}
+
+	@Override
+	public void removeByChapterIds(Collection<Long> courseChapterIds) {
+		if (courseChapterIds == null || courseChapterIds.isEmpty()) {
+			return;
+		}
+		baseMapper.deleteByCourseChapterIds(courseChapterIds);
 	}
 
 }

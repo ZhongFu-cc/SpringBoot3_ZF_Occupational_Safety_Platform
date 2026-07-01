@@ -1,5 +1,6 @@
 package tw.com.zf_occupational_safety_platform.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -21,7 +22,7 @@ public interface ChapterWatchLogService extends IService<ChapterWatchLog> {
 	ChapterWatchLog get(Long chapterWatchLogId);
 
 	List<ChapterWatchLog> findByEnrollmentId(Long enrollmentId);
-	
+
 	Integer calculateTotalDurationSec(Long enrollmentId);
 
 	IPage<ChapterWatchLog> findPageByQuery(Page<ChapterWatchLog> pageInfo, String queryText);
@@ -53,5 +54,12 @@ public interface ChapterWatchLogService extends IService<ChapterWatchLog> {
 	 * @param enrollmentId
 	 */
 	void removeByEnrollmentId(Long enrollmentId);
+
+	/**
+	 * 根據章節IDs 刪除
+	 * 
+	 * @param courseChapterIds
+	 */
+	void removeByChapterIds(Collection<Long> courseChapterIds);
 
 }

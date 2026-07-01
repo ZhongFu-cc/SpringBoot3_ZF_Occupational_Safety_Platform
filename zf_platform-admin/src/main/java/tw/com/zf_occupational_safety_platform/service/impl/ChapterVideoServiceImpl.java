@@ -55,4 +55,9 @@ public class ChapterVideoServiceImpl extends ServiceImpl<ChapterVideoMapper, Cha
 		baseMapper.deleteById(chapterVideoId);
 	}
 
+	@Override
+	public void removeByChapter(Long courseChapterId) {
+		baseMapper.deleteByCourseChapterId(courseChapterId);
+	}
+
 }

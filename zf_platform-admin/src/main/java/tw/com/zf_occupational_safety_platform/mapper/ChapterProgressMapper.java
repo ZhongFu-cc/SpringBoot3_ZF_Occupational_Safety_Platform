@@ -1,10 +1,12 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
 
 /**
@@ -67,4 +69,26 @@ public interface ChapterProgressMapper extends BaseMapper<ChapterProgress> {
 		this.delete(queryWrapper);
 	}
 
+	/**
+	 * 根據章節ID刪除
+	 * 
+	 * @param courseChapterIds
+	 */
+	default void deleteByCourseChapterId(Collection<Long> courseChapterIds) {
+		LambdaQueryWrapper<ChapterProgress> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(ChapterProgress::getCourseChapterId, courseChapterIds);
+		this.delete(queryWrapper);
+	}
+
+	/**
+	 * 查詢符合chapter IDs的資料
+	 * 
+	 * @param courseChapterIds
+	 * @return
+	 */
+	default List<ChapterProgress> selectByChpaterId(Collection<Long> courseChapterIds) {
+		LambdaQueryWrapper<ChapterProgress> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.in(ChapterProgress::getCourseChapterId, courseChapterIds);
+		return this.selectList(queryWrapper);
+	};
 }

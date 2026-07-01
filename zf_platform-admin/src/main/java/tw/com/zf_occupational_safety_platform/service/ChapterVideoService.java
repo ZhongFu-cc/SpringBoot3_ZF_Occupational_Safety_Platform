@@ -33,5 +33,7 @@ public interface ChapterVideoService extends IService<ChapterVideo> {
 	void update(PutChapterVideoDTO putChapterVideoDTO);
 
 	void remove(Long chapterVideoId);
+	
+	void removeByChapter(Long courseChapterId);
 
 }

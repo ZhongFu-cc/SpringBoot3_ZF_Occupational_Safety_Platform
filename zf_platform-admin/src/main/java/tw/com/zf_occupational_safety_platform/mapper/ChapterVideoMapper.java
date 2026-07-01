@@ -28,4 +28,14 @@ public interface ChapterVideoMapper extends BaseMapper<ChapterVideo> {
 		return this.selectOne(queryWrapper);
 	}
 
+	/**
+	 * 根據課程章節ID,進行刪除
+	 * 
+	 * @param courseChapterId
+	 */
+	default void deleteByCourseChapterId(Long courseChapterId) {
+		LambdaQueryWrapper<ChapterVideo> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(ChapterVideo::getCourseChapterId, courseChapterId);
+		this.delete(queryWrapper);
+	}
 }
