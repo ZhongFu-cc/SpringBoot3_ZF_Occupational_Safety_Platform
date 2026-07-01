@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import tw.com.zf_occupational_safety_platform.convert.CourseChapterConvert;
 import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
@@ -32,7 +31,6 @@ import tw.com.zf_occupational_safety_platform.service.ChapterVideoService;
 import tw.com.zf_occupational_safety_platform.service.ChapterWatchLogService;
 import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
-import tw.com.zf_occupational_safety_platform.service.CourseService;
 import tw.com.zf_occupational_safety_platform.service.FormFieldService;
 import tw.com.zf_occupational_safety_platform.service.FormResponseService;
 import tw.com.zf_occupational_safety_platform.service.FormService;
@@ -49,8 +47,6 @@ public class CourseChapterManager {
 	// 「預設」存储桶名称
 	@Value("${spring.cloud.aws.s3.bucketName}") // 注意：这里的 Value key 可能需要对应您的配置
 	private String bucketName;
-
-	private final static String COURSE_CHAPTER_BASE_PATH = "course/course_chapter";
 
 	private final CourseEnrollmentService courseEnrollmentService;
 	private final CourseChapterService courseChapterService;

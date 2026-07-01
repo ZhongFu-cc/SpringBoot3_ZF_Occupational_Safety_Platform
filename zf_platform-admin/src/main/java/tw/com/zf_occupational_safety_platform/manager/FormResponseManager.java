@@ -195,7 +195,8 @@ public class FormResponseManager {
 		FormResponse formResponse = formResponseService.submit(quizResponseDTO);
 		Map<Long, FormField> mapByFieldId = formFieldService.findMapByFieldId(quizResponseDTO.getFormId());
 
-		// 初始化作答回覆 和 作答的結果
+		// 初始化此次做答題數、作答回覆 和 作答的結果
+		Integer quizCount = quizResponseDTO.getResponseAnswer().size();
 		List<ResponseAnswer> responseAnswerList = new ArrayList<>(quizResponseDTO.getResponseAnswer().size());
 		List<AnswerResultVO> answerResultVOList = new ArrayList<>(quizResponseDTO.getResponseAnswer().size());
 
@@ -254,8 +255,9 @@ public class FormResponseManager {
 		responseAnswerService.saveBatch(responseAnswerList);
 
 		// 當測驗全通過
-		long count = answerResultVOList.stream().filter(e -> e.getIsCorrect().getBooleanValue()).count();
-		if (count == 10) {
+		long correctCount = answerResultVOList.stream().filter(e -> e.getIsCorrect().getBooleanValue()).count();
+
+		if (correctCount == quizCount) {
 			// 設定章節測驗通過 , 100分 , 完成 , 設置完成時間
 			chapterProgress.setIsQuizPassed(CommonStatusEnum.YES);
 			chapterProgress.setQuizScore(100);
@@ -276,11 +278,18 @@ public class FormResponseManager {
 				// 當完成課程章節數 大於等於 總共課程章節數
 				courseEnrollment.setCompletedChapters(completedChapters);
 			}
+
+			// 因為總測驗為最後一步,代表他已經完成所有課程
+			courseEnrollment.setCompletedAt(LocalDateTime.now());
+			// 設定課程認證有效期限 1 年
+			courseEnrollment.setExpiredAt(LocalDateTime.now().plusYears(1));
+			courseEnrollment.setStatus(CourseStatusEnum.COMPLETED);
 			courseEnrollmentService.updateById(courseEnrollment);
 
 		} else {
 			// 設定章節測驗失敗 , 設定分數 , 進行中
-			chapterProgress.setQuizScore(Math.toIntExact(count * 10));
+			double score = (double) correctCount * 100 / quizCount;
+			chapterProgress.setQuizScore((int) Math.round(score));
 			chapterProgress.setStatus(CourseStatusEnum.IN_PROGRESS);
 		}
 

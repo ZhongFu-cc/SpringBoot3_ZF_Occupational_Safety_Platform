@@ -38,7 +38,7 @@ public class ChapterProgressServiceImpl extends ServiceImpl<ChapterProgressMappe
 	public ChapterProgress get(Long chapterProgressId) {
 		return baseMapper.selectById(chapterProgressId);
 	}
-
+	
 	@Override
 	public ChapterProgress getByOwner(Long chapterProgressId, Long userId) {
 		return baseMapper.selectByOwner(chapterProgressId, userId);
@@ -119,5 +119,7 @@ public class ChapterProgressServiceImpl extends ServiceImpl<ChapterProgressMappe
 		}
 		baseMapper.deleteByCourseChapterId(courseChapterIds);
 	}
+
+
 
 }

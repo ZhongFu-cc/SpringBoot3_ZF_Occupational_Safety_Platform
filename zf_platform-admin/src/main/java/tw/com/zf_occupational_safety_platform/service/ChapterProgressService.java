@@ -22,6 +22,7 @@ public interface ChapterProgressService extends IService<ChapterProgress> {
 
 	ChapterProgress get(Long chapterProgressId);
 
+
 	/**
 	 * 用戶查詢本人持有的 章節學習進度
 	 * 
@@ -49,7 +50,7 @@ public interface ChapterProgressService extends IService<ChapterProgress> {
 	 * @return
 	 */
 	List<ChapterProgress> findByEnrollment(Long enrollmentId);
-	
+
 	List<ChapterProgress> findByChapter(Collection<Long> chapterIds);
 
 	IPage<ChapterProgress> findPageByQuery(Page<ChapterProgress> pageInfo, String queryText);

@@ -37,6 +37,14 @@ public interface CourseChapterService extends IService<CourseChapter> {
 	CourseChapter get(Long courseChapterId);
 
 	/**
+	 * 透過表單ID查詢章節
+	 * 
+	 * @param formId
+	 * @return
+	 */
+	CourseChapter getByForm(Long formId);
+
+	/**
 	 * 查詢包含自身及其底下子節點
 	 * 
 	 * @param courseChapterId

@@ -138,6 +138,13 @@ public class ChapterProgressManager {
 					courseEnrollment.setCompletedChapters(completedChapters);
 				}
 
+				// 如果課程處於未開始的狀態，更改程進行中，並設定第一次學習的時間
+				if (CourseStatusEnum.NOT_STARTED.equals(courseEnrollment.getStatus())) {
+					courseEnrollment.setStatus(CourseStatusEnum.IN_PROGRESS);
+					courseEnrollment.setStartedAt(now);
+				}
+
+				// 更新學習狀態
 				courseEnrollmentService.updateById(courseEnrollment);
 
 			} else {

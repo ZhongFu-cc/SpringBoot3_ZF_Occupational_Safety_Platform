@@ -35,6 +35,12 @@ public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
 		return this.selectCount(queryWrapper);
 	}
 
+	default CourseChapter selectByFormId(Long formId) {
+		LambdaQueryWrapper<CourseChapter> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(CourseChapter::getFormId, formId);
+		return this.selectOne(queryWrapper);
+	}
+
 	@Update("""
 			    UPDATE course_chapter
 			    SET video_url = NULL

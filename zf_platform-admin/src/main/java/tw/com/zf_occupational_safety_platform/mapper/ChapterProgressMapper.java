@@ -34,7 +34,7 @@ public interface ChapterProgressMapper extends BaseMapper<ChapterProgress> {
 		return this.selectOne(queryWrapper);
 
 	}
-
+	
 	/**
 	 * 根據條件查詢 章節進度
 	 * 
@@ -90,5 +90,7 @@ public interface ChapterProgressMapper extends BaseMapper<ChapterProgress> {
 		LambdaQueryWrapper<ChapterProgress> queryWrapper = new LambdaQueryWrapper<>();
 		queryWrapper.in(ChapterProgress::getCourseChapterId, courseChapterIds);
 		return this.selectList(queryWrapper);
-	};
+	}
+
+
 }

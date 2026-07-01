@@ -133,4 +133,9 @@ public class CourseChapterServiceImpl extends ServiceImpl<CourseChapterMapper, C
 		baseMapper.deleteById(courseChapterId);
 	}
 
+	@Override
+	public CourseChapter getByForm(Long formId) {
+		return baseMapper.selectByFormId(formId);
+	}
+
 }

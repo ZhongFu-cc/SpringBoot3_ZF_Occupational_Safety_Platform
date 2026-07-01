@@ -13,8 +13,12 @@ import tw.com.zf_occupational_safety_platform.convert.FormConvert;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.FormFieldOptionDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormFieldVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormVO;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Form;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
+import tw.com.zf_occupational_safety_platform.service.ChapterProgressService;
+import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
+import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 import tw.com.zf_occupational_safety_platform.service.FormFieldService;
 import tw.com.zf_occupational_safety_platform.service.FormResponseService;
 import tw.com.zf_occupational_safety_platform.service.FormService;
@@ -34,6 +38,10 @@ public class FormManager {
 	private final FormFieldService formFieldService;
 	private final FormResponseService formResponseService;
 	private final ResponseAnswerService responseAnswerService;
+
+	private final ChapterProgressService chapterProgressService;
+	private final CourseEnrollmentService courseEnrollmentService;
+	private final CourseChapterService courseChapterService;
 
 	/**
 	 * 
@@ -66,6 +74,10 @@ public class FormManager {
 	 * @return
 	 */
 	public FormVO getRandomQuizForm(Long formId, int count) {
+
+		// 判斷此章節已經完成到可以進行測驗
+//		CourseChapter courseChapter = courseChapterService.getByForm(formId);
+		
 
 		Form form = formService.searchForm(formId);
 		FormVO formVO = formConvert.entityToVO(form);
