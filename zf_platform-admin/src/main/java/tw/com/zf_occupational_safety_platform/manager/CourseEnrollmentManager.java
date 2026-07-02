@@ -126,7 +126,6 @@ public class CourseEnrollmentManager {
 
 			LearningRecordVO vo = courseEnrollmentConvert.entityToLearningRecord(courseEnrollment);
 			vo.setCourseName(course.getTitle());
-			vo.setStatus(courseEnrollment.getStatus().getLabelZh());
 
 			// 設定章節完成率
 			BigDecimal rate;

@@ -27,7 +27,7 @@ public class LearningRecordVO {
 	private String courseName;
 
 	@Schema(description = "課程學習狀態")
-	private String status;
+	private CourseStatusEnum status;
 
 	@Schema(description = "課程完成進度")
 	private String progress;
