@@ -4,6 +4,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.redisson.api.RBucket;
 import org.redisson.api.RMap;
@@ -222,8 +225,12 @@ public class ChapterProgressManager {
 		// 1.拿到報名資料
 		CourseEnrollment courseEnrollment = courseEnrollmentService.get(courseEnrollmentId);
 
-		// 2.拿到當初報名時的章節Ids
+		// 2.拿到當初報名時的章節Ids 及 Map
 		List<ChapterProgress> chapterProgresses = chapterProgressService.findByEnrollment(courseEnrollmentId);
+		// 將進度清單轉換為 Map <courseChapterId, ChapterProgress>，方便後續快速比對
+		Map<Long, ChapterProgress> progressMap = chapterProgresses.stream()
+				.collect(Collectors.toMap(ChapterProgress::getCourseChapterId, Function.identity()));
+
 		List<Long> courseChapterIds = chapterProgresses.stream().map(ChapterProgress::getCourseChapterId).toList();
 
 		// 3.透過 課程ID 查到所有章節的資訊
@@ -234,6 +241,15 @@ public class ChapterProgressManager {
 		List<CourseChapterVO> filtered = courseChapterVO.stream()
 				.filter(vo -> ChapterContentTypeEnum.DIRECTORY.equals(vo.getContentType())
 						|| courseChapterIds.contains(vo.getCourseChapterId()))
+				.map(vo -> {
+					ChapterProgress progress = progressMap.get(vo.getCourseChapterId());
+					// 使用三元運算子直接賦值 Enum
+					CommonStatusEnum isCompleted = (progress != null
+							&& CourseStatusEnum.COMPLETED.equals(progress.getStatus())) ? CommonStatusEnum.YES
+									: CommonStatusEnum.NO;
+					vo.setIsCompleted(isCompleted);
+					return vo;
+				})
 				.toList();
 
 		// 5.拿著過濾後的資料組成樹狀結構,並在進行一次過濾空目錄，

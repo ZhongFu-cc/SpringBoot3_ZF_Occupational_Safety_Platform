@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
+import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.utils.TreeNode;
 
 @Data
@@ -38,6 +39,12 @@ public class CourseChapterVO implements TreeNode<CourseChapterVO, Long> {
 
 	@Schema(description = "若為影片(video)，儲存其播放路徑")
 	private String videoUrl;
+
+	// === 新增的欄位 ===
+	@Schema(description = "是否已學完此章節 (0 = 否, 1 = 是)")
+	private CommonStatusEnum isCompleted;
+	
+	// =================
 
 	/**
 	 * 為了整理Catrgory嵌套關係這邊實現自定義的NodeTree接口,並實現一些額外方法 getId()方法, 是要實現NodeTree接口的方法,
