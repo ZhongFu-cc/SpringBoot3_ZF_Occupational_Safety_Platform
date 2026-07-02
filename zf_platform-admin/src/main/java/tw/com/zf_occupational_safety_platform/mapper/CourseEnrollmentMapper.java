@@ -63,6 +63,24 @@ public interface CourseEnrollmentMapper extends BaseMapper<CourseEnrollment> {
 	}
 
 	/**
+	 * 根據查詢條件查詢 用戶本身的 課程報名
+	 * 
+	 * @param pageInfo  分頁資訊
+	 * @param status    目前上課的狀態
+	 * @param sysUserId 用戶ID
+	 * @param courseIds 課程IDs
+	 * @return
+	 */
+	default IPage<CourseEnrollment> selectByQueryAndOwner(Page<CourseEnrollment> pageInfo, CourseStatusEnum status,
+			Long sysUserId, Collection<Long> courseIds) {
+		LambdaQueryWrapper<CourseEnrollment> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(status != null, CourseEnrollment::getStatus, status)
+				.eq(CourseEnrollment::getSysUserId, sysUserId)
+				.in(CourseEnrollment::getCourseId, courseIds);
+		return this.selectPage(pageInfo, queryWrapper);
+	}
+
+	/**
 	 * 查詢已存在 報名課程 的用戶 和 課程
 	 * 
 	 * @param userIds

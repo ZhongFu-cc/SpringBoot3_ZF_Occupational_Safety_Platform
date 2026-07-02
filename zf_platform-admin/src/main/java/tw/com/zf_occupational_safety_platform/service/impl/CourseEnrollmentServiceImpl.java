@@ -53,6 +53,15 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 	}
 
 	@Override
+	public IPage<CourseEnrollment> findPageByOwner(Page<CourseEnrollment> pageInfo, CourseStatusEnum status,
+			Long userId, Collection<Long> courseIds) {
+		if (courseIds == null || courseIds.isEmpty()) {
+			return new Page<>(pageInfo.getCurrent(), pageInfo.getSize());
+		}
+		return baseMapper.selectByQueryAndOwner(pageInfo, status, userId, courseIds);
+	}
+
+	@Override
 	public List<CourseEnrollment> findByUsersAndCourses(Collection<Long> userIds, Collection<Long> courseIds) {
 		if (userIds == null || userIds.isEmpty()) {
 			return Collections.emptyList();

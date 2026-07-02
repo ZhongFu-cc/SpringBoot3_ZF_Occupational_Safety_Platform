@@ -37,6 +37,19 @@ public interface CourseEnrollmentService extends IService<CourseEnrollment> {
 	IPage<CourseEnrollment> findPageByOwner(Page<CourseEnrollment> pageInfo, CourseStatusEnum status, Long userId);
 
 	/**
+	 * 用戶查詢自己持有課程的分頁對象
+	 * 
+	 * @param pageInfo  分頁資訊
+	 * @param status    課程狀態
+	 * @param userId    用戶ID
+	 * @param courseIds 課程IDs
+	 * @return
+	 */
+
+	IPage<CourseEnrollment> findPageByOwner(Page<CourseEnrollment> pageInfo, CourseStatusEnum status, Long userId,
+			Collection<Long> courseIds);
+
+	/**
 	 * 報名課程，並代入基礎設定
 	 * 
 	 * @param sysUserId

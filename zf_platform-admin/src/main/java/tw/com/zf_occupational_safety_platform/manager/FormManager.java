@@ -10,10 +10,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.FormConvert;
+import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
+import tw.com.zf_occupational_safety_platform.exception.CourseException;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.FormFieldOptionDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormFieldVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.FormVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Form;
 import tw.com.zf_occupational_safety_platform.pojo.entity.FormResponse;
 import tw.com.zf_occupational_safety_platform.service.ChapterProgressService;
@@ -69,15 +72,29 @@ public class FormManager {
 	 * 獲得指定數量 總測試 考卷<br>
 	 * 順序 及 選項打亂
 	 * 
+	 * @param enrollmentId
 	 * @param formId
 	 * @param count
 	 * @return
 	 */
-	public FormVO getRandomQuizForm(Long formId, int count) {
+	public FormVO getRandomQuizForm(Long enrollmentId, Long formId, int count) {
 
 		// 判斷此章節已經完成到可以進行測驗
-//		CourseChapter courseChapter = courseChapterService.getByForm(formId);
-		
+		CourseEnrollment courseEnrollment = courseEnrollmentService.get(enrollmentId);
+		if (courseEnrollment == null) {
+			throw new CourseException("無此資料");
+		}
+
+		if (!CourseStatusEnum.IN_PROGRESS.equals(courseEnrollment.getStatus())) {
+			throw new CourseException("課程必須處於 學習中 才可以進行測驗");
+		}
+
+		Integer totalChapters = courseEnrollment.getTotalChapters();
+		Integer completedChapters = courseEnrollment.getCompletedChapters();
+
+		if (!courseEnrollment.getIsMinutesMet().getBooleanValue() || ((totalChapters - 1) != completedChapters)) {
+			throw new CourseException("尚未達成測驗的條件");
+		}
 
 		Form form = formService.searchForm(formId);
 		FormVO formVO = formConvert.entityToVO(form);

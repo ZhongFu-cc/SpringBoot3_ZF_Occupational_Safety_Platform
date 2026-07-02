@@ -74,10 +74,11 @@ public class FormController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "從表單題目中,抽取十題作為 總測驗 ，formFields中有十個元素(題目")
 	@SaCheckLogin
-	public R<FormVO> getRandomQuizForm(@PathVariable("id") Long formId) {
+	public R<FormVO> getRandomQuizForm(@PathVariable("id") Long formId,
+			@RequestParam @Schema(type = "string") Long enrollmentId) {
 		// 要抽取的題目數量
 		int questionCount = 10;
-		FormVO formVO = formManager.getRandomQuizForm(formId, questionCount);
+		FormVO formVO = formManager.getRandomQuizForm(enrollmentId, formId, questionCount);
 		return R.ok(formVO);
 	}
 

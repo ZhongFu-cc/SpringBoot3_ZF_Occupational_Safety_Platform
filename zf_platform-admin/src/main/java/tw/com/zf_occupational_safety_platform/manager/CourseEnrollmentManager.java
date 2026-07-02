@@ -1,6 +1,8 @@
 package tw.com.zf_occupational_safety_platform.manager;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
@@ -18,9 +20,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.convert.CourseConvert;
 import tw.com.zf_occupational_safety_platform.convert.CourseEnrollmentConvert;
+import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CourseEnrollmentVO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.LearningRecordVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
@@ -97,6 +101,59 @@ public class CourseEnrollmentManager {
 		voPage.setRecords(vos);
 		return voPage;
 
+	}
+
+	/**
+	 * 用戶(企業員工)查詢自身學習歷程
+	 * 
+	 * @param pageInfo
+	 * @param courseStatusEnum
+	 * @param queryText
+	 * @param operator
+	 * @return
+	 */
+	public IPage<LearningRecordVO> findLearningRecordByOwner(Page<CourseEnrollment> pageInfo,
+			CourseStatusEnum courseStatusEnum, String queryText, SysUserVO operator) {
+		// 在課程模糊查詢的條件下，拿到Map對象
+		Map<Long, Course> mapByCourseId = courseService.findCourseIdMapByQuery(queryText);
+		// 拿著查詢條件拿到分頁對象
+		IPage<CourseEnrollment> courseEnrollmentPage = courseEnrollmentService.findPageByOwner(pageInfo,
+				courseStatusEnum, operator.getSysUserId(), mapByCourseId.keySet());
+
+		// stream處理並進行轉換
+		List<LearningRecordVO> vos = courseEnrollmentPage.getRecords().stream().map(courseEnrollment -> {
+			Course course = mapByCourseId.get(courseEnrollment.getCourseId());
+
+			LearningRecordVO vo = courseEnrollmentConvert.entityToLearningRecord(courseEnrollment);
+			vo.setCourseName(course.getTitle());
+			vo.setStatus(courseEnrollment.getStatus().getLabelZh());
+
+			// 設定章節完成率
+			BigDecimal rate;
+			if (new BigDecimal(courseEnrollment.getTotalChapters()).compareTo(BigDecimal.ZERO) == 0) {
+				rate = BigDecimal.ZERO;
+			} else {
+				rate = new BigDecimal(courseEnrollment.getCompletedChapters())
+						.divide(new BigDecimal(courseEnrollment.getTotalChapters()), 4, RoundingMode.HALF_UP)
+						.multiply(new BigDecimal(100))
+						.setScale(1, RoundingMode.HALF_UP);
+			}
+
+			vo.setProgress(rate.toString() + "%");
+
+			if (courseEnrollment.getCompletedAt() != null) {
+				vo.setIsCompleted(CommonStatusEnum.YES);
+			} else {
+				vo.setIsCompleted(CommonStatusEnum.NO);
+			}
+
+			return vo;
+		}).toList();
+
+		Page<LearningRecordVO> voPage = new Page<LearningRecordVO>(courseEnrollmentPage.getCurrent(),
+				courseEnrollmentPage.getSize(), courseEnrollmentPage.getTotal());
+		voPage.setRecords(vos);
+		return voPage;
 	}
 
 	/**
