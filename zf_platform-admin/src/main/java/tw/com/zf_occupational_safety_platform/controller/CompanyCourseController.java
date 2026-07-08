@@ -27,6 +27,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.manager.CompanyCourseManager;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CompanyCourseVO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseTrainingSummaryVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
@@ -115,6 +116,26 @@ public class CompanyCourseController {
 				queryText, sysUserVO);
 
 		return R.ok(voPage);
+	}
+
+	/**
+	 * 查詢 企業課程 學習狀況 分頁對象
+	 * 
+	 * @param page
+	 * @param size
+	 * @return
+	 */
+	@GetMapping("learning-record")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢 企業課程 學習狀況 分頁對象")
+	@SaCheckRole("company_manager")
+	public R<CourseTrainingSummaryVO> findLearningRecord(@RequestParam @Schema(type = "string") Long courseId) {
+
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		CourseTrainingSummaryVO vo = companyCourseManager.findLearningRecord(courseId, sysUserVO);
+
+		return R.ok(vo);
 	}
 
 	/**

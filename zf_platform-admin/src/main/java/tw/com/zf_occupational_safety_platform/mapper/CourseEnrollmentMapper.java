@@ -3,12 +3,15 @@ package tw.com.zf_occupational_safety_platform.mapper;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseTrainingSummaryVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 
 /**
@@ -26,6 +29,17 @@ public interface CourseEnrollmentMapper extends BaseMapper<CourseEnrollment> {
 		queryWrapper.eq(CourseEnrollment::getSysUserId, sysUserId);
 		return this.selectList(queryWrapper);
 	}
+
+	/**
+	 * 企業員工,報名企業課程的資料
+	 * 
+	 * @param companyId 公司ID
+	 * @param courseId  課程ID
+	 * @return
+	 */
+	CourseTrainingSummaryVO getCompanyTrainingSummary(
+			@Param("companyId") Long companyId,
+			@Param("courseId") Long courseId);
 
 	default List<CourseEnrollment> selectBySysUserIdAndCourseId(Long sysUserId, Long courseId) {
 		LambdaQueryWrapper<CourseEnrollment> queryWrapper = new LambdaQueryWrapper<>();

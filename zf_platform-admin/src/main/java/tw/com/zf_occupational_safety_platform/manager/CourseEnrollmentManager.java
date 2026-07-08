@@ -173,6 +173,7 @@ public class CourseEnrollmentManager {
 		Course course = courseService.get(courseId);
 
 		// 4.填充其他資訊
+		courseEnrollment.setCompanyId(operator.getCompanyId());
 		courseEnrollment.setTotalChapters(courseChapters.size());
 		courseEnrollment.setRequiredSeconds(course.getTotalMinutes() * 60);
 

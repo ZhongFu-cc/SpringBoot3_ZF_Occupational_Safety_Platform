@@ -16,6 +16,7 @@ import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.CourseException;
 import tw.com.zf_occupational_safety_platform.mapper.CourseEnrollmentMapper;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseTrainingSummaryVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 
@@ -36,6 +37,11 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 		return baseMapper.selectById(courseEnrollmentId);
 	}
 
+	@Override
+	public CourseTrainingSummaryVO getCompanyTrainingSummary(Long companyId, Long courseId) {
+		return baseMapper.getCompanyTrainingSummary(companyId,courseId);
+	}
+	
 	@Override
 	public List<CourseEnrollment> findBySysUser(Long sysUserId) {
 		return baseMapper.selectBySysUserId(sysUserId);
@@ -134,5 +140,7 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 	public void remove(Long courseEnrollmentId) {
 		baseMapper.deleteById(courseEnrollmentId);
 	}
+
+
 
 }

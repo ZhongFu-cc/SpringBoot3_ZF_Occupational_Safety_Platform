@@ -1,5 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="tw.com.zf_occupational_safety_platform.mapper.CourseEnrollmentMapper">
+<mapper
+	namespace="tw.com.zf_occupational_safety_platform.mapper.CourseEnrollmentMapper">
+
+	<select id="getCompanyTrainingSummary"
+		resultType="CourseTrainingSummaryVO">
+		SELECT
+		COUNT(CASE WHEN ce.status != 'cancelled' THEN 1 END) AS totalAssignedCount,
+		COUNT(CASE WHEN ce.status = 'completed' THEN 1 END) AS completedCount,
+		COUNT(CASE WHEN ce.status = 'in_progress' THEN 1 END) AS
+		inProgressCount,
+		COUNT(CASE WHEN ce.status = 'not_started' THEN 1 END) AS notStartedCount,
+		COUNT(CASE WHEN ce.status NOT IN ('completed', 'cancelled') AND ce.expired_at
+		&lt; NOW() THEN 1 END) AS expiredCount,
+		IFNULL(
+		CONCAT(
+		ROUND(
+		(COUNT(CASE WHEN ce.status = 'completed' THEN 1 END) * 100.0) /
+		NULLIF(COUNT(CASE WHEN ce.status != 'cancelled' THEN 1 END), 0), 1
+		), '%'
+		), '0.0%'
+		) AS completionRate
+		FROM course_enrollment ce
+		WHERE ce.is_deleted = 0
+		<if test="companyId != null">
+			AND ce.company_id = #{companyId}
+		</if>
+	</select>
+
 
 </mapper>

@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseTrainingSummaryVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 
 /**
@@ -21,8 +22,18 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 public interface CourseEnrollmentService extends IService<CourseEnrollment> {
 
 	CourseEnrollment get(Long courseEnrollmentId);
+	
+	/**
+	 * 
+	 * @param companyId
+	 * @param courseId
+	 * @return
+	 */
+	CourseTrainingSummaryVO getCompanyTrainingSummary(Long companyId, Long courseId);
 
 	List<CourseEnrollment> findBySysUser(Long sysUserId);
+
+
 
 	IPage<CourseEnrollment> findPageByQuery(Page<CourseEnrollment> pageInfo, CourseStatusEnum status);
 

@@ -15,13 +15,16 @@ import tw.com.zf_occupational_safety_platform.exception.CourseException;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
 import tw.com.zf_occupational_safety_platform.pojo.DTO.addEntityDTO.AddCompanyCourseDTO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CompanyCourseVO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.CourseTrainingSummaryVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
 import tw.com.zf_occupational_safety_platform.service.CompanyJobTypeService;
 import tw.com.zf_occupational_safety_platform.service.CompanyService;
 import tw.com.zf_occupational_safety_platform.service.CourseCategoryService;
+import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
 import tw.com.zf_occupational_safety_platform.service.CourseService;
 import tw.com.zf_occupational_safety_platform.service.JobTypeCourseService;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
@@ -33,9 +36,7 @@ import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 @RequiredArgsConstructor
 public class CompanyCourseManager {
 
-	private final CompanyService companyService;
-	private final CompanyJobTypeService companyJobTypeService;
-	private final JobTypeCourseService jobTypeCourseCategoryService;
+	private final CourseEnrollmentService courseEnrollmentService;
 	private final CourseService courseService;
 	private final CompanyCourseService companyCourseService;
 	private final CourseConvert courseConvert;
@@ -162,6 +163,25 @@ public class CompanyCourseManager {
 			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 		companyCourseService.remove(companyCourseId);
+
+	}
+
+	/**
+	 * 查詢公司內,所有員工 課程的學習狀況
+	 * 
+	 * @param courseId
+	 * @param sysUserVO
+	 */
+	public CourseTrainingSummaryVO findLearningRecord(Long courseId, SysUserVO operator) {
+
+		Course course = courseService.get(courseId);
+
+		// 查到所有課程內所有員工上課的統計資料
+		CourseTrainingSummaryVO companyTrainingSummary = courseEnrollmentService
+				.getCompanyTrainingSummary(operator.getCompanyId(), courseId);
+		companyTrainingSummary.setCourseId(courseId);
+		companyTrainingSummary.setCourseName(course.getTitle());
+		return companyTrainingSummary;
 
 	}
 
