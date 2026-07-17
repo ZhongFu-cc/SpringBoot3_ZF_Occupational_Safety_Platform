@@ -11,7 +11,7 @@ import tw.com.zf_occupational_safety_platform.validation.annotation.ValidStartEn
 import tw.com.zf_occupational_safety_platform.validation.constraint.HasLoginAndMultipleSubmissionRules;
 
 @Data
-@ValidStartEndTimeRequiredTogether
+//@ValidStartEndTimeRequiredTogether
 @ValidRequireLoginIfMultipleSubmissions
 public class PutFormDTO  implements HasLoginAndMultipleSubmissionRules {
 

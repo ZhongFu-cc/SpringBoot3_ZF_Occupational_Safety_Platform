@@ -31,14 +31,30 @@ public interface CourseEnrollmentMapper extends BaseMapper<CourseEnrollment> {
 	}
 
 	/**
+	 * 查詢企業課程學習進度
+	 * 
+	 * @param companyId    公司ID
+	 * @param departmentId 部門ID
+	 * @param courseId     課程ID
+	 * @return
+	 */
+	default List<CourseEnrollment> selectCompanyLearningProgress(Long companyId, Long departmentId, Long courseId) {
+		LambdaQueryWrapper<CourseEnrollment> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(companyId != null, CourseEnrollment::getCompanyId, companyId)
+				.eq(departmentId != null, CourseEnrollment::getDepartmentId, departmentId)
+				.eq(courseId != null, CourseEnrollment::getCourseId, courseId);
+		return this.selectList(queryWrapper);
+
+	}
+
+	/**
 	 * 企業員工,報名企業課程的資料
 	 * 
 	 * @param companyId 公司ID
 	 * @param courseId  課程ID
 	 * @return
 	 */
-	CourseTrainingSummaryVO getCompanyTrainingSummary(
-			@Param("companyId") Long companyId,
+	CourseTrainingSummaryVO getCompanyTrainingSummary(@Param("companyId") Long companyId,
 			@Param("courseId") Long courseId);
 
 	default List<CourseEnrollment> selectBySysUserIdAndCourseId(Long sysUserId, Long courseId) {

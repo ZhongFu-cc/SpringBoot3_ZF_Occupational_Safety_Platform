@@ -39,12 +39,17 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 
 	@Override
 	public CourseTrainingSummaryVO getCompanyTrainingSummary(Long companyId, Long courseId) {
-		return baseMapper.getCompanyTrainingSummary(companyId,courseId);
+		return baseMapper.getCompanyTrainingSummary(companyId, courseId);
 	}
-	
+
 	@Override
 	public List<CourseEnrollment> findBySysUser(Long sysUserId) {
 		return baseMapper.selectBySysUserId(sysUserId);
+	}
+
+	@Override
+	public List<CourseEnrollment> findCompanyLearningProgress(Long companyId, Long department, Long courseId) {
+		return baseMapper.selectCompanyLearningProgress(companyId, department, courseId);
 	}
 
 	@Override
@@ -140,7 +145,5 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 	public void remove(Long courseEnrollmentId) {
 		baseMapper.deleteById(courseEnrollmentId);
 	}
-
-
 
 }

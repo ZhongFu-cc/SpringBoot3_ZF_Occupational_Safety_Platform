@@ -295,6 +295,7 @@ public class DepartmentManager {
 				CourseEnrollment enrollment = new CourseEnrollment();
 				enrollment.setCourseEnrollmentId(enrollmentId);
 				enrollment.setCompanyId(operator.getCompanyId());
+				enrollment.setDepartmentId(employee.getDepartmentId());
 				enrollment.setSysUserId(employee.getSysUserId());
 				enrollment.setCourseId(courseId);
 				enrollment.setStatus(CourseStatusEnum.NOT_STARTED);

@@ -40,6 +40,10 @@ public class CourseEnrollment implements Serializable {
     @TableField("company_id")
     private Long companyId;
 
+	@Schema(description = "用戶部門ID")
+	@TableField("department_id")
+	private Long departmentId;
+    
 	@Schema(description = "報名用戶ID")
 	@TableField("sys_user_id")
 	private Long sysUserId;

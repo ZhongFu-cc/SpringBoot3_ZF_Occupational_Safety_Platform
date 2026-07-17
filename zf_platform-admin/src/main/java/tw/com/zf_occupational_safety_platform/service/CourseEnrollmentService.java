@@ -22,7 +22,7 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 public interface CourseEnrollmentService extends IService<CourseEnrollment> {
 
 	CourseEnrollment get(Long courseEnrollmentId);
-	
+
 	/**
 	 * 
 	 * @param companyId
@@ -33,7 +33,15 @@ public interface CourseEnrollmentService extends IService<CourseEnrollment> {
 
 	List<CourseEnrollment> findBySysUser(Long sysUserId);
 
-
+	/**
+	 * 查詢企業內課程的學習進度
+	 * 
+	 * @param companyId
+	 * @param department
+	 * @param courseId
+	 * @return
+	 */
+	List<CourseEnrollment> findCompanyLearningProgress(Long companyId, Long department, Long courseId);
 
 	IPage<CourseEnrollment> findPageByQuery(Page<CourseEnrollment> pageInfo, CourseStatusEnum status);
 
