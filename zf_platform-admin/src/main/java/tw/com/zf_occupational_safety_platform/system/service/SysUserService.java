@@ -101,6 +101,21 @@ public interface SysUserService extends IService<SysUser> {
 	IPage<SysUser> findByCompany(IPage<SysUser> pageInfo, Long parentId, Long companyId, String queryText);
 
 	/**
+	 * 分頁查詢 - by公司<br>
+	 * exclude 同個 parentId，避免查詢到管理者<br>
+	 * 可額外帶入部門ID進行篩選
+	 *
+	 * @param pageInfo     分頁資訊
+	 * @param parentId     父級ID ,
+	 * @param companyId    公司ID
+	 * @param departmentId 部門ID，非必要，null則不篩選
+	 * @param queryText    文字查詢
+	 * @return
+	 */
+	IPage<SysUser> findByCompany(IPage<SysUser> pageInfo, Long parentId, Long companyId, Long departmentId,
+			String queryText);
+
+	/**
 	 * 創建使用者
 	 * 
 	 * @param addSysUserDTO

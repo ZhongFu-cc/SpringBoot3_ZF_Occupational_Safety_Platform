@@ -297,7 +297,7 @@ public class LearningProgressStatisticsManager {
 
 		// 先拿到當頁的用戶
 		IPage<SysUser> userPage = sysUserService.findByCompany(pageInfo, operator.getParentId(),
-				operator.getCompanyId(), queryText);
+				operator.getCompanyId(), departmentId, queryText);
 
 		List<SysUser> users = userPage.getRecords();
 		// 若該頁沒有員工，直接返回空分頁
