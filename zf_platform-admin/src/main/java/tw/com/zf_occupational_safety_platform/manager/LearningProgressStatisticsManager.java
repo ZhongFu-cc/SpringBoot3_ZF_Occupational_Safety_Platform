@@ -353,9 +353,9 @@ public class LearningProgressStatisticsManager {
 					Collections.emptyList());
 
 			int totalCourses = enrollments.size();
-			long completedCount = enrollments.stream().filter(e -> e.getStatus() == CourseStatusEnum.COMPLETED)
-					.count();
-			long notStartedCount = enrollments.stream().filter(e -> e.getStatus() == CourseStatusEnum.NOT_STARTED)
+			long completedCount = enrollments.stream().filter(e -> e.getStatus() == CourseStatusEnum.COMPLETED).count();
+			long notStartedCount = enrollments.stream()
+					.filter(e -> e.getStatus() == CourseStatusEnum.NOT_STARTED)
 					.count();
 
 			CourseStatusEnum overallStatus;
@@ -405,7 +405,8 @@ public class LearningProgressStatisticsManager {
 				departmentId, queryText);
 
 		// 3.取得公司內所有部門 Map，用於補上部門名稱
-		Map<Long, Department> deptMap = departmentService.findByCompany(operator.getCompanyId()).stream()
+		Map<Long, Department> deptMap = departmentService.findByCompany(operator.getCompanyId())
+				.stream()
 				.collect(Collectors.toMap(Department::getDepartmentId, Function.identity()));
 
 		// 4.取得企業內（依部門/課程篩選）的學習進度，再依 sysUserId 分組
@@ -415,9 +416,11 @@ public class LearningProgressStatisticsManager {
 				.collect(Collectors.groupingBy(CourseEnrollment::getSysUserId));
 
 		// 5.取得課程名稱 Map，用於補上課程明細的課程名稱
-		Set<Long> courseIds = companyLearningProgress.stream().map(CourseEnrollment::getCourseId)
+		Set<Long> courseIds = companyLearningProgress.stream()
+				.map(CourseEnrollment::getCourseId)
 				.collect(Collectors.toSet());
-		Map<Long, Course> courseMap = courseService.findByIds(courseIds).stream()
+		Map<Long, Course> courseMap = courseService.findByIds(courseIds)
+				.stream()
 				.collect(Collectors.toMap(Course::getCourseId, Function.identity()));
 
 		// 6.組裝「整體統計」分頁資料
@@ -433,7 +436,8 @@ public class LearningProgressStatisticsManager {
 
 		// 8.輸出成Excel (兩個分頁)
 		try (ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).build()) {
-			WriteSheet summarySheet = EasyExcel.writerSheet(0, "整體統計").head(CompanyLearningStatisticsExcel.class)
+			WriteSheet summarySheet = EasyExcel.writerSheet(0, "整體統計")
+					.head(CompanyLearningStatisticsExcel.class)
 					.build();
 			excelWriter.write(summaryData, summarySheet);
 
@@ -446,12 +450,12 @@ public class LearningProgressStatisticsManager {
 	/**
 	 * 組裝「課程明細」分頁：每位員工的每一門課一列，並計算合併儲存格範圍 (姓名/部門欄位)，讓同一員工的多門課程合併呈現
 	 *
-	 * @param users            員工清單
-	 * @param deptMap          部門 Map
-	 * @param userProgressMap  員工課程進度 Map (key: sysUserId)
-	 * @param courseMap        課程 Map (key: courseId)，用於補上課程名稱
-	 * @param detailData       [輸出] 組裝完成的課程明細列
-	 * @param mergeStrategies  [輸出] 合併儲存格策略 (姓名欄與部門欄)
+	 * @param users           員工清單
+	 * @param deptMap         部門 Map
+	 * @param userProgressMap 員工課程進度 Map (key: sysUserId)
+	 * @param courseMap       課程 Map (key: courseId)，用於補上課程名稱
+	 * @param detailData      [輸出] 組裝完成的課程明細列
+	 * @param mergeStrategies [輸出] 合併儲存格策略 (姓名欄與部門欄)
 	 */
 	private void buildDetailRows(List<SysUser> users, Map<Long, Department> deptMap,
 			Map<Long, List<CourseEnrollment>> userProgressMap, Map<Long, Course> courseMap,
