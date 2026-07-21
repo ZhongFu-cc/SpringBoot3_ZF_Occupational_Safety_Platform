@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URLEncoder;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +28,9 @@ import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CourseEnrollmentVO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.LearningRecordSummaryVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.LearningRecordVO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.UpcomingExpiryVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseCategory;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
@@ -156,8 +162,103 @@ public class CourseEnrollmentManager {
 	}
 
 	/**
+	 * 用戶(企業員工)查詢自身學習歷程 統計摘要
+	 * <p>
+	 * 供 KPI 卡片、狀態分布圖、即將到期提醒、以及表格上方狀態 tab 計數使用
+	 *
+	 * @param operator
+	 * @return
+	 */
+	public LearningRecordSummaryVO getLearningRecordSummary(SysUserVO operator) {
+
+		List<CourseEnrollment> courseEnrollments = courseEnrollmentService.findBySysUser(operator.getSysUserId());
+
+		LearningRecordSummaryVO vo = new LearningRecordSummaryVO();
+
+		if (courseEnrollments == null || courseEnrollments.isEmpty()) {
+			vo.setTotalEnrolled(0);
+			vo.setNotStartedCount(0);
+			vo.setInProgressCount(0);
+			vo.setCompletedCount(0);
+			vo.setExpiredCount(0);
+			vo.setCancelledCount(0);
+			vo.setCompletionRate(0.0);
+			vo.setAccumulatedHours(0.0);
+			vo.setUpcomingExpiryCount(0);
+			vo.setUpcomingExpiryList(Collections.emptyList());
+			return vo;
+		}
+
+		// 依狀態分組計數
+		Map<CourseStatusEnum, Long> countByStatus = courseEnrollments.stream()
+				.collect(Collectors.groupingBy(CourseEnrollment::getStatus, Collectors.counting()));
+
+		int notStartedCount = countByStatus.getOrDefault(CourseStatusEnum.NOT_STARTED, 0L).intValue();
+		int inProgressCount = countByStatus.getOrDefault(CourseStatusEnum.IN_PROGRESS, 0L).intValue();
+		int completedCount = countByStatus.getOrDefault(CourseStatusEnum.COMPLETED, 0L).intValue();
+		int expiredCount = countByStatus.getOrDefault(CourseStatusEnum.EXPIRED, 0L).intValue();
+		int cancelledCount = countByStatus.getOrDefault(CourseStatusEnum.CANCELLED, 0L).intValue();
+		int totalEnrolled = courseEnrollments.size() - cancelledCount;
+
+		vo.setTotalEnrolled(totalEnrolled);
+		vo.setNotStartedCount(notStartedCount);
+		vo.setInProgressCount(inProgressCount);
+		vo.setCompletedCount(completedCount);
+		vo.setExpiredCount(expiredCount);
+		vo.setCancelledCount(cancelledCount);
+
+		// 完成率 (排除已取消)
+		double completionRate = totalEnrolled > 0 ? (double) completedCount / totalEnrolled * 100 : 0.0;
+		vo.setCompletionRate(BigDecimal.valueOf(completionRate).setScale(1, RoundingMode.HALF_UP).doubleValue());
+
+		// 累積學習時數 (排除已取消)
+		double accumulatedHours = courseEnrollments.stream()
+				.filter(e -> e.getStatus() != CourseStatusEnum.CANCELLED)
+				.mapToInt(e -> e.getAccumulatedSeconds() != null ? e.getAccumulatedSeconds() : 0)
+				.sum() / 3600.0;
+		vo.setAccumulatedHours(BigDecimal.valueOf(accumulatedHours).setScale(1, RoundingMode.HALF_UP).doubleValue());
+
+		// 30天內即將到期 (排除已過期、已取消)
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime soonThreshold = now.plusDays(30);
+
+		List<CourseEnrollment> upcomingExpiry = courseEnrollments.stream()
+				.filter(e -> e.getExpiredAt() != null)
+				.filter(e -> e.getStatus() != CourseStatusEnum.CANCELLED && e.getStatus() != CourseStatusEnum.EXPIRED)
+				.filter(e -> e.getExpiredAt().isAfter(now) && e.getExpiredAt().isBefore(soonThreshold))
+				.sorted(Comparator.comparing(CourseEnrollment::getExpiredAt))
+				.toList();
+
+		vo.setUpcomingExpiryCount(upcomingExpiry.size());
+
+		if (upcomingExpiry.isEmpty()) {
+			vo.setUpcomingExpiryList(Collections.emptyList());
+		} else {
+			Set<Long> courseIds = upcomingExpiry.stream().map(CourseEnrollment::getCourseId)
+					.collect(Collectors.toSet());
+			Map<Long, Course> courseMap = courseService.findByIds(courseIds).stream()
+					.collect(Collectors.toMap(Course::getCourseId, Function.identity()));
+
+			List<UpcomingExpiryVO> upcomingExpiryList = upcomingExpiry.stream().map(e -> {
+				UpcomingExpiryVO item = new UpcomingExpiryVO();
+				item.setCourseEnrollmentId(e.getCourseEnrollmentId());
+				item.setCourseId(e.getCourseId());
+				Course course = courseMap.get(e.getCourseId());
+				item.setCourseName(course != null ? course.getTitle() : null);
+				item.setExpiredAt(e.getExpiredAt());
+				item.setDaysLeft(Duration.between(now, e.getExpiredAt()).toDays());
+				return item;
+			}).toList();
+
+			vo.setUpcomingExpiryList(upcomingExpiryList);
+		}
+
+		return vo;
+	}
+
+	/**
 	 * 用戶(企業員工) 報名 課程
-	 * 
+	 *
 	 * @param courseId 課程ID
 	 * @param operator 報名者(操作者)
 	 */
