@@ -145,8 +145,41 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	}
 
 	/**
+	 * 查詢 - 根據父級ID 和 查詢條件<br>
+	 * 並排除公司ID，可選帶部門ID篩選 (不分頁，取得全部符合條件的資料)
+	 *
+	 * @param parentId     父級ID
+	 * @param companyId    公司ID
+	 * @param departmentId 部門ID，非必要，null則不加入條件
+	 * @param queryText    查詢條件
+	 * @return
+	 */
+	default List<SysUser> selectByParentIdAndQueryExcludeCompanyId(Long parentId, Long companyId, Long departmentId,
+			String queryText) {
+
+		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+
+		// 避開所有 , 平台管理員創建 的 企業管理者
+		queryWrapper.ne(SysUser::getParentId, parentId)
+				// 查詢所有跟當前操作者(企業管理者) 同公司的數據
+				.eq(SysUser::getCompanyId, companyId)
+				// 部門ID非必要條件，有帶才加入
+				.eq(departmentId != null, SysUser::getDepartmentId, departmentId)
+				// 加上查詢條件
+				.and(StringUtils.isNotBlank(queryText), w -> {
+					w.like(SysUser::getEmail, queryText)
+							.or()
+							.like(SysUser::getPhone, queryText)
+							.or()
+							.like(SysUser::getRealName, queryText);
+				});
+
+		return this.selectList(queryWrapper);
+	}
+
+	/**
 	 * 從臨時表新增進sys_user表
-	 * 
+	 *
 	 * @param batchId
 	 * @return
 	 */

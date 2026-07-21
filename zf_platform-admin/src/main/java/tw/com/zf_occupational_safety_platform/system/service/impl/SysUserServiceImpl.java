@@ -90,6 +90,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	}
 
 	@Override
+	public List<SysUser> findByCompany(Long parentId, Long companyId, Long departmentId, String queryText) {
+		return baseMapper.selectByParentIdAndQueryExcludeCompanyId(parentId, companyId, departmentId, queryText);
+	}
+
+	@Override
 	public SysUser create(AddSysUserDTO addSysUserDTO) {
 		SysUser sysUser = sysUserConvert.addDTOToEntity(addSysUserDTO);
 		baseMapper.insert(sysUser);

@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.io.IOException;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.manager.LearningProgressStatisticsManager;
 import tw.com.zf_occupational_safety_platform.pojo.VO.LearningProgressChartVO;
@@ -93,6 +96,28 @@ public class LearningProgressStatisticsController {
 		IPage<LearningProgressTableVO> tableVO = learningProgressStatisticsManager.getCourseProgressTable(pageInfo,
 				sysUserVO, departmentId, courseId, queryText);
 		return R.ok(tableVO);
+	}
+
+	/**
+	 * 下載企業員工上課結果統計 Excel
+	 *
+	 * @param response     HTTP響應
+	 * @param departmentId 部門ID
+	 * @param courseId     課程ID
+	 * @param queryText    用戶查詢條件
+	 */
+	@Operation(summary = "下載企業員工上課結果統計 Excel")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@SaCheckRole("company_manager")
+	@GetMapping("download-excel")
+	public void downloadCourseProgressExcel(HttpServletResponse response,
+			@RequestParam(required = false) @Schema(description = "部門ID") Long departmentId,
+			@RequestParam(required = false) @Schema(description = "課程ID") Long courseId,
+			@RequestParam(required = false) @Schema(description = "用戶查詢條件") String queryText) throws IOException {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		learningProgressStatisticsManager.downloadCourseProgressExcel(response, sysUserVO, departmentId, courseId,
+				queryText);
 	}
 
 }
