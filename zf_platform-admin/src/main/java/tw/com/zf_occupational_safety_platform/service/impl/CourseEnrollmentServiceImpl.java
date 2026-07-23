@@ -19,6 +19,8 @@ import tw.com.zf_occupational_safety_platform.mapper.CourseEnrollmentMapper;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CourseTrainingSummaryVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
+import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 
 /**
  * <p>
@@ -86,10 +88,11 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 	}
 
 	@Override
-	public CourseEnrollment create(Long sysUserId, Long courseId) {
+	public CourseEnrollment create(SysUserVO user, Long courseId) {
 
 		// 判斷課程是否有報名過
-		List<CourseEnrollment> courseEnrollments = baseMapper.selectBySysUserIdAndCourseId(sysUserId, courseId);
+		List<CourseEnrollment> courseEnrollments = baseMapper.selectBySysUserIdAndCourseId(user.getSysUserId(),
+				courseId);
 		// 如果要報名的課程有資料並處於 未開始、進行中、已完成 任何一種狀態時，拋出錯誤
 		long count = courseEnrollments.stream()
 				.filter(e -> Set
@@ -103,8 +106,10 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 
 		LocalDateTime now = LocalDateTime.now();
 		CourseEnrollment courseEnrollment = new CourseEnrollment();
-		courseEnrollment.setSysUserId(sysUserId);
+		courseEnrollment.setSysUserId(user.getSysUserId());
 		courseEnrollment.setCourseId(courseId);
+		courseEnrollment.setDepartmentId(user.getDepartmentId());
+		courseEnrollment.setCompanyId(user.getCompanyId());
 		courseEnrollment.setCompletedChapters(0);
 		courseEnrollment.setStatus(CourseStatusEnum.NOT_STARTED);
 		courseEnrollment.setIsChaptersDone(CommonStatusEnum.NO);
@@ -117,7 +122,7 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 	}
 
 	@Override
-	public List<CourseEnrollment> batchCreate(Long sysUserId, Collection<Long> courseIds) {
+	public List<CourseEnrollment> batchCreate(SysUser user, Collection<Long> courseIds) {
 		if (courseIds == null || courseIds.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -125,8 +130,10 @@ public class CourseEnrollmentServiceImpl extends ServiceImpl<CourseEnrollmentMap
 
 		List<CourseEnrollment> courseEnrollments = courseIds.stream().map(courseId -> {
 			CourseEnrollment courseEnrollment = new CourseEnrollment();
-			courseEnrollment.setSysUserId(sysUserId);
+			courseEnrollment.setSysUserId(user.getSysUserId());
 			courseEnrollment.setCourseId(courseId);
+			courseEnrollment.setDepartmentId(user.getDepartmentId());
+			courseEnrollment.setCompanyId(user.getCompanyId());
 			courseEnrollment.setCompletedChapters(0);
 			courseEnrollment.setStatus(CourseStatusEnum.NOT_STARTED);
 			courseEnrollment.setIsChaptersDone(CommonStatusEnum.NO);

@@ -164,7 +164,7 @@ public class CourseEnrollmentManager {
 	public void enrollCourse(Long courseId, SysUserVO operator) {
 
 		// 1.獲得一個初始化的 報名資訊
-		CourseEnrollment courseEnrollment = courseEnrollmentService.create(operator.getSysUserId(), courseId);
+		CourseEnrollment courseEnrollment = courseEnrollmentService.create(operator, courseId);
 
 		// 2.拿到非Directory類別的 課程章節
 		List<CourseChapter> courseChapters = courseChapterService.findNonDirectoryByCourseId(courseId);

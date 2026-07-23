@@ -10,6 +10,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CourseTrainingSummaryVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
+import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 
 /**
  * <p>
@@ -75,7 +77,7 @@ public interface CourseEnrollmentService extends IService<CourseEnrollment> {
 	 * @param courseId
 	 * @return
 	 */
-	CourseEnrollment create(Long sysUserId, Long courseId);
+	CourseEnrollment create(SysUserVO user, Long courseId);
 
 	/**
 	 * 批量幫同一位用戶，報名多個課程，並代入基礎設定<br>
@@ -86,7 +88,7 @@ public interface CourseEnrollmentService extends IService<CourseEnrollment> {
 	 * @param courseIds
 	 * @return
 	 */
-	List<CourseEnrollment> batchCreate(Long sysUserId, Collection<Long> courseIds);
+	List<CourseEnrollment> batchCreate(SysUser user, Collection<Long> courseIds);
 
 	//	void update(PutCourseCategoryDTO putCourseCategoryDTO);
 
