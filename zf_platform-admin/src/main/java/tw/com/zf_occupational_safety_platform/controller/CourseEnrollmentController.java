@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.manager.CourseEnrollmentManager;
 import tw.com.zf_occupational_safety_platform.pojo.VO.CourseEnrollmentVO;
+import tw.com.zf_occupational_safety_platform.pojo.VO.LearningRecordSummaryVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.LearningRecordVO;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.system.manager.AuthManager;
@@ -142,8 +143,24 @@ public class CourseEnrollmentController {
 	}
 
 	/**
+	 * 查詢 學習歷程 統計摘要（KPI 卡片 / 狀態分布圖 / 即將到期提醒）
+	 *
+	 * @return
+	 */
+	@GetMapping("learning-record/summary")
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢 學習歷程 統計摘要（KPI 卡片 / 狀態分布圖 / 即將到期提醒）")
+	@SaCheckLogin
+	public R<LearningRecordSummaryVO> findLearningRecordSummaryByOwner() {
+		SysUserVO sysUserVO = authManager.getUserInfo();
+		LearningRecordSummaryVO vo = courseEnrollmentManager.getLearningRecordSummary(sysUserVO);
+		return R.ok(vo);
+	}
+
+	/**
 	 * 報名 課程
-	 * 
+	 *
 	 * @param courseId 課程ID
 	 * @return
 	 */
