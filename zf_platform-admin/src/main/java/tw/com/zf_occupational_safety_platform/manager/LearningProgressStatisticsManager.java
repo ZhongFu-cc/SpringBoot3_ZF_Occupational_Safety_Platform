@@ -1,31 +1,45 @@
 package tw.com.zf_occupational_safety_platform.manager;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.ExcelWriter;
+import com.alibaba.excel.write.merge.OnceAbsoluteMergeStrategy;
+import com.alibaba.excel.write.metadata.WriteSheet;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import tw.com.zf_occupational_safety_platform.convert.LearningProgressStatisticsConvert;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.pojo.VO.DepartmentRankingVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.LearningProgressChartVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.LearningProgressKpiVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.LearningProgressTableVO;
 import tw.com.zf_occupational_safety_platform.pojo.VO.LearningStatusDistributionVO;
+import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Department;
+import tw.com.zf_occupational_safety_platform.pojo.excel.CompanyLearningStatisticsDetailExcel;
+import tw.com.zf_occupational_safety_platform.pojo.excel.CompanyLearningStatisticsExcel;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
+import tw.com.zf_occupational_safety_platform.service.CourseService;
 import tw.com.zf_occupational_safety_platform.service.DepartmentService;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
@@ -41,6 +55,8 @@ public class LearningProgressStatisticsManager {
 	private final CourseEnrollmentService courseEnrollmentService;
 	private final DepartmentService departmentService;
 	private final SysUserService sysUserService;
+	private final CourseService courseService;
+	private final LearningProgressStatisticsConvert learningProgressStatisticsConvert;
 
 	/**
 	 * 獲取企業內 課程總體進度KPI
@@ -317,14 +333,29 @@ public class LearningProgressStatisticsManager {
 				.collect(Collectors.groupingBy(CourseEnrollment::getSysUserId));
 
 		// 組裝當頁每位員工的課程進度資料
-		List<LearningProgressTableVO> records = users.stream().map(user -> {
+		List<LearningProgressTableVO> records = buildProgressTableRows(users, deptMap, userProgressMap);
+
+		Page<LearningProgressTableVO> resultPage = new Page<>(userPage.getCurrent(), userPage.getSize(),
+				userPage.getTotal());
+		resultPage.setRecords(records);
+		return resultPage;
+
+	}
+
+	/**
+	 * 依「員工清單 / 部門Map / 員工課程進度Map」組裝每位員工的課程進度列 (供 table 查詢 & Excel 匯出共用)
+	 */
+	private List<LearningProgressTableVO> buildProgressTableRows(List<SysUser> users, Map<Long, Department> deptMap,
+			Map<Long, List<CourseEnrollment>> userProgressMap) {
+
+		return users.stream().map(user -> {
 			List<CourseEnrollment> enrollments = userProgressMap.getOrDefault(user.getSysUserId(),
 					Collections.emptyList());
 
 			int totalCourses = enrollments.size();
-			long completedCount = enrollments.stream().filter(e -> e.getStatus() == CourseStatusEnum.COMPLETED)
-					.count();
-			long notStartedCount = enrollments.stream().filter(e -> e.getStatus() == CourseStatusEnum.NOT_STARTED)
+			long completedCount = enrollments.stream().filter(e -> e.getStatus() == CourseStatusEnum.COMPLETED).count();
+			long notStartedCount = enrollments.stream()
+					.filter(e -> e.getStatus() == CourseStatusEnum.NOT_STARTED)
 					.count();
 
 			CourseStatusEnum overallStatus;
@@ -348,12 +379,123 @@ public class LearningProgressStatisticsManager {
 			vo.setOverallStatus(overallStatus.name());
 			return vo;
 		}).collect(Collectors.toList());
+	}
 
-		Page<LearningProgressTableVO> resultPage = new Page<>(userPage.getCurrent(), userPage.getSize(),
-				userPage.getTotal());
-		resultPage.setRecords(records);
-		return resultPage;
+	/**
+	 * 下載企業員工上課結果統計 Excel<br>
+	 * 內含兩個分頁：「整體統計」為每位員工的彙總數據，「課程明細」為每位員工每門課的詳細進度 (以合併儲存格呈現同一員工的多門課程)
+	 *
+	 * @param response     HTTP響應，用於輸出Excel檔案
+	 * @param operator     操作者
+	 * @param departmentId 部門ID
+	 * @param courseId     課程ID
+	 * @param queryText    用戶查詢條件
+	 */
+	public void downloadCourseProgressExcel(HttpServletResponse response, SysUserVO operator, Long departmentId,
+			Long courseId, String queryText) throws IOException {
 
+		// 1.設置Excel 檔案資訊
+		response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+		response.setCharacterEncoding("utf-8");
+		String fileName = URLEncoder.encode("企業員工上課結果統計", StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+		response.setHeader("Content-disposition", "attachment;filename*=" + fileName + ".xlsx");
+
+		// 2.取得符合條件的員工清單 (不分頁，取得該公司/部門下所有員工)
+		List<SysUser> users = sysUserService.findByCompany(operator.getParentId(), operator.getCompanyId(),
+				departmentId, queryText);
+
+		// 3.取得公司內所有部門 Map，用於補上部門名稱
+		Map<Long, Department> deptMap = departmentService.findByCompany(operator.getCompanyId())
+				.stream()
+				.collect(Collectors.toMap(Department::getDepartmentId, Function.identity()));
+
+		// 4.取得企業內（依部門/課程篩選）的學習進度，再依 sysUserId 分組
+		List<CourseEnrollment> companyLearningProgress = courseEnrollmentService
+				.findCompanyLearningProgress(operator.getCompanyId(), departmentId, courseId);
+		Map<Long, List<CourseEnrollment>> userProgressMap = companyLearningProgress.stream()
+				.collect(Collectors.groupingBy(CourseEnrollment::getSysUserId));
+
+		// 5.取得課程名稱 Map，用於補上課程明細的課程名稱
+		Set<Long> courseIds = companyLearningProgress.stream()
+				.map(CourseEnrollment::getCourseId)
+				.collect(Collectors.toSet());
+		Map<Long, Course> courseMap = courseService.findByIds(courseIds)
+				.stream()
+				.collect(Collectors.toMap(Course::getCourseId, Function.identity()));
+
+		// 6.組裝「整體統計」分頁資料
+		List<CompanyLearningStatisticsExcel> summaryData = buildProgressTableRows(users, deptMap, userProgressMap)
+				.stream()
+				.map(learningProgressStatisticsConvert::toSummaryExcel)
+				.toList();
+
+		// 7.組裝「課程明細」分頁資料，並計算合併儲存格範圍 (同一員工的多門課程合併姓名/部門欄位)
+		List<CompanyLearningStatisticsDetailExcel> detailData = new ArrayList<>();
+		List<OnceAbsoluteMergeStrategy> detailMergeStrategies = new ArrayList<>();
+		buildDetailRows(users, deptMap, userProgressMap, courseMap, detailData, detailMergeStrategies);
+
+		// 8.輸出成Excel (兩個分頁)
+		try (ExcelWriter excelWriter = EasyExcel.write(response.getOutputStream()).build()) {
+			WriteSheet summarySheet = EasyExcel.writerSheet(0, "整體統計")
+					.head(CompanyLearningStatisticsExcel.class)
+					.build();
+			excelWriter.write(summaryData, summarySheet);
+
+			var detailSheetBuilder = EasyExcel.writerSheet(1, "課程明細").head(CompanyLearningStatisticsDetailExcel.class);
+			detailMergeStrategies.forEach(detailSheetBuilder::registerWriteHandler);
+			excelWriter.write(detailData, detailSheetBuilder.build());
+		}
+	}
+
+	/**
+	 * 組裝「課程明細」分頁：每位員工的每一門課一列，並計算合併儲存格範圍 (姓名/部門欄位)，讓同一員工的多門課程合併呈現
+	 *
+	 * @param users           員工清單
+	 * @param deptMap         部門 Map
+	 * @param userProgressMap 員工課程進度 Map (key: sysUserId)
+	 * @param courseMap       課程 Map (key: courseId)，用於補上課程名稱
+	 * @param detailData      [輸出] 組裝完成的課程明細列
+	 * @param mergeStrategies [輸出] 合併儲存格策略 (姓名欄與部門欄)
+	 */
+	private void buildDetailRows(List<SysUser> users, Map<Long, Department> deptMap,
+			Map<Long, List<CourseEnrollment>> userProgressMap, Map<Long, Course> courseMap,
+			List<CompanyLearningStatisticsDetailExcel> detailData, List<OnceAbsoluteMergeStrategy> mergeStrategies) {
+
+		// EasyExcel 預設以第0列為表頭，資料列從第1列(index)開始
+		int rowIndex = 1;
+
+		for (SysUser user : users) {
+			List<CourseEnrollment> enrollments = userProgressMap.getOrDefault(user.getSysUserId(),
+					Collections.emptyList());
+			Department department = deptMap.get(user.getDepartmentId());
+			String departmentName = department != null ? department.getName() : null;
+
+			if (enrollments.isEmpty()) {
+				CompanyLearningStatisticsDetailExcel row = new CompanyLearningStatisticsDetailExcel();
+				row.setUserName(user.getRealName());
+				row.setDepartmentName(departmentName);
+				row.setCourseName("尚未分派課程");
+				detailData.add(row);
+				rowIndex++;
+				continue;
+			}
+
+			int startRow = rowIndex;
+			for (CourseEnrollment enrollment : enrollments) {
+				Course course = courseMap.get(enrollment.getCourseId());
+				CompanyLearningStatisticsDetailExcel row = learningProgressStatisticsConvert
+						.toDetailExcel(user.getRealName(), departmentName, course, enrollment);
+				detailData.add(row);
+				rowIndex++;
+			}
+
+			// 該員工佔多列時，合併姓名(欄0)/部門(欄1)儲存格
+			int endRow = rowIndex - 1;
+			if (endRow > startRow) {
+				mergeStrategies.add(new OnceAbsoluteMergeStrategy(startRow, endRow, 0, 0));
+				mergeStrategies.add(new OnceAbsoluteMergeStrategy(startRow, endRow, 1, 1));
+			}
+		}
 	}
 
 }

@@ -278,7 +278,7 @@ public class CompanyManager {
 		}
 		Set<Long> courseIds = companyCourses.stream().map(CompanyCourse::getCourseId).collect(Collectors.toSet());
 
-		courseEnrollmentService.batchCreate(sysUser.getSysUserId(), courseIds);
+		courseEnrollmentService.batchCreate(sysUser, courseIds);
 	}
 
 	/**

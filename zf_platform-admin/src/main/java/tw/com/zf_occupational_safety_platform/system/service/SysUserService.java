@@ -116,6 +116,19 @@ public interface SysUserService extends IService<SysUser> {
 			String queryText);
 
 	/**
+	 * 查詢 - by公司<br>
+	 * exclude 同個 parentId，避免查詢到管理者<br>
+	 * 可額外帶入部門ID進行篩選 (不分頁，取得全部符合條件的資料)
+	 *
+	 * @param parentId     父級ID ,
+	 * @param companyId    公司ID
+	 * @param departmentId 部門ID，非必要，null則不篩選
+	 * @param queryText    文字查詢
+	 * @return
+	 */
+	List<SysUser> findByCompany(Long parentId, Long companyId, Long departmentId, String queryText);
+
+	/**
 	 * 創建使用者
 	 * 
 	 * @param addSysUserDTO
