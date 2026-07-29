@@ -158,7 +158,7 @@ public class CourseChapterManager {
 
 		// 1.查詢刪除此章節受影響的所有章節
 		List<CourseChapter> courseChapters = courseChapterService.findAllNode(courseChapterId);
-
+		
 		// 2.拿到會影響學習歷程的章節，並抽取chapterIds 
 		List<CourseChapter> learningChapters = courseChapters.stream()
 				.filter(chpater -> !ChapterContentTypeEnum.DIRECTORY.equals(chpater.getContentType()))

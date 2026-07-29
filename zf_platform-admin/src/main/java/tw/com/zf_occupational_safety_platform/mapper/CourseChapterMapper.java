@@ -56,8 +56,10 @@ public interface CourseChapterMapper extends BaseMapper<CourseChapter> {
 	 */
 	default List<CourseChapter> selectAllNode(Long courseChapterId) {
 		LambdaQueryWrapper<CourseChapter> queryWrapper = new LambdaQueryWrapper<>();
-		queryWrapper.eq(CourseChapter::getCourseChapterId, courseChapterId)
-				.in(CourseChapter::getParentId, courseChapterId);
+		queryWrapper.eq(CourseChapter::getCourseChapterId, courseChapterId).or(wrap -> {
+			wrap.in(CourseChapter::getParentId, courseChapterId);
+		});
+
 		return this.selectList(queryWrapper);
 	}
 
