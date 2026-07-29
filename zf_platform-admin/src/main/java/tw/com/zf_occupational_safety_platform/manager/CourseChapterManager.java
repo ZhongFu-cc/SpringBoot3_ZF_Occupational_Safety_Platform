@@ -220,8 +220,10 @@ public class CourseChapterManager {
 				sysChunkFileService.deleteSysChunkFileByPath(e.getVideoUrl());
 				
 				// 刪除影片檔案
-				String s3Key = s3Helper.extractS3PathInDbUrl(bucketName, e.getVideoUrl());
-				s3Helper.removeFileIfPresent(bucketName, s3Key);
+				if(e.getVideoUrl() != null) {
+					String s3Key = s3Helper.extractS3PathInDbUrl(bucketName, e.getVideoUrl());
+					s3Helper.removeFileIfPresent(bucketName, s3Key);
+				}
 
 			}
 			// 章節類型為測驗
