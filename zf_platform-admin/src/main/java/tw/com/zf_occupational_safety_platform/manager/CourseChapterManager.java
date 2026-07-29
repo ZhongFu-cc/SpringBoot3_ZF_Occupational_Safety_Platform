@@ -1,6 +1,7 @@
 package tw.com.zf_occupational_safety_platform.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -158,7 +159,7 @@ public class CourseChapterManager {
 
 		// 1.查詢刪除此章節受影響的所有章節
 		List<CourseChapter> courseChapters = courseChapterService.findAllNode(courseChapterId);
-		
+
 		// 2.拿到會影響學習歷程的章節，並抽取chapterIds 
 		List<CourseChapter> learningChapters = courseChapters.stream()
 				.filter(chpater -> !ChapterContentTypeEnum.DIRECTORY.equals(chpater.getContentType()))
@@ -187,8 +188,9 @@ public class CourseChapterManager {
 
 			CourseEnrollment courseEnrollment = courseEnrollmentService.get(enrollmentId);
 
-			// 受影響 已完成的章節
-			List<ChapterProgress> completedRows = completedChapterMapByEnrollmentId.get(enrollmentId);
+			// 受影響 已完成的章節，如果
+			List<ChapterProgress> completedRows = completedChapterMapByEnrollmentId.getOrDefault(enrollmentId,
+					Collections.emptyList());
 
 			// 設定 總章節數 與 已完成章節數（加上 Math.max 防止減到負數）
 			int newTotal = Math.max(0, courseEnrollment.getTotalChapters() - affectedRows.size());
@@ -218,9 +220,9 @@ public class CourseChapterManager {
 
 				// 刪除sysChunk紀錄
 				sysChunkFileService.deleteSysChunkFileByPath(e.getVideoUrl());
-				
+
 				// 刪除影片檔案
-				if(e.getVideoUrl() != null) {
+				if (e.getVideoUrl() != null) {
 					String s3Key = s3Helper.extractS3PathInDbUrl(bucketName, e.getVideoUrl());
 					s3Helper.removeFileIfPresent(bucketName, s3Key);
 				}
