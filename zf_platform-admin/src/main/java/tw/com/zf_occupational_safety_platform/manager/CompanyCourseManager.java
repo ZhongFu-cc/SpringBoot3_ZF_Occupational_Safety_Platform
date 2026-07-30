@@ -51,7 +51,7 @@ public class CompanyCourseManager {
 	 */
 	public CompanyCourseVO getCompanyCourseVO(Long companyCourseId, SysUserVO operator) {
 		CompanyCourse companyCourse = companyCourseService.get(companyCourseId);
-		if (!companyCourse.getCompanyCourseId().equals(operator.getCompanyId())) {
+		if (!companyCourse.getCompanyId().equals(operator.getCompanyId())) {
 			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
