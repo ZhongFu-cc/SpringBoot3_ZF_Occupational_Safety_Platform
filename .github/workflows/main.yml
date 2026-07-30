@@ -40,8 +40,8 @@ jobs:
         envsubst < zf_platform-admin/src/main/resources/application-prod.yml > zf_platform-admin/src/main/resources/application-prod.yml.tmp 
         mv zf_platform-admin/src/main/resources/application-prod.yml.tmp zf_platform-admin/src/main/resources/application-prod.yml
         
-        envsubst < zf_platform-admin/src/main/resources/payment_conf.xml > zf_platform-admin/src/main/resources/payment_conf.xml.tmp
-        mv zf_platform-admin/src/main/resources/payment_conf.xml.tmp zf_platform-admin/src/main/resources/payment_conf.xml
+#        envsubst < zf_platform-admin/src/main/resources/payment_conf.xml > zf_platform-admin/src/main/resources/payment_conf.xml.tmp
+#        mv zf_platform-admin/src/main/resources/payment_conf.xml.tmp zf_platform-admin/src/main/resources/payment_conf.xml
 
 
     - name:  使用 Maven 打包專案 (生成 JAR 檔)
