@@ -81,7 +81,7 @@ mybatis-plus:
 
   # 說明:typeAliases-package: 設定別名掃描包,通常用於掃描單表的實體類,但因繼承BaseMapper這很少用
   # 以這個範例項目為例,他應該是這個包下,預設所有實體類的類名(不區分大小寫)為別名
-  typeAliasesPackage: tw.com.zf_occupational_safety_platform.pojo.entity
+  typeAliasesPackage: tw.com.zf_occupational_safety_platform.pojo.**
   # 配置設定
   configuration:
     # 配置輸出日誌-方便查看SQL語句
