@@ -194,7 +194,7 @@ public class CourseChapterManager {
 
 			// 設定 總章節數 與 已完成章節數（加上 Math.max 防止減到負數）
 			int newTotal = Math.max(0, courseEnrollment.getTotalChapters() - affectedRows.size());
-			int newCompleted = Math.max(0, courseEnrollment.getCompletedChapters() - completedRows.size());
+			int newCompleted = Math.max(0, courseEnrollment.getCompletedChapters() - (completedRows == null ? 0 : completedRows.size()));
 
 			// 設定 總章節 數 減去 受影響的章節
 			courseEnrollment.setTotalChapters(newTotal);
