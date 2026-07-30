@@ -36,7 +36,7 @@ spring:
     driver-class-name: org.mariadb.jdbc.Driver
     # 配置URL,mysql8.0剛出時不配置?serverTimezone=Asia/Taipei,會報啟動錯誤
     # 現在好像解決了
-    url: jdbc:mariadb://localhost:3306/topbs2026_international_conference?rewriteBatchedStatements=true
+    url: jdbc:mariadb://localhost:3306/zf_occupational_safety_platform?rewriteBatchedStatements=true
     # 配置連接用戶
     username: ${DB_USER}
     # 配置用戶密碼
@@ -69,7 +69,7 @@ spring:
         # !!! 关键配置 !!!
         # 指向您的 MinIO 服务地址和 API 端口 (默认通常是 9000)
         endpoint: http://localhost:9000
-        bucketName: topbs
+        bucketName: zf-platform2026
         # MinIO 强制使用 Path Style 路径，这通常是 S3 兼容服务所需要的
         path-style-access-enabled: true
 
