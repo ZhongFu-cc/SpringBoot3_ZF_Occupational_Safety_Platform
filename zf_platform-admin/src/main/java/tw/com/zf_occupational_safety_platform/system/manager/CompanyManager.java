@@ -38,6 +38,7 @@ import tw.com.zf_occupational_safety_platform.system.exception.SysUserException;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.StagingCheckResultDTO;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.EmployeeVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysRole;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
@@ -92,7 +93,7 @@ public class CompanyManager {
 	 * @param sysUserVO
 	 * @return
 	 */
-	public SysUser getEmployee(Long sysUserId, SysUserVO sysUserVO) {
+	public EmployeeVO getEmployee(Long sysUserId, SysUserVO sysUserVO) {
 
 		SysUser sysUser = sysUserService.get(sysUserId);
 
@@ -105,7 +106,18 @@ public class CompanyManager {
 			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
-		return sysUser;
+		EmployeeVO employeeVO = sysUserConvert.entityToEmployeeVO(sysUser);
+
+		// 補上部門名稱，員工可能尚未分配部門
+		if (sysUser.getDepartmentId() != null) {
+			Department department = departmentService.getByIdAndCompany(sysUser.getDepartmentId(),
+					sysUser.getCompanyId());
+			if (department != null) {
+				employeeVO.setDepartmentName(department.getName());
+			}
+		}
+
+		return employeeVO;
 
 	}
 
@@ -118,8 +130,24 @@ public class CompanyManager {
 	 * @param queryText
 	 * @return
 	 */
-	public IPage<SysUser> findEmployee(Page<SysUser> pageInfo, SysUserVO sysUserVO, String queryText) {
-		return sysUserService.findByCompany(pageInfo, sysUserVO.getParentId(), sysUserVO.getCompanyId(), queryText);
+	public IPage<EmployeeVO> findEmployee(Page<SysUser> pageInfo, SysUserVO sysUserVO, String queryText) {
+
+		IPage<SysUser> userPage = sysUserService.findByCompany(pageInfo, sysUserVO.getParentId(),
+				sysUserVO.getCompanyId(), queryText);
+
+		// 公司的部門數量有限，一次撈出建立映射，避免每筆員工都查一次DB
+		Map<Long, String> departmentNameMap = departmentService.findByCompany(sysUserVO.getCompanyId()).stream()
+				.collect(Collectors.toMap(Department::getDepartmentId, Department::getName));
+
+		List<EmployeeVO> vos = userPage.getRecords().stream().map(sysUser -> {
+			EmployeeVO vo = sysUserConvert.entityToEmployeeVO(sysUser);
+			vo.setDepartmentName(departmentNameMap.get(sysUser.getDepartmentId()));
+			return vo;
+		}).toList();
+
+		Page<EmployeeVO> voPage = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+		voPage.setRecords(vos);
+		return voPage;
 	}
 
 	/**

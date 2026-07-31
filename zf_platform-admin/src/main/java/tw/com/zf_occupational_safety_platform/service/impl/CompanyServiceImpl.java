@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -31,6 +33,11 @@ public class CompanyServiceImpl extends ServiceImpl<CompanyMapper, Company> impl
 	@Override
 	public Company get(Long companyId) {
 		return baseMapper.selectById(companyId);
+	}
+
+	@Override
+	public List<Company> findByQuery(String queryText) {
+		return baseMapper.selectByQuery(queryText);
 	}
 
 	@Override
