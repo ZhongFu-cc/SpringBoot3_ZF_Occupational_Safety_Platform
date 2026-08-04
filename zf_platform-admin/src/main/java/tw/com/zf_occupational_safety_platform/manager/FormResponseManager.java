@@ -200,6 +200,10 @@ public class FormResponseManager {
 		List<ResponseAnswer> responseAnswerList = new ArrayList<>(quizResponseDTO.getResponseAnswer().size());
 		List<AnswerResultVO> answerResultVOList = new ArrayList<>(quizResponseDTO.getResponseAnswer().size());
 
+		// 本次提交視為一次作答，整份測驗只 +1
+		Integer quizAttempts = chapterProgress.getQuizAttempts();
+		chapterProgress.setQuizAttempts((quizAttempts == null ? 0 : quizAttempts) + 1);
+
 		// 6.遍歷這次的作答
 		for (AddResponseAnswerDTO addResponseAnswerDTO : quizResponseDTO.getResponseAnswer()) {
 
@@ -225,11 +229,6 @@ public class FormResponseManager {
 							answerResultVO.setYourAnswer(responseAnswer.getAnswerValue());
 
 							boolean isCorrect = correct.getId().equals(responseAnswer.getChoiceId());
-							// 提取回答次數 , +1後重設置
-							Integer quizAttempts = chapterProgress.getQuizAttempts();
-							quizAttempts = quizAttempts == null ? 0 : quizAttempts;
-							quizAttempts += 1;
-							chapterProgress.setQuizAttempts(quizAttempts);
 
 							// 當回答正確
 							if (isCorrect) {

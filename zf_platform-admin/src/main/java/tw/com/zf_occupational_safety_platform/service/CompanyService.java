@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service;
 
+import java.util.List;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -19,6 +21,8 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.Company;
 public interface CompanyService extends IService<Company> {
 
 	Company get(Long companyId);
+	
+	List<Company> findByQuery(String queryText);
 
 	IPage<Company> findPageByQuery(Page<Company> pageInfo, String queryText);
 

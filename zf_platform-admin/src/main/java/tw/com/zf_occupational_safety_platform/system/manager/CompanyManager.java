@@ -1,11 +1,14 @@
 package tw.com.zf_occupational_safety_platform.system.manager;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
@@ -16,20 +19,30 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tw.com.zf_occupational_safety_platform.enums.ChapterContentTypeEnum;
 import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
+import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.MissingRequestParameterException;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
+import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
+import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseChapter;
+import tw.com.zf_occupational_safety_platform.pojo.entity.CourseEnrollment;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Department;
 import tw.com.zf_occupational_safety_platform.pojo.entity.DepartmentCourse;
 import tw.com.zf_occupational_safety_platform.pojo.entity.StagingSysUser;
 import tw.com.zf_occupational_safety_platform.pojo.excel.EmployeeExcel;
+import tw.com.zf_occupational_safety_platform.service.ChapterProgressService;
 import tw.com.zf_occupational_safety_platform.service.CompanyCourseService;
+import tw.com.zf_occupational_safety_platform.service.CourseChapterService;
 import tw.com.zf_occupational_safety_platform.service.CourseEnrollmentService;
+import tw.com.zf_occupational_safety_platform.service.CourseService;
 import tw.com.zf_occupational_safety_platform.service.DepartmentCourseService;
 import tw.com.zf_occupational_safety_platform.service.DepartmentService;
 import tw.com.zf_occupational_safety_platform.service.StagingSysUserService;
@@ -38,6 +51,7 @@ import tw.com.zf_occupational_safety_platform.system.exception.SysUserException;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.StagingCheckResultDTO;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.EmployeeVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysRole;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
@@ -66,6 +80,9 @@ public class CompanyManager {
 	private final DepartmentCourseService departmentCourseService;
 	private final CompanyCourseService companyCourseService;
 	private final CourseEnrollmentService courseEnrollmentService;
+	private final CourseService courseService;
+	private final CourseChapterService courseChapterService;
+	private final ChapterProgressService chapterProgressService;
 
 	/**
 	 * 根據 課程分派規則，為所有<br>
@@ -92,7 +109,7 @@ public class CompanyManager {
 	 * @param sysUserVO
 	 * @return
 	 */
-	public SysUser getEmployee(Long sysUserId, SysUserVO sysUserVO) {
+	public EmployeeVO getEmployee(Long sysUserId, SysUserVO sysUserVO) {
 
 		SysUser sysUser = sysUserService.get(sysUserId);
 
@@ -105,7 +122,18 @@ public class CompanyManager {
 			throw new PermissionException("您無權操作此資源，該資料不屬於您的負責範圍。");
 		}
 
-		return sysUser;
+		EmployeeVO employeeVO = sysUserConvert.entityToEmployeeVO(sysUser);
+
+		// 補上部門名稱，員工可能尚未分配部門
+		if (sysUser.getDepartmentId() != null) {
+			Department department = departmentService.getByIdAndCompany(sysUser.getDepartmentId(),
+					sysUser.getCompanyId());
+			if (department != null) {
+				employeeVO.setDepartmentName(department.getName());
+			}
+		}
+
+		return employeeVO;
 
 	}
 
@@ -118,8 +146,24 @@ public class CompanyManager {
 	 * @param queryText
 	 * @return
 	 */
-	public IPage<SysUser> findEmployee(Page<SysUser> pageInfo, SysUserVO sysUserVO, String queryText) {
-		return sysUserService.findByCompany(pageInfo, sysUserVO.getParentId(), sysUserVO.getCompanyId(), queryText);
+	public IPage<EmployeeVO> findEmployee(Page<SysUser> pageInfo, SysUserVO sysUserVO, String queryText) {
+
+		IPage<SysUser> userPage = sysUserService.findByCompany(pageInfo, sysUserVO.getParentId(),
+				sysUserVO.getCompanyId(), queryText);
+
+		// 公司的部門數量有限，一次撈出建立映射，避免每筆員工都查一次DB
+		Map<Long, String> departmentNameMap = departmentService.findByCompany(sysUserVO.getCompanyId()).stream()
+				.collect(Collectors.toMap(Department::getDepartmentId, Department::getName));
+
+		List<EmployeeVO> vos = userPage.getRecords().stream().map(sysUser -> {
+			EmployeeVO vo = sysUserConvert.entityToEmployeeVO(sysUser);
+			vo.setDepartmentName(departmentNameMap.get(sysUser.getDepartmentId()));
+			return vo;
+		}).toList();
+
+		Page<EmployeeVO> voPage = new Page<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+		voPage.setRecords(vos);
+		return voPage;
 	}
 
 	/**
@@ -231,6 +275,7 @@ public class CompanyManager {
 	 * 
 	 * @param addUserDTO
 	 */
+	@Transactional
 	public void createEmployee(AddSysUserDTO addSysUserDTO, SysUserVO sysUserVO) {
 
 		if (addSysUserDTO.getDepartmentId() == null) {
@@ -244,10 +289,12 @@ public class CompanyManager {
 		sysUser.setCompanyId(sysUserVO.getCompanyId());
 		sysUser.setCompanyName(sysUserVO.getCompanyName());
 
+		// 校驗重複帳號
 		boolean accountExist = sysUserService.validAccountExist(sysUser);
 		if (accountExist) {
 			throw new SysUserException("系統內已有重複帳號，請更換帳號使用");
 		}
+		// 校驗重複Email
 		boolean emailExist = sysUserService.validEmailExist(sysUser);
 		if (emailExist) {
 			throw new SysUserException("系統內已有重複E-Mail，請更換E-Mail使用");
@@ -261,10 +308,24 @@ public class CompanyManager {
 		// 為新的企業員工添加角色
 		sysUserRoleService.assignRole2User(sysUser.getSysUserId(), sysRole.getSysRoleId());
 
-		// 創建完後，查看目前部門有無分配課程，如果有則自動幫他報名
+		// 創建完後，查看目前部門有無分配課程，如果有則自動幫他報名並建立章節進度
+		enrollDepartmentCourses(sysUser, sysUserVO);
+	}
+
+	/**
+	 * 為新建立的企業員工，報名其部門應上的課程，<br>
+	 * 並一併建立每個章節的個人進度 (chapter_progress)<br>
+	 * 作法對齊 DepartmentManager.oneClickEnrollment
+	 *
+	 * @param sysUser  新建立的員工
+	 * @param operator 操作者(企業管理者)
+	 */
+	private void enrollDepartmentCourses(SysUser sysUser, SysUserVO operator) {
+
+		// 查詢部門課程
 		List<DepartmentCourse> departmentCourses = departmentCourseService
 				.findByDepartmentId(sysUser.getDepartmentId());
-		
+
 		// 如果沒有部門課程，直接return
 		if (departmentCourses.isEmpty()) {
 			return;
@@ -278,7 +339,84 @@ public class CompanyManager {
 		}
 		Set<Long> courseIds = companyCourses.stream().map(CompanyCourse::getCourseId).collect(Collectors.toSet());
 
-		courseEnrollmentService.batchCreate(sysUser, courseIds);
+		// 一次查所有課程
+		Map<Long, Course> courseMap = courseService.findByIds(courseIds)
+				.stream()
+				.collect(Collectors.toMap(Course::getCourseId, Function.identity()));
+
+		// 一次查所有非目錄章節， courseId -> chapter list
+		Map<Long, List<CourseChapter>> chapterMap = courseChapterService.findNonDirectoryByCourseIds(courseIds)
+				.stream()
+				.collect(Collectors.groupingBy(CourseChapter::getCourseId));
+
+		List<CourseEnrollment> enrollments = new ArrayList<>();
+		List<ChapterProgress> progresses = new ArrayList<>();
+
+		LocalDateTime now = LocalDateTime.now();
+
+		// 新用戶不可能有既有報名，所以不需再做重複報名的排除
+		for (Long courseId : courseIds) {
+
+			Course course = courseMap.get(courseId);
+
+			if (course == null) {
+				continue;
+			}
+
+			List<CourseChapter> courseChapters = chapterMap.getOrDefault(courseId, Collections.emptyList());
+
+			// 先取得 Snowflake ID，章節進度才有辦法直接關聯到這筆報名
+			Long enrollmentId = IdWorker.getId();
+
+			CourseEnrollment enrollment = new CourseEnrollment();
+			enrollment.setCourseEnrollmentId(enrollmentId);
+			enrollment.setCompanyId(sysUser.getCompanyId());
+			enrollment.setDepartmentId(sysUser.getDepartmentId());
+			enrollment.setSysUserId(sysUser.getSysUserId());
+			enrollment.setCourseId(courseId);
+			enrollment.setStatus(CourseStatusEnum.NOT_STARTED);
+			enrollment.setCompletedChapters(0);
+			enrollment.setIsChaptersDone(CommonStatusEnum.NO);
+			enrollment.setIsMinutesMet(CommonStatusEnum.NO);
+			enrollment.setEnrolledAt(now);
+			enrollment.setTotalChapters(courseChapters.size());
+			enrollment.setRequiredSeconds(course.getTotalMinutes() * 60);
+			enrollment.setCreateBy(operator.getAccount());
+
+			enrollments.add(enrollment);
+
+			// 建立章節進度
+			for (CourseChapter chapter : courseChapters) {
+
+				ChapterProgress progress = new ChapterProgress();
+
+				progress.setCourseEnrollmentId(enrollmentId);
+				progress.setCourseChapterId(chapter.getCourseChapterId());
+				progress.setCourseId(chapter.getCourseId());
+				progress.setSysUserId(sysUser.getSysUserId());
+				progress.setStatus(CourseStatusEnum.NOT_STARTED);
+
+				// 如果當前章節的類別為測驗
+				if (ChapterContentTypeEnum.QUIZ.equals(chapter.getContentType())) {
+					progress.setIsQuizPassed(CommonStatusEnum.NO);
+				} else {
+					// 如果不是測驗，直接當作測驗通過
+					progress.setIsQuizPassed(CommonStatusEnum.YES);
+					progress.setQuizScore(100);
+				}
+
+				progresses.add(progress);
+			}
+		}
+
+		// 批次新增
+		if (!enrollments.isEmpty()) {
+			courseEnrollmentService.saveBatch(enrollments);
+		}
+
+		if (!progresses.isEmpty()) {
+			chapterProgressService.saveBatch(progresses);
+		}
 	}
 
 	/**

@@ -31,6 +31,7 @@ import tw.com.zf_occupational_safety_platform.system.manager.CompanyManager;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.UpdateUserStatus;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.EmployeeVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 import tw.com.zf_occupational_safety_platform.system.service.SysUserService;
@@ -70,10 +71,10 @@ public class SysCompanyController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@SaCheckRole("company_manager")
 	@GetMapping("{id}")
-	public R<SysUser> getUser(@PathVariable("id") @Schema(type = "string") Long id) {
+	public R<EmployeeVO> getUser(@PathVariable("id") @Schema(type = "string") Long id) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
-		SysUser sysUser = companyManager.getEmployee(id, sysUserVO);
-		return R.ok(sysUser);
+		EmployeeVO employeeVO = companyManager.getEmployee(id, sysUserVO);
+		return R.ok(employeeVO);
 	}
 
 	/**
@@ -89,11 +90,11 @@ public class SysCompanyController {
 			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
 	@Operation(summary = "查詢child使用者 (企業員工)")
 	@SaCheckRole("company_manager")
-	public R<IPage<SysUser>> findDirectChildUser(@RequestParam Integer page, @RequestParam Integer size,
+	public R<IPage<EmployeeVO>> findDirectChildUser(@RequestParam Integer page, @RequestParam Integer size,
 			@RequestParam(required = false) String queryText) {
 		SysUserVO sysUserVO = authManager.getUserInfo();
 		Page<SysUser> pageInfo = new Page<>(page, size);
-		IPage<SysUser> userPage = companyManager.findEmployee(pageInfo, sysUserVO, queryText);
+		IPage<EmployeeVO> userPage = companyManager.findEmployee(pageInfo, sysUserVO, queryText);
 		return R.ok(userPage);
 	}
 

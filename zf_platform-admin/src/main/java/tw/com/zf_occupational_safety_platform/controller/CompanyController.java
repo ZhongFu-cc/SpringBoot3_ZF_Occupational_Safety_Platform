@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.controller;
 
+import java.util.List;
+
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,6 +61,22 @@ public class CompanyController {
 	public R<Company> getCompany(@PathVariable("id") @Schema(type = "string") Long id) {
 		Company courseCategory = companyService.get(id);
 		return R.ok(courseCategory);
+	}
+
+	/**
+	 * 查詢 全部公司列表
+	 * 
+	 * @param queryText
+	 * @return
+	 */
+	@GetMapping()
+	@Parameters({
+			@Parameter(name = "Authorization", description = "請求頭token,token-value開頭必須為Bearer ", required = true, in = ParameterIn.HEADER) })
+	@Operation(summary = "查詢 公司列表")
+	@SaCheckRole("super-admin")
+	public R<List<Company>> findCompanys(@RequestParam(required = false) String queryText) {
+		List<Company> companys = companyService.findByQuery(queryText);
+		return R.ok(companys);
 	}
 
 	/**

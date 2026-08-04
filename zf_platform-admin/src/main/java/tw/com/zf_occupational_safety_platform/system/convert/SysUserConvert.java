@@ -6,6 +6,7 @@ import tw.com.zf_occupational_safety_platform.pojo.entity.StagingSysUser;
 import tw.com.zf_occupational_safety_platform.pojo.excel.EmployeeExcel;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.AddSysUserDTO;
 import tw.com.zf_occupational_safety_platform.system.pojo.DTO.PutSysUserDTO;
+import tw.com.zf_occupational_safety_platform.system.pojo.VO.EmployeeVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.VO.SysUserVO;
 import tw.com.zf_occupational_safety_platform.system.pojo.entity.SysUser;
 
@@ -18,6 +19,9 @@ public interface SysUserConvert {
 	
 	//最後返回為SysUserVo對象, 方法名為entityToVO, 參數為SysUser對象
 	SysUserVO entityToVO(SysUser sysUser);
+
+	//企業員工對象, 部門名稱由 Manager 層補上
+	EmployeeVO entityToEmployeeVO(SysUser sysUser);
 	
 	SysUser employeeExcelToEntity(EmployeeExcel employeeExcel);
 	
