@@ -12,6 +12,10 @@ public class AddSysUserDTO {
 	@Schema(description = "公司ID",type = "string")
 	private Long companyId;
 	
+//	@NotBlank
+	@Schema(description = "公司名稱")
+	private String companyName;
+	
 	@Schema(description = "部門ID",type = "string")
 	private Long departmentId;
 	
@@ -34,10 +38,6 @@ public class AddSysUserDTO {
 	@NotBlank
 	@Schema(description = "電話號碼")
 	private String phone;
-
-//	@NotBlank
-	@Schema(description = "公司名稱")
-	private String companyName;
 
 	@Schema(description = "備註,通常寫這個使用者的主要角色")
 	private String remark;
