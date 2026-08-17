@@ -1,5 +1,6 @@
 package tw.com.zf_occupational_safety_platform.system.service;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -31,6 +32,15 @@ public interface SysUserRoleService extends IService<SysUserRole> {
 	 * @param sysRoleId
 	 */
 	void assignRole2User(Long sysUserId, Long sysRoleId);
+
+	/**
+	 * 為多個使用者 批次添加 同一個角色<br>
+	 * 用於Excel批量匯入的情境,避免逐筆insert
+	 *
+	 * @param sysUserIds
+	 * @param sysRoleId
+	 */
+	void assignRole2Users(Collection<Long> sysUserIds, Long sysRoleId);
 
 	/**
 	 * 刪除使用者所有角色<br>

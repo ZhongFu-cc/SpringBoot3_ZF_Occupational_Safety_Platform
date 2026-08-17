@@ -173,7 +173,7 @@ public class DepartmentManager {
 
 	/**
 	 * 為企業所有部門員工，報名應上的課程
-	 * 
+	 *
 	 * @param operator
 	 */
 	@Transactional
@@ -191,30 +191,58 @@ public class DepartmentManager {
 		// 2. 查詢部門所有員工
 		List<SysUser> employees = sysUserService.findByDepartments(departmentIds);
 
-		if (employees.isEmpty()) {
+		// 3. 交由共用方法處理報名
+		this.enrollEmployees(employees, operator);
+	}
+
+	/**
+	 * 為指定的一批員工，報名其所屬部門應上的課程<br>
+	 * 並一併建立每個非目錄章節的個人進度<br>
+	 * <br>
+	 * 共用於：一鍵報名(全公司)、單筆新增員工、Excel批量匯入員工<br>
+	 * 內部會排除既有報名，重複呼叫是安全的
+	 *
+	 * @param employees 要報名的員工，需帶有 sysUserId 與 departmentId
+	 * @param operator  操作者(企業管理者)
+	 */
+	@Transactional
+	public void enrollEmployees(List<SysUser> employees, SysUserVO operator) {
+
+		if (employees == null || employees.isEmpty()) {
 			return;
 		}
 
-		// 3. 部門 -> companyCourseIds
+		// 1. 取出這批員工所屬的部門，員工可能尚未分配部門
+		List<Long> departmentIds = employees.stream()
+				.map(SysUser::getDepartmentId)
+				.filter(Objects::nonNull)
+				.distinct()
+				.toList();
+
+		if (departmentIds.isEmpty()) {
+			return;
+		}
+
+		// 2. 部門 -> companyCourseIds
 		Map<Long, List<Long>> departmentCompanyCourseMap = departmentCourseService.mapByDepartmentId(departmentIds);
 		if (departmentCompanyCourseMap.isEmpty()) {
 			return;
 		}
 
-		// 4. 收集所有 companyCourseId
+		// 3. 收集所有 companyCourseId
 		List<Long> companyCourseIds = departmentCompanyCourseMap.values()
 				.stream()
 				.flatMap(List::stream)
 				.distinct()
 				.toList();
 
-		// 5. companyCourse -> course
+		// 4. companyCourse -> course
 		List<CompanyCourse> companyCourses = companyCourseService.findByIds(companyCourseIds);
 
 		Map<Long, Long> companyCourseToCourseMap = companyCourses.stream()
 				.collect(Collectors.toMap(CompanyCourse::getCompanyCourseId, CompanyCourse::getCourseId));
 
-		// 6. department -> courseIds
+		// 5. department -> courseIds
 		Map<Long, List<Long>> departmentCourseMap = departmentCompanyCourseMap.entrySet()
 				.stream()
 				.collect(Collectors.toMap(Map.Entry::getKey,
@@ -225,19 +253,19 @@ public class DepartmentManager {
 								.distinct()
 								.toList()));
 
-		// 7. 所有課程ID
+		// 6. 所有課程ID
 		List<Long> allCourseIds = departmentCourseMap.values().stream().flatMap(List::stream).distinct().toList();
 
 		if (allCourseIds.isEmpty()) {
 			return;
 		}
 
-		// 8. 一次查所有課程
+		// 7. 一次查所有課程
 		Map<Long, Course> courseMap = courseService.findByIds(allCourseIds)
 				.stream()
 				.collect(Collectors.toMap(Course::getCourseId, Function.identity()));
 
-		// 9. 一次查所有非目錄章節
+		// 8. 一次查所有非目錄章節
 		List<CourseChapter> chapters = courseChapterService.findNonDirectoryByCourseIds(allCourseIds);
 
 		// courseId -> chapter list
@@ -249,7 +277,7 @@ public class DepartmentManager {
 				.collect(Collectors.groupingBy(CourseChapter::getCourseId,
 						Collectors.collectingAndThen(Collectors.counting(), Long::intValue)));
 
-		// 10. 查詢已報名
+		// 9. 查詢已報名
 		List<Long> userIds = employees.stream().map(SysUser::getSysUserId).toList();
 
 		List<CourseEnrollment> existedEnrollments = courseEnrollmentService.findByUsersAndCourses(userIds,
@@ -269,7 +297,7 @@ public class DepartmentManager {
 
 		LocalDateTime now = LocalDateTime.now();
 
-		// 11. 建立 Enrollment 與 Progress
+		// 10. 建立 Enrollment 與 Progress
 		for (SysUser employee : employees) {
 
 			List<Long> requiredCourses = departmentCourseMap.getOrDefault(employee.getDepartmentId(),
@@ -336,7 +364,7 @@ public class DepartmentManager {
 			}
 		}
 
-		// 12. 批次新增
+		// 11. 批次新增
 		if (!enrollments.isEmpty()) {
 			courseEnrollmentService.saveBatch(enrollments);
 		}

@@ -29,6 +29,7 @@ import tw.com.zf_occupational_safety_platform.enums.CommonStatusEnum;
 import tw.com.zf_occupational_safety_platform.enums.CourseStatusEnum;
 import tw.com.zf_occupational_safety_platform.exception.MissingRequestParameterException;
 import tw.com.zf_occupational_safety_platform.exception.PermissionException;
+import tw.com.zf_occupational_safety_platform.manager.DepartmentManager;
 import tw.com.zf_occupational_safety_platform.pojo.entity.ChapterProgress;
 import tw.com.zf_occupational_safety_platform.pojo.entity.CompanyCourse;
 import tw.com.zf_occupational_safety_platform.pojo.entity.Course;
@@ -76,6 +77,7 @@ public class CompanyManager {
 	private final SysUserConvert sysUserConvert;
 	private final SysUserRoleService sysUserRoleService;
 	private final SysRoleService sysRoleService;
+	private final DepartmentManager departmentManager;
 	private final DepartmentService departmentService;
 	private final DepartmentCourseService departmentCourseService;
 	private final CompanyCourseService companyCourseService;
@@ -189,7 +191,24 @@ public class CompanyManager {
 		validateStaging(batchId, companyId);
 
 		// SQL內轉存：由 DB 內部執行 INSERT INTO ... SELECT
-		sysUserService.insertFromStaging(batchId);
+		sysUserService.insertFromStaging(batchId, operator.getRealName());
+
+		// 轉存後、清空前查出這批資料，
+		// staging_sys_user_id 轉存後就是 sys_user_id，故不需再查一次 sys_user
+		List<StagingSysUser> importedStagings = stagingSysUserService.findByBatchId(batchId);
+
+		if (!importedStagings.isEmpty()) {
+
+			List<SysUser> importedUsers = sysUserConvert.stagingToEntity(importedStagings);
+
+			// 比照單筆新增，為這批員工指派 企業員工 角色
+			SysRole sysRole = sysRoleService.getByRoleKey(ROLE_KEY);
+			sysUserRoleService.assignRole2Users(importedUsers.stream().map(SysUser::getSysUserId).toList(),
+					sysRole.getSysRoleId());
+
+			// 比照單筆新增，為這批員工報名所屬部門的課程並建立章節進度
+			departmentManager.enrollEmployees(importedUsers, operator);
+		}
 
 		// Phase 5: cleanup
 		stagingSysUserService.removeByBatchId(batchId);

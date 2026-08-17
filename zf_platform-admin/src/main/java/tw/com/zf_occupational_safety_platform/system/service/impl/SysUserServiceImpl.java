@@ -103,9 +103,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	}
 
 	@Override
-	public void insertFromStaging(String batchId) {
-		// TODO Auto-generated method stub
-
+	public void insertFromStaging(String batchId, String createBy) {
+		baseMapper.insertFromStaging(batchId, createBy);
 	}
 
 	@Override

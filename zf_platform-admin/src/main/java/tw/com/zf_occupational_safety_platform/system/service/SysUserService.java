@@ -137,10 +137,11 @@ public interface SysUserService extends IService<SysUser> {
 
 	/**
 	 * 從臨時表進行新增
-	 * 
+	 *
 	 * @param batchId
+	 * @param createBy 操作者(企業管理者)名稱
 	 */
-	void insertFromStaging(String batchId);
+	void insertFromStaging(String batchId, String createBy);
 
 	/**
 	 * 更新使用者

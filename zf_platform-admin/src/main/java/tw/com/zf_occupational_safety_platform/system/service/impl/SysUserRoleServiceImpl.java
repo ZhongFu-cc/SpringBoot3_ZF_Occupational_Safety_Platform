@@ -1,5 +1,6 @@
 package tw.com.zf_occupational_safety_platform.system.service.impl;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -32,6 +33,23 @@ public class SysUserRoleServiceImpl extends ServiceImpl<SysUserRoleMapper, SysUs
 		sysUserRole.setSysUserId(sysUserId);
 		sysUserRole.setSysRoleId(sysRoleId);
 		baseMapper.insert(sysUserRole);
+	}
+
+	@Override
+	public void assignRole2Users(Collection<Long> sysUserIds, Long sysRoleId) {
+
+		if (sysUserIds == null || sysUserIds.isEmpty()) {
+			return;
+		}
+
+		List<SysUserRole> sysUserRoles = sysUserIds.stream().map(sysUserId -> {
+			SysUserRole sysUserRole = new SysUserRole();
+			sysUserRole.setSysUserId(sysUserId);
+			sysUserRole.setSysRoleId(sysRoleId);
+			return sysUserRole;
+		}).toList();
+
+		this.saveBatch(sysUserRoles);
 	}
 
 	@Override

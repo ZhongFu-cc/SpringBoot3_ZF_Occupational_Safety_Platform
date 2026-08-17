@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.mapper;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -55,6 +57,12 @@ public interface StagingSysUserMapper extends BaseMapper<StagingSysUser> {
 			) t LIMIT 1
 			""")
 	StagingCheckResultDTO executeStagingValidation(@Param("batchId") String batchId);
+
+	default List<StagingSysUser> selectByBatchId(String batchId) {
+		LambdaQueryWrapper<StagingSysUser> queryWrapper = new LambdaQueryWrapper<>();
+		queryWrapper.eq(StagingSysUser::getBatchId, batchId);
+		return this.selectList(queryWrapper);
+	}
 
 	default void deleteByBatchId(String batchId) {
 		LambdaQueryWrapper<StagingSysUser> queryWrapper = new LambdaQueryWrapper<>();

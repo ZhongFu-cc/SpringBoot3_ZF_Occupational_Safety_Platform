@@ -178,9 +178,12 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 	}
 
 	/**
-	 * 從臨時表新增進sys_user表
+	 * 從臨時表新增進sys_user表<br>
+	 * 注意:原生SQL不會觸發 MybatisPlusMetaObjectHander 的自動填充,<br>
+	 * 所以 is_active、is_deleted、create_by、create_date 都要在SQL內自行給值
 	 *
 	 * @param batchId
+	 * @param createBy 操作者(企業管理者)名稱
 	 * @return
 	 */
 	@Insert("""
@@ -195,7 +198,10 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 			    real_name,
 			    company_name,
 			    phone,
-			    create_time
+			    is_active,
+			    is_deleted,
+			    create_by,
+			    create_date
 			)
 			SELECT
 				staging_sys_user_id,
@@ -208,11 +214,14 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 			    real_name,
 			    company_name,
 			    phone,
+			    1,
+			    0,
+			    #{createBy},
 			    NOW()
 			FROM staging_sys_user
 			WHERE batch_id = #{batchId}
 			""")
-	int insertFromStaging(@Param("batchId") String batchId);
+	int insertFromStaging(@Param("batchId") String batchId, @Param("createBy") String createBy);
 
 	default List<SysUser> selectByDepartmentIds(Collection<Long> departmentIds) {
 		LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();

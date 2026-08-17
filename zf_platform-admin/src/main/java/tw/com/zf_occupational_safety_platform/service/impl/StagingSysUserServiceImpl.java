@@ -1,5 +1,7 @@
 package tw.com.zf_occupational_safety_platform.service.impl;
 
+import java.util.List;
+
 import tw.com.zf_occupational_safety_platform.pojo.entity.StagingSysUser;
 import tw.com.zf_occupational_safety_platform.mapper.StagingSysUserMapper;
 import tw.com.zf_occupational_safety_platform.service.StagingSysUserService;
@@ -27,6 +29,11 @@ public class StagingSysUserServiceImpl extends ServiceImpl<StagingSysUserMapper,
 
 	public StagingCheckResultDTO executeStagingValidation(String batchId) {
 		return baseMapper.executeStagingValidation(batchId);
+	}
+
+	@Override
+	public List<StagingSysUser> findByBatchId(String batchId) {
+		return baseMapper.selectByBatchId(batchId);
 	}
 
 	@Override
